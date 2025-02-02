@@ -33,33 +33,35 @@ export default function Sell() {
     const formData = new FormData(e.currentTarget);
 
     try {
-      // Créer la propriété
+      // Créer la propriété avec les types corrects
+      const propertyData = {
+        owner_id: user.profile.id,
+        title: formData.get("title") as string,
+        description: formData.get("description") as string | null,
+        property_type: formData.get("property_type") as string,
+        transaction_type: formData.get("transaction_type") as string,
+        price: Number(formData.get("price")),
+        city: formData.get("city") as string,
+        neighborhood: formData.get("neighborhood") as string,
+        area_size: Number(formData.get("area_size")),
+        bedrooms: formData.get("bedrooms") ? Number(formData.get("bedrooms")) : null,
+        bathrooms: formData.get("bathrooms") ? Number(formData.get("bathrooms")) : null,
+        is_furnished: formData.get("is_furnished") === "true",
+        distance_from_road: formData.get("distance_from_road") 
+          ? Number(formData.get("distance_from_road")) 
+          : null,
+      };
+
       const { data: property, error: propertyError } = await supabase
         .from("properties")
-        .insert([
-          {
-            owner_id: user.profile.id,
-            title: formData.get("title"),
-            description: formData.get("description"),
-            property_type: formData.get("property_type"),
-            transaction_type: formData.get("transaction_type"),
-            price: formData.get("price"),
-            city: formData.get("city"),
-            neighborhood: formData.get("neighborhood"),
-            area_size: formData.get("area_size"),
-            bedrooms: formData.get("bedrooms"),
-            bathrooms: formData.get("bathrooms"),
-            is_furnished: formData.get("is_furnished") === "true",
-            distance_from_road: formData.get("distance_from_road"),
-          },
-        ])
+        .insert([propertyData])
         .select()
         .single();
 
       if (propertyError) throw propertyError;
 
       // Uploader les images
-      if (images) {
+      if (images && property) {
         for (let i = 0; i < images.length; i++) {
           const file = images[i];
           const fileExt = file.name.split(".").pop();
