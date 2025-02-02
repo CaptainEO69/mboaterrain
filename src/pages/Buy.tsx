@@ -1,11 +1,62 @@
-import { SearchBar } from "@/components/SearchBar";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { PropertyCard } from "@/components/PropertyCard";
 import { BottomNav } from "@/components/BottomNav";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+type Property = {
+  id: string;
+  title: string;
+  price: number;
+  city: string;
+  neighborhood: string;
+  area_size: number;
+  property_images: {
+    image_url: string;
+    is_main: boolean;
+  }[];
+};
+
 export default function Buy() {
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("properties")
+          .select(`
+            *,
+            property_images (
+              image_url,
+              is_main
+            )
+          `)
+          .eq("transaction_type", "sale")
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        setProperties(data || []);
+      } catch (error: any) {
+        console.error("Erreur lors du chargement des propriétés:", error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProperties();
+  }, []);
+
   return (
     <div className="min-h-screen pb-20">
       <div className="bg-white p-4 shadow-md">
@@ -20,7 +71,8 @@ export default function Buy() {
               <SelectItem value="house">Maison</SelectItem>
               <SelectItem value="apartment">Appartement</SelectItem>
               <SelectItem value="land">Terrain</SelectItem>
-              <SelectItem value="commercial">Local commercial</SelectItem>
+              <SelectItem value="office">Bureau</SelectItem>
+              <SelectItem value="store">Commerce</SelectItem>
             </SelectContent>
           </Select>
 
@@ -32,31 +84,10 @@ export default function Buy() {
               <SelectItem value="yaounde">Yaoundé</SelectItem>
               <SelectItem value="douala">Douala</SelectItem>
               <SelectItem value="bafoussam">Bafoussam</SelectItem>
-              <SelectItem value="bamenda">Bamenda</SelectItem>
-              <SelectItem value="garoua">Garoua</SelectItem>
-              <SelectItem value="maroua">Maroua</SelectItem>
-              <SelectItem value="bertoua">Bertoua</SelectItem>
-              <SelectItem value="ebolowa">Ebolowa</SelectItem>
             </SelectContent>
           </Select>
 
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Quartier" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="bastos">Bastos</SelectItem>
-              <SelectItem value="mvan">Mvan</SelectItem>
-              <SelectItem value="nsimeyong">Nsimeyong</SelectItem>
-              <SelectItem value="mendong">Mendong</SelectItem>
-              <SelectItem value="mvogbi">Mvog-Bi</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Input placeholder="Superficie (m²)" type="number" />
-            <Input placeholder="Budget (FCFA)" type="number" />
-          </div>
+          <Input placeholder="Budget maximum (FCFA)" type="number" />
 
           <Button type="submit" className="w-full bg-cmr-green hover:bg-cmr-green/90">
             Rechercher
@@ -65,27 +96,25 @@ export default function Buy() {
       </div>
 
       <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <PropertyCard
-          title="Villa moderne à Bastos"
-          price="150 000 000 FCFA"
-          location="Bastos, Yaoundé"
-          size="500 m²"
-          imageUrl="/placeholder.svg"
-        />
-        <PropertyCard
-          title="Appartement au centre-ville"
-          price="75 000 000 FCFA"
-          location="Centre, Douala"
-          size="120 m²"
-          imageUrl="/placeholder.svg"
-        />
-        <PropertyCard
-          title="Terrain titré à Nsimeyong"
-          price="45 000 000 FCFA"
-          location="Nsimeyong, Yaoundé"
-          size="400 m²"
-          imageUrl="/placeholder.svg"
-        />
+        {loading ? (
+          <p>Chargement des propriétés...</p>
+        ) : properties.length === 0 ? (
+          <p>Aucune propriété disponible</p>
+        ) : (
+          properties.map((property) => (
+            <PropertyCard
+              key={property.id}
+              title={property.title}
+              price={`${property.price.toLocaleString()} FCFA`}
+              location={`${property.neighborhood}, ${property.city}`}
+              size={`${property.area_size} m²`}
+              imageUrl={
+                property.property_images.find((img) => img.is_main)?.image_url ||
+                "/placeholder.svg"
+              }
+            />
+          ))
+        )}
       </div>
 
       <BottomNav />
