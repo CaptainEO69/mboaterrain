@@ -1,41 +1,47 @@
 import { useState } from "react";
-import { Link, Navigate } from "react-router-dom";
-import { useAuth } from "@/lib/auth";
+import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
-export default function Login() {
+export default function ResetPassword() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, user } = useAuth();
-
-  if (user) {
-    return <Navigate to="/" />;
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
-      await signIn(email, password);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/update-password`,
+      });
+
+      if (error) throw error;
+
+      toast.success("Instructions envoyées par email");
+      setEmail("");
+    } catch (error: any) {
+      toast.error(error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const isFormValid = email.includes('@') && password.length >= 6;
+  const isFormValid = email.includes("@");
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-center text-2xl font-bold">Connexion</CardTitle>
+          <CardTitle className="text-center text-2xl font-bold">
+            Réinitialisation du mot de passe
+          </CardTitle>
           <CardDescription className="text-center">
-            Connectez-vous à votre compte MboaTer
+            Entrez votre email pour recevoir les instructions
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -55,31 +61,6 @@ export default function Login() {
                 placeholder="votre@email.com"
               />
             </div>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                  Mot de passe
-                </label>
-                <Link 
-                  to="/reset-password"
-                  className="text-sm font-medium text-cmr-green hover:text-cmr-green/80"
-                  tabIndex={isLoading ? -1 : 0}
-                >
-                  Mot de passe oublié ?
-                </Link>
-              </div>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={isLoading}
-                className="w-full"
-                placeholder="••••••••"
-                minLength={6}
-              />
-            </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button 
@@ -90,20 +71,19 @@ export default function Login() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Connexion en cours...
+                  Envoi en cours...
                 </>
               ) : (
-                "Se connecter"
+                "Envoyer les instructions"
               )}
             </Button>
             <p className="text-center text-sm">
-              Pas encore de compte ?{" "}
               <Link 
-                to="/register" 
+                to="/login" 
                 className="font-medium text-cmr-green hover:text-cmr-green/80"
                 tabIndex={isLoading ? -1 : 0}
               >
-                S'inscrire
+                Retour à la connexion
               </Link>
             </p>
           </CardFooter>
