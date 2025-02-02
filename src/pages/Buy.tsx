@@ -104,6 +104,7 @@ export default function Buy() {
           properties.map((property) => (
             <PropertyCard
               key={property.id}
+              id={property.id}
               title={property.title}
               price={`${property.price.toLocaleString()} FCFA`}
               location={`${property.neighborhood}, ${property.city}`}

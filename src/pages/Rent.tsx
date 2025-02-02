@@ -103,6 +103,7 @@ export default function Rent() {
           properties.map((property) => (
             <PropertyCard
               key={property.id}
+              id={property.id}
               title={property.title}
               price={`${property.price.toLocaleString()} FCFA/mois`}
               location={`${property.neighborhood}, ${property.city}`}
