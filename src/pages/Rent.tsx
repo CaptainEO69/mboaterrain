@@ -2,15 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PropertyCard } from "@/components/PropertyCard";
 import { BottomNav } from "@/components/BottomNav";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { PropertySearchForm, PropertyFilters } from "@/components/PropertySearchForm";
 
 type Property = {
   id: string;
@@ -29,31 +21,48 @@ export default function Rent() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("properties")
-          .select(`
-            *,
-            property_images (
-              image_url,
-              is_main
-            )
-          `)
-          .eq("transaction_type", "rent")
-          .order("created_at", { ascending: false });
+  const fetchProperties = async (filters: PropertyFilters = {}) => {
+    try {
+      let query = supabase
+        .from("properties")
+        .select(`
+          *,
+          property_images (
+            image_url,
+            is_main
+          )
+        `)
+        .eq("transaction_type", "rent")
+        .order("created_at", { ascending: false });
 
-        if (error) throw error;
-
-        setProperties(data || []);
-      } catch (error: any) {
-        console.error("Erreur lors du chargement des propriétés:", error.message);
-      } finally {
-        setLoading(false);
+      if (filters.propertyType) {
+        query = query.eq("property_type", filters.propertyType);
       }
-    };
+      if (filters.city) {
+        query = query.eq("city", filters.city);
+      }
+      if (filters.maxPrice) {
+        query = query.lte("price", filters.maxPrice);
+      }
+      if (filters.minSize) {
+        query = query.gte("area_size", filters.minSize);
+      }
+      if (filters.isFurnished !== undefined) {
+        query = query.eq("is_furnished", filters.isFurnished);
+      }
 
+      const { data, error } = await query;
+
+      if (error) throw error;
+      setProperties(data || []);
+    } catch (error: any) {
+      console.error("Erreur lors du chargement des propriétés:", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchProperties();
   }, []);
 
@@ -61,37 +70,7 @@ export default function Rent() {
     <div className="min-h-screen pb-20">
       <div className="bg-white p-4 shadow-md">
         <h1 className="text-xl font-bold mb-4">Louer un bien</h1>
-        
-        <form className="space-y-4">
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Type de bien" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="house">Maison meublée</SelectItem>
-              <SelectItem value="apartment">Maison non meublée</SelectItem>
-              <SelectItem value="land">Appartement meublé</SelectItem>
-              <SelectItem value="office">Appartement non meublé</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Ville" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="yaounde">Yaoundé</SelectItem>
-              <SelectItem value="douala">Douala</SelectItem>
-              <SelectItem value="bafoussam">Bafoussam</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Input placeholder="Budget maximum (FCFA/mois)" type="number" />
-
-          <Button type="submit" className="w-full bg-cmr-green hover:bg-cmr-green/90">
-            Rechercher
-          </Button>
-        </form>
+        <PropertySearchForm transactionType="rent" onSearch={fetchProperties} />
       </div>
 
       <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
