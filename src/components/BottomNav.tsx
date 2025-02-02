@@ -13,17 +13,17 @@ export function BottomNav() {
           <Home size={24} />
           <span className="text-xs mt-1">Accueil</span>
         </Link>
-        <Link to="/search" className={`flex flex-col items-center p-2 ${isActive("/search") ? "text-cmr-green" : "text-gray-600"}`}>
+        <Link to="/buy" className={`flex flex-col items-center p-2 ${isActive("/buy") ? "text-cmr-green" : "text-gray-600"}`}>
           <Search size={24} />
-          <span className="text-xs mt-1">Rechercher</span>
+          <span className="text-xs mt-1">Acheter</span>
         </Link>
-        <Link to="/post" className={`flex flex-col items-center p-2 ${isActive("/post") ? "text-cmr-green" : "text-gray-600"}`}>
+        <Link to="/sell" className={`flex flex-col items-center p-2 ${isActive("/sell") ? "text-cmr-green" : "text-gray-600"}`}>
           <PlusCircle size={24} />
-          <span className="text-xs mt-1">Publier</span>
+          <span className="text-xs mt-1">Vendre</span>
         </Link>
-        <Link to="/profile" className={`flex flex-col items-center p-2 ${isActive("/profile") ? "text-cmr-green" : "text-gray-600"}`}>
+        <Link to="/login" className={`flex flex-col items-center p-2 ${isActive("/login") ? "text-cmr-green" : "text-gray-600"}`}>
           <User size={24} />
-          <span className="text-xs mt-1">Profil</span>
+          <span className="text-xs mt-1">Compte</span>
         </Link>
       </div>
     </nav>
