@@ -13,6 +13,7 @@ import Rent from "./pages/Rent";
 import Sell from "./pages/Sell";
 import Profile from "./pages/Profile";
 import PropertyDetails from "./pages/PropertyDetails";
+import Favorites from "./pages/Favorites";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -36,6 +37,7 @@ const App = () => (
               <Route path="/sell" element={<ProtectedRoute><Sell /></ProtectedRoute>} />
               <Route path="/property/:id" element={<ProtectedRoute><PropertyDetails /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>

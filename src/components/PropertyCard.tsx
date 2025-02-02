@@ -1,6 +1,8 @@
 import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
+import { useFavorites } from "@/hooks/useFavorites";
+import { Button } from "./ui/button";
 
 interface PropertyCardProps {
   id: string;
@@ -13,19 +15,28 @@ interface PropertyCardProps {
 }
 
 export function PropertyCard({ id, title, price, location, size, imageUrl, className }: PropertyCardProps) {
+  const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites();
+  const favorite = isFavorite(id);
+
   return (
     <Link to={`/property/${id}`} className={cn("block rounded-lg overflow-hidden shadow-md bg-white hover:shadow-lg transition-shadow", className)}>
       <div className="relative">
         <img src={imageUrl} alt={title} className="w-full h-48 object-cover" />
-        <button 
-          className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md"
+        <Button
+          variant="secondary"
+          size="icon"
+          className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm hover:bg-white"
           onClick={(e) => {
             e.preventDefault();
-            // TODO: Implement favorites functionality
+            if (favorite) {
+              removeFromFavorites(id);
+            } else {
+              addToFavorites(id);
+            }
           }}
         >
-          <Heart className="w-5 h-5 text-cmr-red" />
-        </button>
+          <Heart className={cn("w-5 h-5", favorite ? "fill-cmr-red text-cmr-red" : "text-cmr-red")} />
+        </Button>
       </div>
       <div className="p-4">
         <h3 className="font-semibold text-lg mb-1">{title}</h3>
