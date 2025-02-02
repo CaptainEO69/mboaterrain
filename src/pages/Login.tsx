@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -35,16 +36,23 @@ export default function Login() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
           },
+          skipBrowserRedirect: false,
         }
       });
-      if (error) throw error;
+      
+      if (error) {
+        console.error("Erreur Google Auth:", error);
+        toast.error("Erreur lors de la connexion avec Google");
+        throw error;
+      }
     } catch (error: any) {
       console.error('Erreur de connexion Google:', error.message);
+      toast.error("Erreur lors de la connexion avec Google");
     } finally {
       setIsGoogleLoading(false);
     }
