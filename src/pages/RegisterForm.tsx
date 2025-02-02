@@ -1,140 +1,109 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { Header } from "@/components/Header";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { useAuth } from "@/lib/auth";
 import { useState } from "react";
-
-type FormData = {
-  email: string;
-  password: string;
-  confirmPassword: string;
-  full_name: string;
-  phone_number: string;
-};
+import { useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function RegisterForm() {
-  const { type } = useParams();
+  const { type } = useParams<{ type: string }>();
   const navigate = useNavigate();
-  const { signUp, createProfile } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const form = useForm<FormData>();
+  const { signUp } = useAuth();
+  
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
-  const onSubmit = async (data: FormData) => {
-    if (data.password !== data.confirmPassword) {
-      form.setError("confirmPassword", {
-        message: "Les mots de passe ne correspondent pas",
-      });
-      return;
-    }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await signUp(email, password);
+  };
 
-    setLoading(true);
-    try {
-      await signUp(data.email, data.password);
-      await createProfile({
-        full_name: data.full_name,
-        phone_number: data.phone_number,
-        user_type: type || "buyer",
-      });
-    } finally {
-      setLoading(false);
+  const getUserTypeLabel = () => {
+    switch (type) {
+      case "owner":
+        return "Propriétaire";
+      case "agent":
+        return "Agent immobilier";
+      case "buyer":
+        return "Acheteur";
+      case "renter":
+        return "Locataire";
+      default:
+        navigate("/register");
+        return "";
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      <div className="container mx-auto p-4">
-        <div className="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow-lg">
-          <h2 className="text-xl font-semibold mb-6">
-            Inscription - {type?.charAt(0).toUpperCase() + type?.slice(1)}
-          </h2>
-
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input type="email" required {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-center text-2xl font-bold">
+            Inscription {getUserTypeLabel()}
+          </CardTitle>
+          <CardDescription className="text-center">
+            Créez votre compte MboaTer
+          </CardDescription>
+        </CardHeader>
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+                Nom complet
+              </label>
+              <Input
+                id="fullName"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
               />
-
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Mot de passe</FormLabel>
-                    <FormControl>
-                      <Input type="password" required {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email
+              </label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
-
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirmer le mot de passe</FormLabel>
-                    <FormControl>
-                      <Input type="password" required {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
+                Numéro de téléphone
+              </label>
+              <Input
+                id="phoneNumber"
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                required
               />
-
-              <FormField
-                control={form.control}
-                name="full_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nom complet</FormLabel>
-                    <FormControl>
-                      <Input required {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Mot de passe
+              </label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
-
-              <FormField
-                control={form.control}
-                name="phone_number"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Numéro de téléphone</FormLabel>
-                    <FormControl>
-                      <Input required {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <Button 
-                type="submit" 
-                className="w-full bg-cmr-green hover:bg-cmr-green/90"
-                disabled={loading}
-              >
-                {loading ? "Inscription en cours..." : "S'inscrire"}
-              </Button>
-            </form>
-          </Form>
-        </div>
-      </div>
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col space-y-4">
+            <Button type="submit" className="w-full">
+              S'inscrire
+            </Button>
+          </CardFooter>
+        </form>
+      </Card>
     </div>
   );
 }
