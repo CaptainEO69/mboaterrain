@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Header } from "@/components/Header";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { House } from "lucide-react";
 
 const userTypes = [
   { id: "proprietaire", label: "Propriétaire" },
@@ -26,18 +26,13 @@ export default function Register() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+      <Header />
+      <div className="flex flex-col items-center justify-center p-4">
         <div className="w-full max-w-md space-y-8 bg-white p-6 rounded-xl shadow-lg">
-          <div className="flex items-center justify-center gap-2">
-            <House className="h-8 w-8 text-cmr-green" />
-            <div className="text-center">
-              <h1 className="text-2xl font-bold text-cmr-green">MboaTer</h1>
-              <p className="text-sm text-gray-600">La première plateforme immobilière 100% camerounaise</p>
-            </div>
-          </div>
-
           <div>
-            <h2 className="text-xl font-semibold text-center mb-6">Choisissez votre profil</h2>
+            <h2 className="text-xl font-semibold text-center mb-6">
+              Choisissez votre profil
+            </h2>
             
             <RadioGroup
               value={userType}
