@@ -1,35 +1,44 @@
 import { Header } from "@/components/Header";
 import { BottomNav } from "@/components/BottomNav";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/lib/auth";
 
 export default function Profile() {
-  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
   return (
     <div className="min-h-screen pb-20">
       <Header />
       
       <div className="p-4 space-y-6">
-        <div className="text-center space-y-4">
-          <h2 className="text-xl font-semibold">Mon Profil</h2>
-          <Button
-            onClick={() => navigate("/login")}
-            className="w-full bg-cmr-green hover:bg-cmr-green/90"
-          >
-            Se connecter
-          </Button>
-          <Button
-            onClick={() => navigate("/register")}
-            variant="outline"
-            className="w-full border-cmr-green text-cmr-green hover:bg-cmr-green/10"
-          >
-            S'inscrire
-          </Button>
-        </div>
+        {user ? (
+          <div className="space-y-4">
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h2 className="text-xl font-semibold mb-4">Mon Profil</h2>
+              <div className="space-y-2">
+                <p><span className="font-medium">Email:</span> {user.email}</p>
+                <p><span className="font-medium">Nom:</span> {user.profile?.full_name}</p>
+                <p><span className="font-medium">Téléphone:</span> {user.profile?.phone_number}</p>
+                <p><span className="font-medium">Type:</span> {user.profile?.user_type}</p>
+              </div>
+            </div>
+            
+            <Button
+              onClick={() => signOut()}
+              variant="destructive"
+              className="w-full"
+            >
+              Se déconnecter
+            </Button>
+          </div>
+        ) : (
+          <div className="text-center">
+            <p>Vous devez être connecté pour voir votre profil.</p>
+          </div>
+        )}
       </div>
 
       <BottomNav />
     </div>
   );
-};
+}

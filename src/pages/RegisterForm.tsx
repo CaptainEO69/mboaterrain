@@ -4,62 +4,43 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
+import { useAuth } from "@/lib/auth";
+import { useState } from "react";
+
+type FormData = {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  full_name: string;
+  phone_number: string;
+};
 
 export default function RegisterForm() {
   const { type } = useParams();
   const navigate = useNavigate();
-  const form = useForm();
+  const { signUp, createProfile } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const form = useForm<FormData>();
 
-  const getFormFields = () => {
-    const commonFields = [
-      { name: "nom", label: "Nom" },
-      { name: "prenom", label: "Prénom" },
-      { name: "lieuNaissance", label: "Lieu de naissance" },
-      { name: "anneeNaissance", label: "Année de naissance" },
-      { name: "numeroCNI", label: "Numéro de CNI" },
-      { name: "profession", label: "Profession" },
-      { name: "lieuHabitation", label: "Lieu d'habitation" },
-    ];
-
-    switch (type) {
-      case "proprietaire":
-        return commonFields;
-      case "vendeur":
-        return [
-          ...commonFields,
-          { name: "motifVente", label: "Motif de vente" },
-          { name: "preuveVente", label: "Preuve du droit de vente" },
-        ];
-      case "acheteur":
-        return commonFields.slice(0, 6); // Exclure lieu d'habitation
-      case "geometre":
-        return [
-          ...commonFields,
-          { name: "assermente", label: "Assermenté" },
-          { name: "prixBornage", label: "Prix du bornage" },
-          { name: "prixImplantation", label: "Prix de l'implantation" },
-          { name: "prixLeveeTopographique", label: "Prix de la levée topographique" },
-          { name: "prixDossierTechnique", label: "Prix du dossier technique" },
-        ];
-      case "notaire":
-      case "clerc":
-        return [
-          ...commonFields,
-          { name: "prixOuvertureDossier", label: "Prix d'ouverture du dossier" },
-          { name: "prixMorcellement", label: "Prix du morcellement" },
-          { name: "prixActeNotarie", label: "Prix de l'acte notarié" },
-          { name: "prixMutationDeces", label: "Prix de la mutation par décès" },
-          { name: "prixRetraitIndivision", label: "Prix des retraits d'indivision" },
-        ];
-      default:
-        return commonFields;
+  const onSubmit = async (data: FormData) => {
+    if (data.password !== data.confirmPassword) {
+      form.setError("confirmPassword", {
+        message: "Les mots de passe ne correspondent pas",
+      });
+      return;
     }
-  };
 
-  const onSubmit = (data: any) => {
-    console.log("Form data:", data);
-    // TODO: Implement form submission logic
-    navigate("/profile");
+    setLoading(true);
+    try {
+      await signUp(data.email, data.password);
+      await createProfile({
+        full_name: data.full_name,
+        phone_number: data.phone_number,
+        user_type: type || "buyer",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -73,25 +54,82 @@ export default function RegisterForm() {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              {getFormFields().map((field) => (
-                <FormField
-                  key={field.name}
-                  control={form.control}
-                  name={field.name}
-                  render={({ field: formField }) => (
-                    <FormItem>
-                      <FormLabel>{field.label}</FormLabel>
-                      <FormControl>
-                        <Input {...formField} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              ))}
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" required {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-              <Button type="submit" className="w-full bg-cmr-green hover:bg-cmr-green/90">
-                S'inscrire
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Mot de passe</FormLabel>
+                    <FormControl>
+                      <Input type="password" required {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirmer le mot de passe</FormLabel>
+                    <FormControl>
+                      <Input type="password" required {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="full_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nom complet</FormLabel>
+                    <FormControl>
+                      <Input required {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="phone_number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Numéro de téléphone</FormLabel>
+                    <FormControl>
+                      <Input required {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button 
+                type="submit" 
+                className="w-full bg-cmr-green hover:bg-cmr-green/90"
+                disabled={loading}
+              >
+                {loading ? "Inscription en cours..." : "S'inscrire"}
               </Button>
             </form>
           </Form>
