@@ -12,6 +12,7 @@ import Buy from "./pages/Buy";
 import Rent from "./pages/Rent";
 import Sell from "./pages/Sell";
 import Profile from "./pages/Profile";
+import PropertyDetails from "./pages/PropertyDetails";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -33,6 +34,7 @@ const App = () => (
               <Route path="/buy" element={<ProtectedRoute><Buy /></ProtectedRoute>} />
               <Route path="/rent" element={<ProtectedRoute><Rent /></ProtectedRoute>} />
               <Route path="/sell" element={<ProtectedRoute><Sell /></ProtectedRoute>} />
+              <Route path="/property/:id" element={<ProtectedRoute><PropertyDetails /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
