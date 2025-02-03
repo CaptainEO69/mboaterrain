@@ -18,6 +18,9 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        playfair: ['Playfair Display', 'serif'],
+      },
       colors: {
         // Cameroon flag colors
         "cmr-green": "#009A44",
