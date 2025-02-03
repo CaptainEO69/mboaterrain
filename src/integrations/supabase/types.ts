@@ -63,6 +63,35 @@ export type Database = {
           },
         ]
       }
+      neighborhoods: {
+        Row: {
+          city_id: string
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          city_id: string
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          city_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "neighborhoods_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           birth_place: string | null

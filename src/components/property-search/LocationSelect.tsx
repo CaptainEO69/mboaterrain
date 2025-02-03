@@ -40,21 +40,35 @@ export function LocationSelect({ onCityChange, onNeighborhoodChange }: LocationS
   }, []);
 
   useEffect(() => {
-    if (selectedCity) {
-      const mockNeighborhoods = [
-        "Centre-ville",
-        "Bastos",
-        "Santa Barbara",
-        "Hippodrome",
-        "Tsinga",
-        "Mvan",
-        "Nsam",
-        "Mvog-Mbi",
-      ];
-      setNeighborhoods(mockNeighborhoods);
-    } else {
-      setNeighborhoods([]);
+    async function fetchNeighborhoods() {
+      if (selectedCity) {
+        try {
+          const { data: cityData } = await supabase
+            .from('cities')
+            .select('id')
+            .eq('name', selectedCity)
+            .single();
+
+          if (cityData) {
+            const { data: neighborhoodsData, error } = await supabase
+              .from('neighborhoods')
+              .select('name')
+              .eq('city_id', cityData.id)
+              .order('name');
+
+            if (error) throw error;
+            setNeighborhoods(neighborhoodsData.map(n => n.name) || []);
+          }
+        } catch (error) {
+          console.error('Erreur lors du chargement des quartiers:', error);
+          setNeighborhoods([]);
+        }
+      } else {
+        setNeighborhoods([]);
+      }
     }
+
+    fetchNeighborhoods();
   }, [selectedCity]);
 
   return (
