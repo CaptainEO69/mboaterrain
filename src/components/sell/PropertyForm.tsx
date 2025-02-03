@@ -8,11 +8,12 @@ import { usePropertyFormValidation } from "./form-validation/usePropertyFormVali
 import { toast } from "sonner";
 
 interface PropertyFormProps {
-  onSubmit: (formData: FormData) => Promise<void>;
-  isSubmitting: boolean;
+  onSubmit?: (formData: FormData) => Promise<void>;
+  isSubmitting?: boolean;
+  transactionType: "sell" | "rent";
 }
 
-export function PropertyForm({ onSubmit, isSubmitting }: PropertyFormProps) {
+export function PropertyForm({ onSubmit, isSubmitting = false, transactionType }: PropertyFormProps) {
   const [propertyType, setPropertyType] = useState<string>("");
   const [images, setImages] = useState<FileList | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -21,6 +22,7 @@ export function PropertyForm({ onSubmit, isSubmitting }: PropertyFormProps) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    formData.append("transaction_type", transactionType);
     
     const errors = validateForm(formData, images);
     setValidationErrors(errors);
@@ -30,7 +32,9 @@ export function PropertyForm({ onSubmit, isSubmitting }: PropertyFormProps) {
       return;
     }
 
-    await onSubmit(formData);
+    if (onSubmit) {
+      await onSubmit(formData);
+    }
   };
 
   return (
