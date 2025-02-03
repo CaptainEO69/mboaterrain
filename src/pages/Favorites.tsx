@@ -58,9 +58,7 @@ export default function Favorites() {
 
   return (
     <div className="min-h-screen pb-20">
-      <div className="bg-white p-4 shadow-md">
-        <h1 className="text-xl font-bold mb-4">Mes Favoris</h1>
-      </div>
+      <h1 className="text-xl font-bold p-4">Mes Favoris</h1>
 
       <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {loading ? (
