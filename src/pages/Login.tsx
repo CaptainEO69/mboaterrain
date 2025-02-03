@@ -14,8 +14,6 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <Header />
-
       <Card className="w-full max-w-md p-6 bg-white mt-8">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900">Connexion</h2>
