@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Home, Search, Heart, PlusCircle, UserRound } from "lucide-react";
+import { Home, Search, Heart, PlusCircle, UserRound, Key } from "lucide-react";
 
 export function BottomNav() {
   const location = useLocation();
@@ -9,11 +9,11 @@ export function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
-      <div className="flex justify-around items-center h-16">
+      <div className="grid grid-cols-6 h-16">
         <Link
           to="/"
           className={cn(
-            "flex flex-col items-center text-xs",
+            "flex flex-col items-center justify-center text-xs",
             isActive("/") ? "text-cmr-green" : "text-gray-500"
           )}
         >
@@ -23,7 +23,7 @@ export function BottomNav() {
         <Link
           to="/buy"
           className={cn(
-            "flex flex-col items-center text-xs",
+            "flex flex-col items-center justify-center text-xs",
             isActive("/buy") ? "text-cmr-green" : "text-gray-500"
           )}
         >
@@ -31,9 +31,19 @@ export function BottomNav() {
           Acheter
         </Link>
         <Link
+          to="/rent"
+          className={cn(
+            "flex flex-col items-center justify-center text-xs",
+            isActive("/rent") ? "text-cmr-green" : "text-gray-500"
+          )}
+        >
+          <Key className="w-6 h-6 mb-1" />
+          Louer
+        </Link>
+        <Link
           to="/sell"
           className={cn(
-            "flex flex-col items-center text-xs",
+            "flex flex-col items-center justify-center text-xs",
             isActive("/sell") ? "text-cmr-green" : "text-gray-500"
           )}
         >
@@ -43,7 +53,7 @@ export function BottomNav() {
         <Link
           to="/favorites"
           className={cn(
-            "flex flex-col items-center text-xs",
+            "flex flex-col items-center justify-center text-xs",
             isActive("/favorites") ? "text-cmr-green" : "text-gray-500"
           )}
         >
@@ -53,7 +63,7 @@ export function BottomNav() {
         <Link
           to="/profile"
           className={cn(
-            "flex flex-col items-center text-xs",
+            "flex flex-col items-center justify-center text-xs",
             isActive("/profile") ? "text-cmr-green" : "text-gray-500"
           )}
         >
