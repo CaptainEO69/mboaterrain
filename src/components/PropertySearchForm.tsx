@@ -40,22 +40,10 @@ export function PropertySearchForm({ transactionType, onSearch }: PropertySearch
           <SelectValue placeholder="Type de bien" />
         </SelectTrigger>
         <SelectContent>
-          {transactionType === "sale" ? (
-            <>
-              <SelectItem value="house">Maison</SelectItem>
-              <SelectItem value="apartment">Appartement</SelectItem>
-              <SelectItem value="land">Terrain</SelectItem>
-              <SelectItem value="office">Bureau</SelectItem>
-              <SelectItem value="store">Commerce</SelectItem>
-            </>
-          ) : (
-            <>
-              <SelectItem value="furnished_house">Maison meublée</SelectItem>
-              <SelectItem value="unfurnished_house">Maison non meublée</SelectItem>
-              <SelectItem value="furnished_apartment">Appartement meublé</SelectItem>
-              <SelectItem value="unfurnished_apartment">Appartement non meublé</SelectItem>
-            </>
-          )}
+          <SelectItem value="house">Maison</SelectItem>
+          <SelectItem value="apartment">Appartement</SelectItem>
+          <SelectItem value="land">Terrain</SelectItem>
+          <SelectItem value="commercial">Local commercial</SelectItem>
         </SelectContent>
       </Select>
 
@@ -69,6 +57,8 @@ export function PropertySearchForm({ transactionType, onSearch }: PropertySearch
           <SelectItem value="yaounde">Yaoundé</SelectItem>
           <SelectItem value="douala">Douala</SelectItem>
           <SelectItem value="bafoussam">Bafoussam</SelectItem>
+          <SelectItem value="bamenda">Bamenda</SelectItem>
+          <SelectItem value="garoua">Garoua</SelectItem>
         </SelectContent>
       </Select>
 
