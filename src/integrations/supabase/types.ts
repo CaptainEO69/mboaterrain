@@ -47,28 +47,58 @@ export type Database = {
       }
       profiles: {
         Row: {
+          birth_place: string | null
+          birth_year: number | null
           created_at: string
           full_name: string | null
           id: string
+          id_number: string | null
+          is_certified: boolean | null
+          notary_office: string | null
           phone_number: string | null
+          profession: string | null
+          residence_place: string | null
+          sale_proof_url: string | null
+          sale_reason: string | null
+          service_prices: Json | null
           updated_at: string
           user_id: string
           user_type: string
         }
         Insert: {
+          birth_place?: string | null
+          birth_year?: number | null
           created_at?: string
           full_name?: string | null
           id?: string
+          id_number?: string | null
+          is_certified?: boolean | null
+          notary_office?: string | null
           phone_number?: string | null
+          profession?: string | null
+          residence_place?: string | null
+          sale_proof_url?: string | null
+          sale_reason?: string | null
+          service_prices?: Json | null
           updated_at?: string
           user_id: string
           user_type: string
         }
         Update: {
+          birth_place?: string | null
+          birth_year?: number | null
           created_at?: string
           full_name?: string | null
           id?: string
+          id_number?: string | null
+          is_certified?: boolean | null
+          notary_office?: string | null
           phone_number?: string | null
+          profession?: string | null
+          residence_place?: string | null
+          sale_proof_url?: string | null
+          sale_reason?: string | null
+          service_prices?: Json | null
           updated_at?: string
           user_id?: string
           user_type?: string
@@ -168,6 +198,41 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_prices: {
+        Row: {
+          created_at: string | null
+          id: string
+          price: number
+          profile_id: string | null
+          service_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          price: number
+          profile_id?: string | null
+          service_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          price?: number
+          profile_id?: string | null
+          service_type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_prices_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
