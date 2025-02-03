@@ -4,6 +4,7 @@ import { ImageUpload } from "./ImageUpload";
 import { BasicInfoSection } from "./form-sections/BasicInfoSection";
 import { PriceLocationSection } from "./form-sections/PriceLocationSection";
 import { LandDetailsSection } from "./form-sections/LandDetailsSection";
+import { toast } from "sonner";
 
 interface PropertyFormProps {
   onSubmit: (formData: FormData) => Promise<void>;
