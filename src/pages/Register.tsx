@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { House, User, UserSquare2, Users, Scale, FileText } from "lucide-react";
+import { House, User, Users, Scale, FileText, UserSquare2 } from "lucide-react";
 import { UserTypeCard } from "@/components/registration/UserTypeCard";
 
 const userTypes = [
