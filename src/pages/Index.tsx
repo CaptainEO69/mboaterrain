@@ -10,10 +10,10 @@ export default function Index() {
     <div className="flex flex-col gap-6 pb-20">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-cmr-green to-cmr-green/80 text-white p-6">
-        <h1 className="text-2xl font-bold mb-2 font-playfair">
+        <h1 className="text-3xl md:text-4xl font-playfair font-bold mb-3 leading-tight tracking-tight">
           Trouvez votre bien au Cameroun
         </h1>
-        <p className="text-sm opacity-90 mb-4">
+        <p className="text-base md:text-lg opacity-90 mb-4 font-light">
           Achetez, louez ou vendez en toute simplicité
         </p>
         <SearchBar />
@@ -59,7 +59,9 @@ export default function Index() {
 
       {/* Featured Properties Section */}
       <div className="px-4">
-        <h2 className="text-xl font-semibold mb-4 font-playfair">Biens à la une</h2>
+        <h2 className="text-2xl md:text-3xl font-playfair font-bold mb-4 tracking-tight text-cmr-green">
+          Biens à la une
+        </h2>
         <div className="grid grid-cols-1 gap-4">
           {/* Cette section sera remplie dynamiquement avec les propriétés mises en avant */}
           <div className="h-48 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
