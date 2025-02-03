@@ -4,7 +4,31 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { PropertyForm } from "@/components/sell/PropertyForm";
+import { FeatureCard } from "@/components/sell/FeatureCard";
 import { Building2, MapPin, Ruler, FileCheck } from "lucide-react";
+
+const features = [
+  {
+    icon: Building2,
+    title: "Tous types de biens",
+    description: "Maisons, appartements, terrains",
+  },
+  {
+    icon: MapPin,
+    title: "Localisation précise",
+    description: "Ville et quartier",
+  },
+  {
+    icon: Ruler,
+    title: "Détails complets",
+    description: "Surface, distance route",
+  },
+  {
+    icon: FileCheck,
+    title: "Documents légaux",
+    description: "Titres et certificats",
+  },
+];
 
 export default function Sell() {
   const { user } = useAuth();
@@ -45,9 +69,8 @@ export default function Sell() {
       if (propertyError) throw propertyError;
 
       // Upload images if present
-      const imagesInput = formData.get("images") as File | null;
-      if (imagesInput && property) {
-        const files = formData.getAll("images") as File[];
+      const files = formData.getAll("images") as File[];
+      if (files.length > 0 && property) {
         for (let i = 0; i < files.length; i++) {
           const file = files[i];
           const fileExt = file.name.split(".").pop();
@@ -96,34 +119,14 @@ export default function Sell() {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg flex items-center space-x-3">
-              <Building2 className="w-6 h-6" />
-              <div>
-                <h3 className="font-semibold">Tous types de biens</h3>
-                <p className="text-sm opacity-75">Maisons, appartements, terrains</p>
-              </div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg flex items-center space-x-3">
-              <MapPin className="w-6 h-6" />
-              <div>
-                <h3 className="font-semibold">Localisation précise</h3>
-                <p className="text-sm opacity-75">Ville et quartier</p>
-              </div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg flex items-center space-x-3">
-              <Ruler className="w-6 h-6" />
-              <div>
-                <h3 className="font-semibold">Détails complets</h3>
-                <p className="text-sm opacity-75">Surface, distance route</p>
-              </div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg flex items-center space-x-3">
-              <FileCheck className="w-6 h-6" />
-              <div>
-                <h3 className="font-semibold">Documents légaux</h3>
-                <p className="text-sm opacity-75">Titres et certificats</p>
-              </div>
-            </div>
+            {features.map((feature) => (
+              <FeatureCard
+                key={feature.title}
+                icon={feature.icon}
+                title={feature.title}
+                description={feature.description}
+              />
+            ))}
           </div>
         </div>
       </div>
