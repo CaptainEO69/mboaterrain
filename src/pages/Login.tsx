@@ -15,7 +15,7 @@ export default function Login() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col items-center mb-8">
         <img
-          src="/lovable-uploads/ff74bfca-be9a-4f99-9ec1-a7e93bc5c72f.png"
+          src="/lovable-uploads/b0d64b27-cdd5-43a9-b0dd-fba53da4a96d.png"
           alt="MboaTer Logo"
           className="w-24 h-24 mb-4"
         />
