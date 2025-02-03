@@ -2,38 +2,24 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
-import { BottomNav } from "@/components/BottomNav";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { toast } from "sonner";
+import { PropertyForm } from "@/components/sell/PropertyForm";
+import { Building2, MapPin, Ruler, FileCheck } from "lucide-react";
 
 export default function Sell() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [images, setImages] = useState<FileList | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (formData: FormData) => {
     if (!user?.profile?.id) {
       toast.error("Vous devez compléter votre profil avant de publier une annonce");
       return;
     }
 
     setIsSubmitting(true);
-    const formData = new FormData(e.currentTarget);
 
     try {
-      // Créer la propriété avec les types corrects
       const propertyData = {
         owner_id: user.profile.id,
         title: formData.get("title") as string,
@@ -44,8 +30,6 @@ export default function Sell() {
         city: formData.get("city") as string,
         neighborhood: formData.get("neighborhood") as string,
         area_size: Number(formData.get("area_size")),
-        bedrooms: formData.get("bedrooms") ? Number(formData.get("bedrooms")) : null,
-        bathrooms: formData.get("bathrooms") ? Number(formData.get("bathrooms")) : null,
         is_furnished: formData.get("is_furnished") === "true",
         distance_from_road: formData.get("distance_from_road") 
           ? Number(formData.get("distance_from_road")) 
@@ -60,7 +44,8 @@ export default function Sell() {
 
       if (propertyError) throw propertyError;
 
-      // Uploader les images
+      // Upload images if present
+      const images = formData.get("images") as FileList;
       if (images && property) {
         for (let i = 0; i < images.length; i++) {
           const file = images[i];
@@ -102,152 +87,51 @@ export default function Sell() {
 
   return (
     <div className="min-h-screen pb-20">
-      <div className="bg-white p-4 shadow-md">
-        <h1 className="text-xl font-bold mb-4">Publier une annonce</h1>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="title">Titre de l'annonce</Label>
-            <Input id="title" name="title" required />
-          </div>
+      <div className="bg-gradient-to-r from-cmr-green to-cmr-green/80 text-white py-8">
+        <div className="container mx-auto px-4">
+          <h1 className="text-3xl font-bold mb-4">Publier une annonce</h1>
+          <p className="text-lg opacity-90 mb-8">
+            Vendez ou louez votre bien immobilier en toute simplicité
+          </p>
 
-          <div>
-            <Label htmlFor="description">Description</Label>
-            <Textarea id="description" name="description" />
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg flex items-center space-x-3">
+              <Building2 className="w-6 h-6" />
+              <div>
+                <h3 className="font-semibold">Tous types de biens</h3>
+                <p className="text-sm opacity-75">Maisons, appartements, terrains</p>
+              </div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg flex items-center space-x-3">
+              <MapPin className="w-6 h-6" />
+              <div>
+                <h3 className="font-semibold">Localisation précise</h3>
+                <p className="text-sm opacity-75">Ville et quartier</p>
+              </div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg flex items-center space-x-3">
+              <Ruler className="w-6 h-6" />
+              <div>
+                <h3 className="font-semibold">Détails complets</h3>
+                <p className="text-sm opacity-75">Surface, distance route</p>
+              </div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg flex items-center space-x-3">
+              <FileCheck className="w-6 h-6" />
+              <div>
+                <h3 className="font-semibold">Documents légaux</h3>
+                <p className="text-sm opacity-75">Titres et certificats</p>
+              </div>
+            </div>
           </div>
-
-          <div>
-            <Label htmlFor="property_type">Type de bien</Label>
-            <Select name="property_type" required>
-              <SelectTrigger>
-                <SelectValue placeholder="Sélectionnez un type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="house">Maison</SelectItem>
-                <SelectItem value="apartment">Appartement</SelectItem>
-                <SelectItem value="land">Terrain</SelectItem>
-                <SelectItem value="office">Bureau</SelectItem>
-                <SelectItem value="store">Commerce</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="transaction_type">Type de transaction</Label>
-            <Select name="transaction_type" required>
-              <SelectTrigger>
-                <SelectValue placeholder="Vente ou Location" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="sale">Vente</SelectItem>
-                <SelectItem value="rent">Location</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="price">Prix (FCFA)</Label>
-            <Input
-              id="price"
-              name="price"
-              type="number"
-              min="0"
-              step="1000"
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="city">Ville</Label>
-            <Select name="city" required>
-              <SelectTrigger>
-                <SelectValue placeholder="Sélectionnez une ville" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="yaounde">Yaoundé</SelectItem>
-                <SelectItem value="douala">Douala</SelectItem>
-                <SelectItem value="bafoussam">Bafoussam</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="neighborhood">Quartier</Label>
-            <Input id="neighborhood" name="neighborhood" required />
-          </div>
-
-          <div>
-            <Label htmlFor="area_size">Superficie (m²)</Label>
-            <Input
-              id="area_size"
-              name="area_size"
-              type="number"
-              min="0"
-              step="0.01"
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="bedrooms">Nombre de chambres</Label>
-            <Input id="bedrooms" name="bedrooms" type="number" min="0" />
-          </div>
-
-          <div>
-            <Label htmlFor="bathrooms">Nombre de salles de bain</Label>
-            <Input id="bathrooms" name="bathrooms" type="number" min="0" />
-          </div>
-
-          <div>
-            <Label htmlFor="is_furnished">Meublé</Label>
-            <Select name="is_furnished">
-              <SelectTrigger>
-                <SelectValue placeholder="Le bien est-il meublé ?" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="true">Oui</SelectItem>
-                <SelectItem value="false">Non</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="distance_from_road">Distance de la route (m)</Label>
-            <Input
-              id="distance_from_road"
-              name="distance_from_road"
-              type="number"
-              min="0"
-              step="0.01"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="images">Photos</Label>
-            <Input
-              id="images"
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={(e) => setImages(e.target.files)}
-              className="cursor-pointer"
-            />
-            <p className="text-sm text-gray-500 mt-1">
-              Vous pouvez sélectionner plusieurs photos. La première sera l'image principale.
-            </p>
-          </div>
-
-          <Button
-            type="submit"
-            className="w-full bg-cmr-green hover:bg-cmr-green/90"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Publication en cours..." : "Publier l'annonce"}
-          </Button>
-        </form>
+        </div>
       </div>
 
-      <BottomNav />
+      <div className="container mx-auto px-4 -mt-6">
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <PropertyForm onSubmit={handleSubmit} isSubmitting={isSubmitting} />
+        </div>
+      </div>
     </div>
   );
 }
