@@ -9,9 +9,10 @@ export const Header = () => {
         />
         <div className="text-center">
           <h1 className="text-2xl font-bold text-cmr-green font-playfair">MboaTer</h1>
-          <p className="text-sm text-gray-600 font-playfair font-bold">
-            L'immobilier qui valorise nos terres
-          </p>
+          <div className="text-sm text-gray-600 font-playfair font-bold flex flex-col">
+            <span>L'immobilier qui valorise</span>
+            <span>nos terres</span>
+          </div>
         </div>
       </div>
     </div>
