@@ -1,5 +1,3 @@
-import { Header } from "@/components/Header";
-import { BottomNav } from "@/components/BottomNav";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -8,8 +6,6 @@ export default function Index() {
 
   return (
     <div className="min-h-screen pb-20">
-      <Header />
-      
       <div className="p-4 space-y-6">
         <div className="grid grid-cols-2 gap-4">
           <Button
@@ -32,8 +28,6 @@ export default function Index() {
           </Button>
         </div>
       </div>
-
-      <BottomNav />
     </div>
   );
-};
+}
