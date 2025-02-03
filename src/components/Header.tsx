@@ -5,7 +5,7 @@ export const Header = () => {
         <img
           src="/lovable-uploads/b0d64b27-cdd5-43a9-b0dd-fba53da4a96d.png"
           alt="MboaTer Logo"
-          className="h-24 w-24 md:h-40 md:w-40" // Increased size significantly and adjusted for both mobile and desktop
+          className="h-32 w-32 md:h-48 md:w-48" // Increased size to 128px on mobile and 192px on desktop
         />
         <div className="text-center">
           <h1 className="text-2xl md:text-3xl font-bold text-cmr-green font-playfair tracking-[0.2em] mb-1">
