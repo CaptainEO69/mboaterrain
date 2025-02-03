@@ -45,10 +45,11 @@ export default function Sell() {
       if (propertyError) throw propertyError;
 
       // Upload images if present
-      const images = formData.get("images") as FileList;
-      if (images && property) {
-        for (let i = 0; i < images.length; i++) {
-          const file = images[i];
+      const imagesInput = formData.get("images") as File | null;
+      if (imagesInput && property) {
+        const files = formData.getAll("images") as File[];
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
           const fileExt = file.name.split(".").pop();
           const filePath = `${property.id}/${Math.random()}.${fileExt}`;
 
