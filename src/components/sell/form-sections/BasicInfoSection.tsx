@@ -1,7 +1,6 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { PropertyTypeSelect } from "../../property-search/PropertyTypeSelect";
 import {
   Select,
   SelectContent,
@@ -9,8 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FurnishedSelect } from "../../property-search/FurnishedSelect";
-import { Building2, DollarSign, Info } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Info } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -25,25 +24,13 @@ interface BasicInfoSectionProps {
 
 export function BasicInfoSection({ errors, onPropertyTypeChange }: BasicInfoSectionProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div>
-        <div className="flex items-center gap-2 mb-2">
-          <Label htmlFor="title">Titre de l'annonce</Label>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Info className="w-4 h-4 text-muted-foreground" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Donnez un titre accrocheur à votre annonce</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-        <Input 
-          id="title" 
-          name="title" 
-          required 
+        <Label htmlFor="title">Titre de l'annonce</Label>
+        <Input
+          id="title"
+          name="title"
+          required
           className={errors.title ? "border-red-500" : ""}
         />
         {errors.title && (
@@ -53,49 +40,63 @@ export function BasicInfoSection({ errors, onPropertyTypeChange }: BasicInfoSect
 
       <div>
         <Label htmlFor="description">Description</Label>
-        <Textarea 
-          id="description" 
-          name="description" 
+        <Textarea
+          id="description"
+          name="description"
+          rows={4}
           placeholder="Décrivez votre bien en détail..."
-          className="min-h-[120px]"
         />
       </div>
 
       <div>
-        <div className="flex items-center gap-2 mb-2">
-          <Label>Type de bien</Label>
-          <Building2 className="w-4 h-4 text-muted-foreground" />
-        </div>
-        <PropertyTypeSelect onValueChange={onPropertyTypeChange} />
-      </div>
-
-      <div>
-        <div className="flex items-center gap-2 mb-2">
-          <Label htmlFor="transaction_type">Type de transaction</Label>
-          <DollarSign className="w-4 h-4 text-muted-foreground" />
-        </div>
-        <Select name="transaction_type" required>
+        <Label htmlFor="property_type">Type de bien</Label>
+        <Select
+          name="property_type"
+          onValueChange={(value) => {
+            onPropertyTypeChange(value);
+          }}
+        >
           <SelectTrigger>
-            <SelectValue placeholder="Vente ou Location" />
+            <SelectValue placeholder="Sélectionnez le type de bien" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="sale">Vente</SelectItem>
-            <SelectItem value="rent">Location</SelectItem>
+            <SelectItem value="house">Maison</SelectItem>
+            <SelectItem value="apartment">Appartement</SelectItem>
+            <SelectItem value="land">Terrain</SelectItem>
+            <SelectItem value="commercial">Local commercial</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div>
-        <Label>Meublé</Label>
-        <FurnishedSelect
-          onValueChange={(value) => {
-            const form = document.querySelector('form');
-            if (form) {
-              const formData = new FormData(form);
-              formData.set('is_furnished', value.toString());
-            }
-          }}
-        />
+        <Label htmlFor="transaction_type">Type de transaction</Label>
+        <Select name="transaction_type" defaultValue="sale">
+          <SelectTrigger>
+            <SelectValue placeholder="Sélectionnez le type de transaction" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="sale">Vente</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <div className="space-y-0.5">
+          <div className="flex items-center gap-2">
+            <Label htmlFor="is_furnished">Meublé</Label>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Info className="w-4 h-4 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Indiquez si le bien est vendu meublé ou non</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        </div>
+        <Switch id="is_furnished" name="is_furnished" />
       </div>
     </div>
   );
