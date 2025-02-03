@@ -3,7 +3,7 @@ export const Header = () => {
     <div className="bg-white p-4 shadow-sm">
       <div className="flex items-center justify-center gap-2">
         <img
-          src="/lovable-uploads/ff74bfca-be9a-4f99-9ec1-a7e93bc5c72f.png"
+          src="/lovable-uploads/b0d64b27-cdd5-43a9-b0dd-fba53da4a96d.png"
           alt="MboaTer Logo"
           className="h-8 w-8"
         />
