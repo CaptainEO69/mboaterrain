@@ -20,26 +20,27 @@ export default function Sell() {
     try {
       setIsSubmitting(true);
 
+      // Convert FormData values to the correct types
+      const propertyData = {
+        owner_id: user.profile.id,
+        title: formData.get('title') as string,
+        description: formData.get('description') as string,
+        property_type: formData.get('property_type') as string,
+        transaction_type: formData.get('transaction_type') as string,
+        price: Number(formData.get('price')),
+        city: formData.get('city') as string,
+        neighborhood: formData.get('neighborhood') as string,
+        area_size: Number(formData.get('area_size')),
+        bedrooms: formData.get('bedrooms') ? Number(formData.get('bedrooms')) : null,
+        bathrooms: formData.get('bathrooms') ? Number(formData.get('bathrooms')) : null,
+        is_furnished: formData.get('is_furnished') === 'true',
+        distance_from_road: formData.get('distance_from_road') ? Number(formData.get('distance_from_road')) : null
+      };
+
       // Insert property data
       const { data: property, error: propertyError } = await supabase
         .from('properties')
-        .insert([
-          {
-            owner_id: user.profile.id,
-            title: formData.get('title'),
-            description: formData.get('description'),
-            property_type: formData.get('property_type'),
-            transaction_type: formData.get('transaction_type'),
-            price: formData.get('price'),
-            city: formData.get('city'),
-            neighborhood: formData.get('neighborhood'),
-            area_size: formData.get('area_size'),
-            bedrooms: formData.get('bedrooms'),
-            bathrooms: formData.get('bathrooms'),
-            is_furnished: formData.get('is_furnished') === 'true',
-            distance_from_road: formData.get('distance_from_road'),
-          }
-        ])
+        .insert(propertyData)
         .select()
         .single();
 
