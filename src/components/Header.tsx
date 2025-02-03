@@ -8,7 +8,7 @@ export const Header = () => {
           className="h-32 w-32"
         />
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-cmr-green font-playfair">MboaTer</h1>
+          <h1 className="text-3xl font-bold text-cmr-green font-playfair tracking-wider">MboaTer</h1>
           <div className="text-sm text-gray-600 font-playfair font-bold flex flex-col">
             <span>L'immobilier qui valorise</span>
             <span>nos terres</span>
