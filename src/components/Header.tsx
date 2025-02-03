@@ -9,8 +9,8 @@ export const Header = () => {
         />
         <div className="text-center">
           <h1 className="text-2xl font-bold text-cmr-green font-playfair">MboaTer</h1>
-          <p className="text-sm text-gray-600">
-            La première plateforme immobilière 100% camerounaise
+          <p className="text-sm text-gray-600 font-playfair italic">
+            Première plateforme immobilière 100% camerounaise
           </p>
         </div>
       </div>
