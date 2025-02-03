@@ -4,9 +4,10 @@ import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Loader2, House } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Header } from "@/components/Header";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -58,17 +59,9 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="flex items-center justify-center gap-2 mb-8">
-        <House className="h-8 w-8 text-cmr-green" />
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-cmr-green">MboaTer</h1>
-          <p className="text-sm text-gray-600">
-            La première plateforme immobilière 100% camerounaise
-          </p>
-        </div>
-      </div>
+      <Header />
 
-      <Card className="w-full max-w-md p-6 bg-white">
+      <Card className="w-full max-w-md p-6 bg-white mt-8">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900">Connexion</h2>
           <p className="text-sm text-gray-600">
