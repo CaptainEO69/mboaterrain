@@ -5,7 +5,7 @@ export const Header = () => {
         <img
           src="/lovable-uploads/b0d64b27-cdd5-43a9-b0dd-fba53da4a96d.png"
           alt="MboaTer Logo"
-          className="h-28 w-28"
+          className="h-32 w-32"
         />
         <div className="text-center">
           <h1 className="text-2xl font-bold text-cmr-green">MboaTer</h1>
