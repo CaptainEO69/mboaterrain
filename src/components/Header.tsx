@@ -1,13 +1,12 @@
-import { House } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-
 export const Header = () => {
-  const navigate = useNavigate();
-
   return (
     <div className="bg-white p-4 shadow-sm">
       <div className="flex items-center justify-center gap-2">
-        <House className="h-8 w-8 text-cmr-green" />
+        <img
+          src="/lovable-uploads/ff74bfca-be9a-4f99-9ec1-a7e93bc5c72f.png"
+          alt="MboaTer Logo"
+          className="h-8 w-8"
+        />
         <div className="text-center">
           <h1 className="text-2xl font-bold text-cmr-green">MboaTer</h1>
           <p className="text-sm text-gray-600">
