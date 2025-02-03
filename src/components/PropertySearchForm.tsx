@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 export type PropertyFilters = {
   propertyType?: string;
   city?: string;
+  neighborhood?: string;
   maxPrice?: number;
   minSize?: number;
   bedrooms?: number;
@@ -32,6 +33,7 @@ interface PropertySearchFormProps {
 export function PropertySearchForm({ transactionType, onSearch }: PropertySearchFormProps) {
   const [filters, setFilters] = useState<PropertyFilters>({});
   const [cities, setCities] = useState<{ id: string; name: string }[]>([]);
+  const [neighborhoods, setNeighborhoods] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -53,6 +55,26 @@ export function PropertySearchForm({ transactionType, onSearch }: PropertySearch
 
     fetchCities();
   }, []);
+
+  // Simuler une liste de quartiers (à remplacer par des données réelles)
+  useEffect(() => {
+    if (filters.city) {
+      // Ici, vous pourriez faire un appel API pour obtenir les quartiers de la ville sélectionnée
+      const mockNeighborhoods = [
+        "Centre-ville",
+        "Bastos",
+        "Santa Barbara",
+        "Hippodrome",
+        "Tsinga",
+        "Mvan",
+        "Nsam",
+        "Mvog-Mbi",
+      ];
+      setNeighborhoods(mockNeighborhoods);
+    } else {
+      setNeighborhoods([]);
+    }
+  }, [filters.city]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,6 +102,20 @@ export function PropertySearchForm({ transactionType, onSearch }: PropertySearch
 
         <div>
           <Select
+            onValueChange={(value) => setFilters({ ...filters, isFurnished: value === "true" })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Meublé" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="true">Meublé</SelectItem>
+              <SelectItem value="false">Non meublé</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Select
             onValueChange={(value) => setFilters({ ...filters, city: value })}
             disabled={loading}
           >
@@ -90,6 +126,24 @@ export function PropertySearchForm({ transactionType, onSearch }: PropertySearch
               {cities.map((city) => (
                 <SelectItem key={city.id} value={city.name}>
                   {city.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Select
+            onValueChange={(value) => setFilters({ ...filters, neighborhood: value })}
+            disabled={!filters.city}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Quartier" />
+            </SelectTrigger>
+            <SelectContent>
+              {neighborhoods.map((neighborhood) => (
+                <SelectItem key={neighborhood} value={neighborhood}>
+                  {neighborhood}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -131,22 +185,6 @@ export function PropertySearchForm({ transactionType, onSearch }: PropertySearch
             className="w-full"
           />
         </div>
-
-        {transactionType === "rent" && (
-          <div>
-            <Select
-              onValueChange={(value) => setFilters({ ...filters, isFurnished: value === "true" })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Meublé" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="true">Oui</SelectItem>
-                <SelectItem value="false">Non</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        )}
 
         <div>
           <Input
