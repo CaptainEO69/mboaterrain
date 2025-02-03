@@ -30,7 +30,6 @@ function App() {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/buy" element={<Buy />} />
-              <Route path="/rent" element={<Rent />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/register/form" element={<RegisterForm />} />
@@ -38,6 +37,14 @@ function App() {
               <Route path="/update-password" element={<UpdatePassword />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<Terms />} />
+              <Route
+                path="/rent"
+                element={
+                  <ProtectedRoute>
+                    <Rent />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/sell"
                 element={
