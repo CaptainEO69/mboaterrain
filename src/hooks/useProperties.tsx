@@ -3,12 +3,12 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PropertyFilters } from "@/components/PropertySearchForm";
 
-type PropertyImage = {
+interface BasePropertyImage {
   image_url: string;
   is_main: boolean;
-};
+}
 
-type Property = {
+interface BaseProperty {
   id: string;
   title: string;
   price: number;
@@ -20,18 +20,21 @@ type Property = {
   rooms?: number;
   is_furnished?: boolean;
   distance_from_road?: number;
-  property_images: PropertyImage[];
-};
+}
+
+interface PropertyWithImages extends BaseProperty {
+  property_images: BasePropertyImage[];
+}
 
 export function useProperties(transactionType: "sale" | "rent") {
-  const [properties, setProperties] = useState<Property[]>([]);
+  const [properties, setProperties] = useState<PropertyWithImages[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchProperties = async (filters: PropertyFilters = {}) => {
     try {
-      const { data, error } = await supabase
+      const { data: propertiesData, error } = await supabase
         .from("properties")
-        .select("*, property_images(*)")
+        .select("*, property_images!property_images_property_id_fkey(image_url, is_main)")
         .eq("transaction_type", transactionType)
         .eq("property_type", filters.propertyType || null)
         .eq("city", filters.city || null)
@@ -44,10 +47,10 @@ export function useProperties(transactionType: "sale" | "rent") {
 
       if (error) throw error;
 
-      const formattedProperties = (data || []).map(property => ({
+      const formattedProperties = (propertiesData || []).map(property => ({
         ...property,
         property_images: property.property_images || [],
-      })) as Property[];
+      }));
 
       setProperties(formattedProperties);
     } catch (error: any) {
