@@ -13,8 +13,9 @@ export function CFAIcon(props: SVGProps<SVGSVGElement>) {
       {...props}
     >
       <circle cx="12" cy="12" r="10" />
-      <path d="M11 8h4" />
-      <path d="M13 16V8" />
+      <path d="M10 8h5" />
+      <path d="M10 12h4" />
+      <path d="M10 8v8" />
     </svg>
   );
 }
