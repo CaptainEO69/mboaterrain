@@ -32,10 +32,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let mounted = true;
+
     const initializeAuth = async () => {
       try {
+        console.log("Initializing auth...");
         const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
+        
+        if (session && mounted) {
+          console.log("Session found, fetching profile...");
           const { data: profile } = await supabase
             .from('profiles')
             .select('*')
@@ -47,14 +52,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             email: session.user.email!,
             profile: profile || undefined,
           });
+          console.log("Auth initialized with user:", session.user.id);
         } else {
-          setUser(null);
+          if (mounted) {
+            console.log("No session found");
+            setUser(null);
+          }
         }
       } catch (error) {
-        console.error("Erreur lors de l'initialisation de l'auth:", error);
-        setUser(null);
+        console.error("Error during auth initialization:", error);
+        if (mounted) setUser(null);
       } finally {
-        setLoading(false);
+        if (mounted) {
+          console.log("Auth initialization complete");
+          setLoading(false);
+        }
       }
     };
 
@@ -63,7 +75,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session) {
+      console.log("Auth state changed:", event);
+      
+      if (session && mounted) {
         try {
           const { data: profile } = await supabase
             .from('profiles')
@@ -77,14 +91,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             profile: profile || undefined,
           });
         } catch (error) {
-          console.error("Erreur lors de la récupération du profil:", error);
+          console.error("Error fetching profile:", error);
         }
-      } else {
+      } else if (mounted) {
         setUser(null);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
