@@ -32,8 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Vérifier la session initiale
-    const checkSession = async () => {
+    const initializeAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
@@ -48,103 +47,94 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             email: session.user.email!,
             profile: profile || undefined,
           });
+        } else {
+          setUser(null);
         }
       } catch (error) {
-        console.error("Erreur lors de la vérification de la session:", error);
+        console.error("Erreur lors de l'initialisation de l'auth:", error);
+        setUser(null);
       } finally {
         setLoading(false);
       }
     };
 
-    checkSession();
+    initializeAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session) {
         try {
-          if (session) {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('user_id', session.user.id)
-              .single();
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .single();
 
-            setUser({
-              id: session.user.id,
-              email: session.user.email!,
-              profile: profile || undefined,
-            });
-          } else {
-            setUser(null);
-          }
+          setUser({
+            id: session.user.id,
+            email: session.user.email!,
+            profile: profile || undefined,
+          });
         } catch (error) {
-          console.error("Erreur lors du changement d'état d'authentification:", error);
-          setUser(null);
-        } finally {
-          setLoading(false);
+          console.error("Erreur lors de la récupération du profil:", error);
         }
+      } else {
+        setUser(null);
       }
-    );
+    });
 
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
-      setLoading(true);
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       navigate('/');
       toast.success('Connexion réussie');
     } catch (error: any) {
       toast.error(error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
   const signUp = async (email: string, password: string) => {
     try {
-      setLoading(true);
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) throw error;
       toast.success('Inscription réussie. Veuillez vérifier votre email.');
       navigate('/login');
     } catch (error: any) {
       toast.error(error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
   const signOut = async () => {
     try {
-      setLoading(true);
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      setUser(null);
       navigate('/login');
       toast.success('Déconnexion réussie');
     } catch (error: any) {
       toast.error(error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
   const createProfile = async (profile: Omit<AuthUser['profile'], 'id'>) => {
     try {
-      setLoading(true);
+      if (!user) throw new Error("Utilisateur non connecté");
+      
       const { error } = await supabase
         .from('profiles')
-        .insert([{ ...profile, user_id: user?.id }]);
+        .insert([{ ...profile, user_id: user.id }]);
+        
       if (error) throw error;
+      
       toast.success('Profil créé avec succès');
       navigate('/');
     } catch (error: any) {
       toast.error(error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
