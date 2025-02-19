@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { FileCheck, Upload } from "lucide-react";
+import { FileCheck } from "lucide-react";
 
 interface LandTitleSectionProps {
   errors: Record<string, string>;
@@ -18,12 +18,13 @@ export function LandTitleSection({ errors }: LandTitleSectionProps) {
       </div>
 
       <Tabs defaultValue="land_title" className="space-y-4">
-        <TabsList className="grid grid-cols-2 md:grid-cols-5 gap-2">
+        <TabsList className="grid grid-cols-2 md:grid-cols-6 gap-2">
           <TabsTrigger value="land_title">Titre foncier</TabsTrigger>
           <TabsTrigger value="property_cert">Certificat de propriété</TabsTrigger>
           <TabsTrigger value="plot_plan">Plan de lotissement</TabsTrigger>
           <TabsTrigger value="plot_number">Numéro de lot</TabsTrigger>
           <TabsTrigger value="plot_space">Espace</TabsTrigger>
+          <TabsTrigger value="sale_right">Droit de vente</TabsTrigger>
         </TabsList>
 
         <TabsContent value="land_title" className="space-y-4">
@@ -93,11 +94,26 @@ export function LandTitleSection({ errors }: LandTitleSectionProps) {
               <div className="flex items-center space-x-2 mt-2">
                 <Switch id="is_built" name="is_built" />
                 <Label htmlFor="is_built" className="cursor-pointer">
-                  {/* This label will update based on the switch state using JS */}
                   Espace bâti
                 </Label>
               </div>
             </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="sale_right" className="space-y-4">
+          <div>
+            <Label htmlFor="sale_right_file">Preuve du droit de vente</Label>
+            <Input 
+              id="sale_right_file"
+              name="sale_right_file"
+              type="file"
+              accept=".pdf,.doc,.docx"
+              className="cursor-pointer"
+            />
+            <p className="text-sm text-gray-500 mt-1">
+              Formats acceptés : PDF, Word
+            </p>
           </div>
         </TabsContent>
       </Tabs>
