@@ -2,6 +2,12 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PropertyFilters } from "@/components/PropertySearchForm";
+import { Database } from "@/types/supabase";
+
+type PropertyImage = {
+  image_url: string;
+  is_main: boolean;
+};
 
 type Property = {
   id: string;
@@ -15,10 +21,7 @@ type Property = {
   rooms?: number;
   is_furnished?: boolean;
   distance_from_road?: number;
-  property_images: {
-    image_url: string;
-    is_main: boolean;
-  }[];
+  property_images: PropertyImage[];
 };
 
 export function useProperties(transactionType: "sale" | "rent") {
@@ -27,7 +30,7 @@ export function useProperties(transactionType: "sale" | "rent") {
 
   const fetchProperties = async (filters: PropertyFilters = {}) => {
     try {
-      const query = supabase
+      let query = supabase
         .from("properties")
         .select(`
           *,
@@ -38,35 +41,41 @@ export function useProperties(transactionType: "sale" | "rent") {
         `)
         .eq("transaction_type", transactionType);
 
-      // Apply filters
+      // Apply filters in sequence
       if (filters.propertyType) {
-        query.eq("property_type", filters.propertyType);
+        query = query.eq("property_type", filters.propertyType);
       }
       if (filters.city) {
-        query.eq("city", filters.city);
+        query = query.eq("city", filters.city);
       }
       if (filters.maxPrice) {
-        query.lte("price", filters.maxPrice);
+        query = query.lte("price", filters.maxPrice);
       }
       if (filters.minSize) {
-        query.gte("area_size", filters.minSize);
+        query = query.gte("area_size", filters.minSize);
       }
       if (filters.rooms) {
-        query.eq("rooms", filters.rooms);
+        query = query.eq("rooms", filters.rooms);
       }
       if (filters.isFurnished !== undefined) {
-        query.eq("is_furnished", filters.isFurnished);
+        query = query.eq("is_furnished", filters.isFurnished);
       }
       if (filters.distanceFromRoad) {
-        query.lte("distance_from_road", filters.distanceFromRoad);
+        query = query.lte("distance_from_road", filters.distanceFromRoad);
       }
 
-      query.order("created_at", { ascending: false });
-
-      const { data, error } = await query;
+      const { data, error } = await query.order("created_at", { ascending: false });
 
       if (error) throw error;
-      setProperties(data || []);
+
+      // Ensure the correct type casting
+      const typedProperties = (data || []).map(item => ({
+        ...item,
+        transaction_type: item.transaction_type as "sale" | "rent",
+        property_images: item.property_images || []
+      })) as Property[];
+
+      setProperties(typedProperties);
     } catch (error: any) {
       console.error("Erreur lors du chargement des propriétés:", error.message);
     } finally {
