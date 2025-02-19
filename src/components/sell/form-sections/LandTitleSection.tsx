@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { FileCheck } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 interface LandTitleSectionProps {
   errors: Record<string, string>;
@@ -18,13 +19,14 @@ export function LandTitleSection({ errors }: LandTitleSectionProps) {
       </div>
 
       <Tabs defaultValue="land_title" className="space-y-4">
-        <TabsList className="grid grid-cols-2 md:grid-cols-6 gap-2">
+        <TabsList className="grid grid-cols-2 md:grid-cols-7 gap-2">
           <TabsTrigger value="land_title">Titre foncier</TabsTrigger>
           <TabsTrigger value="property_cert">Certificat de propriété</TabsTrigger>
           <TabsTrigger value="plot_plan">Plan de lotissement</TabsTrigger>
           <TabsTrigger value="plot_number">Numéro de lot</TabsTrigger>
           <TabsTrigger value="plot_space">Espace</TabsTrigger>
           <TabsTrigger value="sale_right">Droit de vente</TabsTrigger>
+          <TabsTrigger value="sale_reason">Motif de vente</TabsTrigger>
         </TabsList>
 
         <TabsContent value="land_title" className="space-y-4">
@@ -114,6 +116,18 @@ export function LandTitleSection({ errors }: LandTitleSectionProps) {
             <p className="text-sm text-gray-500 mt-1">
               Formats acceptés : PDF, Word
             </p>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="sale_reason" className="space-y-4">
+          <div>
+            <Label htmlFor="sale_reason">Motif de vente</Label>
+            <Textarea
+              id="sale_reason"
+              name="sale_reason"
+              placeholder="Expliquez le motif de la vente"
+              className="min-h-[100px]"
+            />
           </div>
         </TabsContent>
       </Tabs>

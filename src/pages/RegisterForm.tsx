@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useRegistrationForm } from "@/hooks/useRegistrationForm";
 import { BasicInfoSection } from "@/components/registration/form-sections/BasicInfoSection";
 import { PersonalInfoSection } from "@/components/registration/form-sections/PersonalInfoSection";
-import { SellerSection } from "@/components/registration/form-sections/SellerSection";
 import { ProfessionalSection } from "@/components/registration/form-sections/ProfessionalSection";
 
 export default function RegisterForm() {
@@ -49,10 +48,6 @@ export default function RegisterForm() {
 
             {(type === "owner" || type === "seller" || type === "surveyor" || type === "notary" || type === "notary_clerk") && (
               <PersonalInfoSection formData={formData} setters={setters} />
-            )}
-
-            {type === "seller" && (
-              <SellerSection formData={formData} setters={setters} />
             )}
 
             {(type === "surveyor" || type === "notary" || type === "notary_clerk") && (
