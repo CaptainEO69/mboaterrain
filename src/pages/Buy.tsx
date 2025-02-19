@@ -2,7 +2,8 @@
 import { PropertySearchForm } from "@/components/PropertySearchForm";
 import { PropertyList } from "@/components/PropertyList";
 import { useProperties } from "@/hooks/useProperties";
-import { Building2, MapPin, Ruler, CandlestickChart } from "lucide-react";
+import { Building2, MapPin, Ruler } from "lucide-react";
+import { CFAIcon } from "@/components/icons/CFAIcon";
 
 export default function Buy() {
   const { properties, loading, fetchProperties } = useProperties("sale");
@@ -39,7 +40,7 @@ export default function Buy() {
               </div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg flex items-center space-x-3">
-              <CandlestickChart className="w-6 h-6" />
+              <CFAIcon className="w-6 h-6" />
               <div>
                 <h3 className="font-semibold">Prix Compétitifs</h3>
                 <p className="text-sm opacity-75">Pour tous les budgets</p>
