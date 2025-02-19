@@ -1,3 +1,4 @@
+
 import { useSearchParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { ServicePricesForm } from "@/components/registration/ServicePricesForm";
 import { useRegistrationForm } from "@/hooks/useRegistrationForm";
+import { LandTitleSection } from "@/components/sell/form-sections/LandTitleSection";
 
 export default function RegisterForm() {
   const [searchParams] = useSearchParams();
@@ -138,6 +140,7 @@ export default function RegisterForm() {
 
             {type === "seller" && (
               <div className="space-y-4">
+                <LandTitleSection errors={{}} />
                 <div className="space-y-2">
                   <Label>Motif de vente</Label>
                   <Textarea
