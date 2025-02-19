@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { PropertyTypeSelect } from "./property-search/PropertyTypeSelect";
@@ -11,12 +12,8 @@ export type PropertyFilters = {
   neighborhood?: string;
   maxPrice?: number;
   minSize?: number;
-  bedrooms?: number;
+  rooms?: number;
   isFurnished?: boolean;
-  minBedrooms?: number;
-  maxBedrooms?: number;
-  minBathrooms?: number;
-  maxBathrooms?: number;
   distanceFromRoad?: number;
 };
 
@@ -42,11 +39,13 @@ export function PropertySearchForm({ transactionType, onSearch }: PropertySearch
           />
         </div>
 
-        <div>
-          <FurnishedSelect
-            onValueChange={(value) => setFilters({ ...filters, isFurnished: value })}
-          />
-        </div>
+        {filters.propertyType && filters.propertyType !== "land" && (
+          <div>
+            <FurnishedSelect
+              onValueChange={(value) => setFilters({ ...filters, isFurnished: value })}
+            />
+          </div>
+        )}
 
         <div className="col-span-2">
           <LocationSelect
@@ -58,10 +57,10 @@ export function PropertySearchForm({ transactionType, onSearch }: PropertySearch
         <div className="col-span-2">
           <PropertyFilters
             transactionType={transactionType}
+            propertyType={filters.propertyType}
             onMaxPriceChange={(value) => setFilters({ ...filters, maxPrice: value })}
             onMinSizeChange={(value) => setFilters({ ...filters, minSize: value })}
-            onMinBedroomsChange={(value) => setFilters({ ...filters, minBedrooms: value })}
-            onMinBathroomsChange={(value) => setFilters({ ...filters, minBathrooms: value })}
+            onRoomsChange={(value) => setFilters({ ...filters, rooms: value })}
             onDistanceFromRoadChange={(value) => setFilters({ ...filters, distanceFromRoad: value })}
           />
         </div>

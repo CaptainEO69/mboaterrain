@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PropertyFilters } from "@/components/PropertySearchForm";
@@ -45,17 +46,8 @@ export function useProperties(transactionType: "sale" | "rent") {
       if (filters.minSize) {
         query = query.gte("area_size", filters.minSize);
       }
-      if (filters.minBedrooms) {
-        query = query.gte("bedrooms", filters.minBedrooms);
-      }
-      if (filters.maxBedrooms) {
-        query = query.lte("bedrooms", filters.maxBedrooms);
-      }
-      if (filters.minBathrooms) {
-        query = query.gte("bathrooms", filters.minBathrooms);
-      }
-      if (filters.maxBathrooms) {
-        query = query.lte("bathrooms", filters.maxBathrooms);
+      if (filters.rooms) {
+        query = query.eq("rooms", filters.rooms);
       }
       if (filters.isFurnished !== undefined) {
         query = query.eq("is_furnished", filters.isFurnished);

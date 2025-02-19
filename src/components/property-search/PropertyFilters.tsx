@@ -1,20 +1,21 @@
+
 import { Input } from "@/components/ui/input";
 
 interface PropertyFiltersProps {
   transactionType: "sale" | "rent";
+  propertyType?: string;
   onMaxPriceChange: (value: number) => void;
   onMinSizeChange: (value: number) => void;
-  onMinBedroomsChange: (value: number) => void;
-  onMinBathroomsChange: (value: number) => void;
+  onRoomsChange: (value: number) => void;
   onDistanceFromRoadChange: (value: number) => void;
 }
 
 export function PropertyFilters({
   transactionType,
+  propertyType,
   onMaxPriceChange,
   onMinSizeChange,
-  onMinBedroomsChange,
-  onMinBathroomsChange,
+  onRoomsChange,
   onDistanceFromRoadChange,
 }: PropertyFiltersProps) {
   return (
@@ -33,19 +34,14 @@ export function PropertyFilters({
         className="w-full"
       />
 
-      <Input
-        placeholder="Chambres minimum"
-        type="number"
-        onChange={(e) => onMinBedroomsChange(Number(e.target.value))}
-        className="w-full"
-      />
-
-      <Input
-        placeholder="Salles de bain minimum"
-        type="number"
-        onChange={(e) => onMinBathroomsChange(Number(e.target.value))}
-        className="w-full"
-      />
+      {propertyType && propertyType !== "land" && (
+        <Input
+          placeholder="Nombre de pièces disponibles"
+          type="number"
+          onChange={(e) => onRoomsChange(Number(e.target.value))}
+          className="w-full"
+        />
+      )}
 
       <Input
         placeholder="Distance max. de la route (m)"
