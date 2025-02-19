@@ -42,7 +42,7 @@ export default function Buy() {
             <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg flex items-center space-x-3">
               <CFAIcon className="w-6 h-6" />
               <div>
-                <h3 className="font-semibold">Prix Compétitifs</h3>
+                <h3 className="font-semibold">Prix Compétitifs CFA</h3>
                 <p className="text-sm opacity-75">Pour tous les budgets</p>
               </div>
             </div>
