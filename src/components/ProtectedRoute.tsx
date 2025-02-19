@@ -9,18 +9,21 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Si le chargement est terminé, on peut afficher le contenu
     if (!loading) {
       setIsReady(true);
     }
   }, [loading]);
 
-  // Ajout de logs pour debug
-  console.log("ProtectedRoute - Loading:", loading);
-  console.log("ProtectedRoute - User:", user);
-  console.log("ProtectedRoute - IsReady:", isReady);
+  // Logs pour debug
+  console.log("ProtectedRoute - Current state:", {
+    loading,
+    user,
+    isReady,
+    pathname: location.pathname
+  });
 
-  if (!isReady) {
+  // Si l'authentification est en cours de chargement, afficher le loader
+  if (loading || !isReady) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -31,10 +34,12 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     );
   }
 
+  // Si l'utilisateur n'est pas connecté, rediriger vers la page de connexion
   if (!user) {
-    console.log("ProtectedRoute - Redirecting to login");
+    console.log("ProtectedRoute - Redirecting to login from:", location.pathname);
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // Si l'utilisateur est connecté, afficher le contenu protégé
   return <>{children}</>;
 }
