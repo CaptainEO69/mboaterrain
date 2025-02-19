@@ -17,12 +17,11 @@ interface BaseProperty {
   area_size: number;
   property_type: string;
   transaction_type: "sale" | "rent";
-  rooms?: number | null;
-  is_furnished?: boolean | null;
-  distance_from_road?: number | null;
-  bathrooms?: number | null;
-  bedrooms?: number | null;
-  description?: string | null;
+  is_furnished: boolean | null;
+  distance_from_road: number | null;
+  bathrooms: number | null;
+  bedrooms: number | null;
+  description: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -37,24 +36,20 @@ export function useProperties(transactionType: "sale" | "rent") {
 
   const fetchProperties = async (filters: PropertyFilters = {}) => {
     try {
-      const { data: propertiesData, error } = await supabase
+      const query = supabase
         .from("properties")
-        .select(`
-          *,
-          property_images (
-            image_url,
-            is_main
-          )
-        `)
-        .eq("transaction_type", transactionType)
-        .eq("property_type", filters.propertyType || null)
-        .eq("city", filters.city || null)
-        .lte("price", filters.maxPrice || null)
-        .gte("area_size", filters.minSize || null)
-        .eq("rooms", filters.rooms || null)
-        .eq("is_furnished", filters.isFurnished || null)
-        .lte("distance_from_road", filters.distanceFromRoad || null)
-        .order("created_at", { ascending: false });
+        .select("*, property_images(image_url, is_main)")
+        .eq("transaction_type", transactionType);
+
+      // Apply filters conditionally
+      if (filters.propertyType) query.eq("property_type", filters.propertyType);
+      if (filters.city) query.eq("city", filters.city);
+      if (filters.maxPrice) query.lte("price", filters.maxPrice);
+      if (filters.minSize) query.gte("area_size", filters.minSize);
+      if (filters.isFurnished !== undefined) query.eq("is_furnished", filters.isFurnished);
+      if (filters.distanceFromRoad) query.lte("distance_from_road", filters.distanceFromRoad);
+
+      const { data: propertiesData, error } = await query.order("created_at", { ascending: false });
 
       if (error) throw error;
 
@@ -63,7 +58,6 @@ export function useProperties(transactionType: "sale" | "rent") {
         ...property,
         transaction_type: property.transaction_type as "sale" | "rent",
         property_images: (property.property_images || []) as BasePropertyImage[],
-        rooms: property.rooms || null,
         is_furnished: property.is_furnished || null,
         distance_from_road: property.distance_from_road || null,
         bathrooms: property.bathrooms || null,
