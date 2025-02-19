@@ -10,6 +10,11 @@ type Property = {
   city: string;
   neighborhood: string;
   area_size: number;
+  property_type: string;
+  transaction_type: "sale" | "rent";
+  rooms?: number;
+  is_furnished?: boolean;
+  distance_from_road?: number;
   property_images: {
     image_url: string;
     is_main: boolean;
@@ -22,7 +27,7 @@ export function useProperties(transactionType: "sale" | "rent") {
 
   const fetchProperties = async (filters: PropertyFilters = {}) => {
     try {
-      let query = supabase
+      const query = supabase
         .from("properties")
         .select(`
           *,
@@ -31,30 +36,32 @@ export function useProperties(transactionType: "sale" | "rent") {
             is_main
           )
         `)
-        .eq("transaction_type", transactionType)
-        .order("created_at", { ascending: false });
+        .eq("transaction_type", transactionType);
 
+      // Apply filters
       if (filters.propertyType) {
-        query = query.eq("property_type", filters.propertyType);
+        query.eq("property_type", filters.propertyType);
       }
       if (filters.city) {
-        query = query.eq("city", filters.city);
+        query.eq("city", filters.city);
       }
       if (filters.maxPrice) {
-        query = query.lte("price", filters.maxPrice);
+        query.lte("price", filters.maxPrice);
       }
       if (filters.minSize) {
-        query = query.gte("area_size", filters.minSize);
+        query.gte("area_size", filters.minSize);
       }
       if (filters.rooms) {
-        query = query.eq("rooms", filters.rooms);
+        query.eq("rooms", filters.rooms);
       }
       if (filters.isFurnished !== undefined) {
-        query = query.eq("is_furnished", filters.isFurnished);
+        query.eq("is_furnished", filters.isFurnished);
       }
       if (filters.distanceFromRoad) {
-        query = query.lte("distance_from_road", filters.distanceFromRoad);
+        query.lte("distance_from_road", filters.distanceFromRoad);
       }
+
+      query.order("created_at", { ascending: false });
 
       const { data, error } = await query;
 
@@ -69,7 +76,7 @@ export function useProperties(transactionType: "sale" | "rent") {
 
   useEffect(() => {
     fetchProperties();
-  }, []);
+  }, [transactionType]);
 
   return { properties, loading, fetchProperties };
 }
