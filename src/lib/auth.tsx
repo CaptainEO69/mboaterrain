@@ -47,12 +47,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .eq('user_id', session.user.id)
             .single();
 
-          setUser({
-            id: session.user.id,
-            email: session.user.email!,
-            profile: profile || undefined,
-          });
-          console.log("Auth initialized with user:", session.user.id);
+          if (mounted) {
+            setUser({
+              id: session.user.id,
+              email: session.user.email!,
+              profile: profile || undefined,
+            });
+            console.log("Auth initialized with user:", session.user.id);
+          }
         } else {
           if (mounted) {
             console.log("No session found");
@@ -72,9 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initializeAuth();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event);
       
       if (session && mounted) {
@@ -85,13 +85,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .eq('user_id', session.user.id)
             .single();
 
-          setUser({
-            id: session.user.id,
-            email: session.user.email!,
-            profile: profile || undefined,
-          });
+          if (mounted) {
+            setUser({
+              id: session.user.id,
+              email: session.user.email!,
+              profile: profile || undefined,
+            });
+          }
         } catch (error) {
           console.error("Error fetching profile:", error);
+          if (mounted) setUser(null);
         }
       } else if (mounted) {
         setUser(null);
