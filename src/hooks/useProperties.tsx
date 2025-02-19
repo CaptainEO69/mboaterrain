@@ -17,9 +17,14 @@ interface BaseProperty {
   area_size: number;
   property_type: string;
   transaction_type: "sale" | "rent";
-  rooms?: number;
-  is_furnished?: boolean;
-  distance_from_road?: number;
+  rooms?: number | null;
+  is_furnished?: boolean | null;
+  distance_from_road?: number | null;
+  bathrooms?: number | null;
+  bedrooms?: number | null;
+  description?: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 interface PropertyWithImages extends BaseProperty {
@@ -34,7 +39,13 @@ export function useProperties(transactionType: "sale" | "rent") {
     try {
       const { data: propertiesData, error } = await supabase
         .from("properties")
-        .select("*, property_images!property_images_property_id_fkey(image_url, is_main)")
+        .select(`
+          *,
+          property_images (
+            image_url,
+            is_main
+          )
+        `)
         .eq("transaction_type", transactionType)
         .eq("property_type", filters.propertyType || null)
         .eq("city", filters.city || null)
@@ -47,9 +58,17 @@ export function useProperties(transactionType: "sale" | "rent") {
 
       if (error) throw error;
 
-      const formattedProperties = (propertiesData || []).map(property => ({
+      // Cast the response data to the correct type with explicit type checking
+      const formattedProperties: PropertyWithImages[] = (propertiesData || []).map(property => ({
         ...property,
-        property_images: property.property_images || [],
+        transaction_type: property.transaction_type as "sale" | "rent",
+        property_images: (property.property_images || []) as BasePropertyImage[],
+        rooms: property.rooms || null,
+        is_furnished: property.is_furnished || null,
+        distance_from_road: property.distance_from_road || null,
+        bathrooms: property.bathrooms || null,
+        bedrooms: property.bedrooms || null,
+        description: property.description || null,
       }));
 
       setProperties(formattedProperties);
