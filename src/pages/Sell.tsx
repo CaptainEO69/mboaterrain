@@ -1,6 +1,8 @@
+
 import { useState } from "react";
 import { PropertyForm } from "@/components/sell/PropertyForm";
-import { Building2, MapPin, BadgeDollarSign, FileCheck } from "lucide-react";
+import { Building2, MapPin, FileCheck } from "lucide-react";
+import { CFAIcon } from "@/components/icons/CFAIcon";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
@@ -117,7 +119,7 @@ export default function Sell() {
               </div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg flex items-center space-x-3">
-              <BadgeDollarSign className="w-6 h-6" />
+              <CFAIcon className="w-6 h-6" />
               <div>
                 <h3 className="font-semibold">Prix Flexibles</h3>
                 <p className="text-sm opacity-75">Définissez vos tarifs</p>

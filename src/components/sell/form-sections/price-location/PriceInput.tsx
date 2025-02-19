@@ -1,6 +1,8 @@
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { DollarSign, Info } from "lucide-react";
+import { Info } from "lucide-react";
+import { CFAIcon } from "@/components/icons/CFAIcon";
 import {
   Tooltip,
   TooltipContent,
@@ -18,7 +20,7 @@ export function PriceInput({ error }: PriceInputProps) {
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Label htmlFor="price">Prix de vente (FCFA)</Label>
-          <DollarSign className="w-4 h-4 text-muted-foreground" />
+          <CFAIcon className="w-4 h-4 text-muted-foreground" />
         </div>
         <Input
           id="price"
