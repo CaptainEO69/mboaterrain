@@ -1,3 +1,4 @@
+
 export function usePropertyFormValidation() {
   const validateForm = (formData: FormData, images: FileList | null): Record<string, string> => {
     const errors: Record<string, string> = {};
@@ -36,6 +37,11 @@ export function usePropertyFormValidation() {
       const certificateValidity = formData.get("certificate_validity") as string;
       if (!certificateValidity) {
         errors.certificate_validity = "La date de validité est requise";
+      }
+
+      const plotNumber = formData.get("plot_number") as string;
+      if (!plotNumber) {
+        errors.plot_number = "Le numéro de lot est requis";
       }
     }
 

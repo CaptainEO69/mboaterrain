@@ -1,9 +1,11 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "./ImageUpload";
 import { BasicInfoSection } from "./form-sections/BasicInfoSection";
 import { PriceLocationSection } from "./form-sections/PriceLocationSection";
 import { LandDocumentsSection } from "./form-sections/land-documents/LandDocumentsSection";
+import { LandTitleSection } from "./form-sections/LandTitleSection";
 import { usePropertyFormValidation } from "./form-validation/usePropertyFormValidation";
 import { toast } from "sonner";
 
@@ -49,7 +51,10 @@ export function PropertyForm({ onSubmit, isSubmitting = false, transactionType }
       <PriceLocationSection errors={validationErrors} />
 
       {propertyType === "land" && (
-        <LandDocumentsSection errors={validationErrors} />
+        <>
+          <LandTitleSection errors={validationErrors} />
+          <LandDocumentsSection errors={validationErrors} />
+        </>
       )}
 
       <div className={validationErrors.images ? "border border-red-500 rounded-lg p-4" : ""}>
