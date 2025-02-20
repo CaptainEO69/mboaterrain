@@ -79,7 +79,11 @@ export function Header({ mobileMenuOpen, setMobileMenuOpen }: HeaderProps) {
     <header className="bg-white py-4 shadow-md">
       <div className="container mx-auto px-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <img src="/logo-mboater.png" alt="Mboater Logo" className="h-8 w-auto" />
+          <img 
+            src="/lovable-uploads/9bc95231-71ad-4886-9f52-e0ba2d37f3c6.png" 
+            alt="Mboater Logo" 
+            className="h-8 w-8"
+          />
           <span className="text-2xl font-bold text-cmr-green">Mboater</span>
         </Link>
 
