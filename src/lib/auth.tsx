@@ -9,6 +9,7 @@ interface Profile {
   user_id: string;
   full_name: string | null;
   user_type: string | null;
+  phone_number: string | null;
 }
 
 interface UserWithProfile extends User {
@@ -22,6 +23,8 @@ interface AuthState {
 }
 
 interface AuthContextType extends AuthState {
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -121,6 +124,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [navigate, location.pathname]);
 
+  const signIn = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      throw error;
+    }
+  };
+
+  const signUp = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) {
+      throw error;
+    }
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
     localStorage.removeItem('supabase_session');
@@ -128,7 +153,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ ...state, signOut }}>
+    <AuthContext.Provider value={{ ...state, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );
