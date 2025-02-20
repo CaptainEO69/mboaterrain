@@ -130,7 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
           // Rediriger vers login uniquement si la route actuelle nécessite une authentification
           if (!isPublicRoute(location.pathname)) {
-            navigate("/login");
+            navigate("/login", { state: { from: location.pathname } });
           }
         }
       }
