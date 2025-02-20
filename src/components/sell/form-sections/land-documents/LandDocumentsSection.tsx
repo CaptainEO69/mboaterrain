@@ -1,17 +1,19 @@
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FileCheck } from "lucide-react";
 
 interface LandDocumentsSectionProps {
   errors: Record<string, string>;
+  forHouse?: boolean;
 }
 
-export function LandDocumentsSection({ errors }: LandDocumentsSectionProps) {
+export function LandDocumentsSection({ errors, forHouse = false }: LandDocumentsSectionProps) {
   return (
     <div className="space-y-4 border-t pt-4">
       <div className="flex items-center gap-2 mb-4">
         <FileCheck className="w-5 h-5 text-cmr-green" />
-        <h3 className="font-medium">Documents du terrain</h3>
+        <h3 className="font-medium">{forHouse ? "Documents de la maison" : "Documents du terrain"}</h3>
       </div>
 
       <div>

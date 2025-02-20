@@ -57,6 +57,13 @@ export function PropertyForm({ onSubmit, isSubmitting = false, transactionType }
         </>
       )}
 
+      {propertyType === "house" && (
+        <>
+          <LandTitleSection errors={validationErrors} />
+          <LandDocumentsSection errors={validationErrors} forHouse={true} />
+        </>
+      )}
+
       <div className={validationErrors.images ? "border border-red-500 rounded-lg p-4" : ""}>
         <ImageUpload onChange={(files) => setImages(files)} />
         {validationErrors.images && (
