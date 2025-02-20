@@ -46,7 +46,8 @@ export function PropertyForm({ onSubmit, isSubmitting = false, transactionType }
         errors={validationErrors} 
         onPropertyTypeChange={(value) => {
           setPropertyType(value);
-        }} 
+        }}
+        transactionType={transactionType}
       />
 
       <PriceLocationSection errors={validationErrors} />
