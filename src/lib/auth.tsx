@@ -1,193 +1,143 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import { useLocation, useNavigate } from "react-router-dom";
+import type { User } from "@supabase/supabase-js";
 
-type AuthUser = {
+interface Profile {
   id: string;
-  email: string;
-  profile?: {
-    id: string;
-    full_name: string | null;
-    phone_number: string | null;
-    user_type: string;
-  };
-};
+  user_id: string;
+  full_name: string | null;
+  user_type: string | null;
+}
 
-type AuthContextType = {
-  user: AuthUser | null;
+interface UserWithProfile extends User {
+  profile?: Profile;
+}
+
+interface AuthState {
+  user: UserWithProfile | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
-  signOut: () => Promise<void>;
-  createProfile: (profile: Omit<AuthUser['profile'], 'id'>) => Promise<void>;
-};
+  isReady: boolean;
+}
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+interface AuthContextType extends AuthState {
+  signOut: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(() => {
-    // Initialiser l'état utilisateur à partir du localStorage
-    const savedUser = localStorage.getItem('auth_user');
-    return savedUser ? JSON.parse(savedUser) : null;
+  const [state, setState] = useState<AuthState>({
+    user: null,
+    loading: true,
+    isReady: false,
   });
-  const [loading, setLoading] = useState(true);
+  
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    let mounted = true;
-
-    const initializeAuth = async () => {
+    // Restore session from localStorage if it exists
+    const savedSession = localStorage.getItem('supabase_session');
+    if (savedSession) {
       try {
-        console.log("Initializing auth...");
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session && mounted) {
-          console.log("Session found, fetching profile...");
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .single();
-
-          if (mounted) {
-            const userData = {
-              id: session.user.id,
-              email: session.user.email!,
-              profile: profile || undefined,
-            };
-            setUser(userData);
-            // Sauvegarder l'utilisateur dans le localStorage
-            localStorage.setItem('auth_user', JSON.stringify(userData));
-            console.log("Auth initialized with user:", session.user.id);
-          }
-        } else {
-          if (mounted) {
-            console.log("No session found");
-            setUser(null);
-            localStorage.removeItem('auth_user');
-          }
-        }
+        const session = JSON.parse(savedSession);
+        supabase.auth.setSession(session);
       } catch (error) {
-        console.error("Error during auth initialization:", error);
-        if (mounted) {
-          setUser(null);
-          localStorage.removeItem('auth_user');
-        }
-      } finally {
-        if (mounted) {
-          console.log("Auth initialization complete");
-          setLoading(false);
-        }
+        console.error('Error restoring session:', error);
+        localStorage.removeItem('supabase_session');
+      }
+    }
+
+    const fetchUserProfile = async (userId: string) => {
+      try {
+        const { data: profile, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("user_id", userId)
+          .single();
+
+        if (error) throw error;
+        return profile;
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+        return null;
       }
     };
 
-    initializeAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event);
-      
-      if (session && mounted) {
-        try {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .single();
-
-          if (mounted) {
-            const userData = {
-              id: session.user.id,
-              email: session.user.email!,
-              profile: profile || undefined,
-            };
-            setUser(userData);
-            // Mettre à jour le localStorage quand l'état de l'auth change
-            localStorage.setItem('auth_user', JSON.stringify(userData));
-          }
-        } catch (error) {
-          console.error("Error fetching profile:", error);
-          if (mounted) {
-            setUser(null);
-            localStorage.removeItem('auth_user');
-          }
-        }
-      } else if (mounted) {
-        setUser(null);
-        localStorage.removeItem('auth_user');
+    console.info("Initializing auth...");
+    
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        const profile = await fetchUserProfile(session.user.id);
+        setState({
+          user: { ...session.user, profile },
+          loading: false,
+          isReady: true,
+        });
+        // Save session to localStorage
+        localStorage.setItem('supabase_session', JSON.stringify(session));
+      } else {
+        setState({ user: null, loading: false, isReady: true });
+        localStorage.removeItem('supabase_session');
       }
     });
 
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.info("Auth state changed:", event);
+
+        if (session?.user) {
+          const profile = await fetchUserProfile(session.user.id);
+          setState({
+            user: { ...session.user, profile },
+            loading: false,
+            isReady: true,
+          });
+          // Save session to localStorage on auth state change
+          localStorage.setItem('supabase_session', JSON.stringify(session));
+
+          if (location.pathname === "/login" || location.pathname === "/register") {
+            navigate("/");
+          }
+        } else {
+          setState({ user: null, loading: false, isReady: true });
+          localStorage.removeItem('supabase_session');
+
+          if (location.pathname !== "/login" && 
+              location.pathname !== "/register" && 
+              location.pathname !== "/reset-password" && 
+              location.pathname !== "/update-password" &&
+              !location.pathname.startsWith("/property/")) {
+            navigate("/login");
+          }
+        }
+      }
+    );
+
     return () => {
-      mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
-
-  const signIn = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      navigate('/');
-      toast.success('Connexion réussie');
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
-
-  const signUp = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signUp({ email, password });
-      if (error) throw error;
-      toast.success('Inscription réussie. Veuillez vérifier votre email.');
-      navigate('/login');
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
+  }, [navigate, location.pathname]);
 
   const signOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      setUser(null);
-      localStorage.removeItem('auth_user');
-      navigate('/login');
-      toast.success('Déconnexion réussie');
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
-
-  const createProfile = async (profile: Omit<AuthUser['profile'], 'id'>) => {
-    try {
-      if (!user) throw new Error("Utilisateur non connecté");
-      
-      const { error } = await supabase
-        .from('profiles')
-        .insert([{ ...profile, user_id: user.id }]);
-        
-      if (error) throw error;
-      
-      toast.success('Profil créé avec succès');
-      navigate('/');
-    } catch (error: any) {
-      toast.error(error.message);
-    }
+    await supabase.auth.signOut();
+    localStorage.removeItem('supabase_session');
+    navigate("/login");
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, createProfile }}>
+    <AuthContext.Provider value={{ ...state, signOut }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
-};
+}
