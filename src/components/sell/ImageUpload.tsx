@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
@@ -10,27 +11,29 @@ interface ImageUploadProps {
 }
 
 export function ImageUpload({ onChange }: ImageUploadProps) {
-  const [images, setImages] = useState<FileList | null>(null);
+  const [files, setFiles] = useState<FileList | null>(null);
   const [previews, setPreviews] = useState<string[]>([]);
   const { takePicture } = useCamera();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      setImages(files);
+      setFiles(files);
       onChange(files);
       
-      // Create previews
+      // Create previews for images only
       const newPreviews: string[] = [];
       Array.from(files).forEach(file => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          newPreviews.push(reader.result as string);
-          if (newPreviews.length === files.length) {
-            setPreviews(newPreviews);
-          }
-        };
-        reader.readAsDataURL(file);
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            newPreviews.push(reader.result as string);
+            if (newPreviews.length === files.length) {
+              setPreviews(newPreviews);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
       });
     }
   };
@@ -50,7 +53,7 @@ export function ImageUpload({ onChange }: ImageUploadProps) {
   };
 
   const handleRemoveAll = () => {
-    setImages(null);
+    setFiles(null);
     setPreviews([]);
     onChange(null);
   };
@@ -58,13 +61,13 @@ export function ImageUpload({ onChange }: ImageUploadProps) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="images">Photos</Label>
+        <Label htmlFor="files">Sélectionner fichiers</Label>
         <div className="flex gap-2">
           <Input
-            id="images"
-            name="images"
+            id="files"
+            name="files"
             type="file"
-            accept="image/*"
+            accept="image/*,.pdf"
             multiple
             onChange={handleChange}
             className="cursor-pointer"
@@ -80,7 +83,7 @@ export function ImageUpload({ onChange }: ImageUploadProps) {
           </Button>
         </div>
         <p className="text-sm text-gray-500">
-          Vous pouvez sélectionner plusieurs photos ou utiliser l'appareil photo. La première sera l'image principale.
+          Vous pouvez sélectionner plusieurs photos ou documents PDF. Pour les photos, la première sera l'image principale.
         </p>
       </div>
 
