@@ -1,71 +1,89 @@
-
-import { Routes, Route } from "react-router-dom";
-import { Toaster } from "@/components/ui/toaster";
-import { AuthProvider } from "@/lib/auth";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { Header } from "@/components/Header";
-import { BottomNav } from "@/components/BottomNav";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Root from "@/components/Root";
+import NotFound from "@/pages/NotFound";
 import Index from "@/pages/Index";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
+import ResetPassword from "@/pages/ResetPassword";
+import UpdatePassword from "@/pages/UpdatePassword";
+import PropertyDetails from "@/pages/PropertyDetails";
+import AddProperty from "@/pages/AddProperty";
+import EditProperty from "@/pages/EditProperty";
 import Buy from "@/pages/Buy";
 import Rent from "@/pages/Rent";
 import Sell from "@/pages/Sell";
-import Login from "@/pages/Login";
-import Register from "@/pages/Register";
-import RegisterForm from "@/pages/RegisterForm";
 import Profile from "@/pages/Profile";
-import PropertyDetails from "@/pages/PropertyDetails";
-import Favorites from "@/pages/Favorites";
-import ResetPassword from "@/pages/ResetPassword";
-import UpdatePassword from "@/pages/UpdatePassword";
-import NotFound from "@/pages/NotFound";
-import PrivacyPolicy from "@/pages/PrivacyPolicy";
-import Terms from "@/pages/Terms";
+import Messages from "@/pages/Messages";
+import { AuthProvider } from "@/lib/auth";
+import { Toaster } from "@/components/ui/toaster";
 
-function App() {
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Root />,
+    errorElement: <NotFound />,
+    children: [
+      {
+        index: true,
+        element: <Index />,
+      },
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        path: "/register",
+        element: <Register />,
+      },
+      {
+        path: "/reset-password",
+        element: <ResetPassword />,
+      },
+      {
+        path: "/update-password",
+        element: <UpdatePassword />,
+      },
+      {
+        path: "/property/:id",
+        element: <PropertyDetails />,
+      },
+      {
+        path: "/add-property",
+        element: <AddProperty />,
+      },
+      {
+        path: "/edit-property/:id",
+        element: <EditProperty />,
+      },
+      {
+        path: "/buy",
+        element: <Buy />,
+      },
+      {
+        path: "/rent",
+        element: <Rent />,
+      },
+      {
+        path: "/sell",
+        element: <Sell />,
+      },
+      {
+        path: "/profile",
+        element: <Profile />,
+      },
+      {
+        path: "/messages",
+        element: <Messages />,
+      },
+    ],
+  },
+]);
+
+export default function App() {
   return (
     <AuthProvider>
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/buy" element={<Buy />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/register/form" element={<RegisterForm />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/update-password" element={<UpdatePassword />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/property/:id" element={<PropertyDetails />} />
-            <Route path="/rent" element={
-              <ProtectedRoute>
-                <Rent />
-              </ProtectedRoute>
-            } />
-            <Route path="/sell" element={
-              <ProtectedRoute>
-                <Sell />
-              </ProtectedRoute>
-            } />
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            } />
-            <Route path="/favorites" element={
-              <ProtectedRoute>
-                <Favorites />
-              </ProtectedRoute>
-            } />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </main>
-        <BottomNav />
-      </div>
+      <RouterProvider router={router} />
       <Toaster />
     </AuthProvider>
   );
 }
-
-export default App;

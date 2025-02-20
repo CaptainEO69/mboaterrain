@@ -32,6 +32,7 @@ type Property = {
   profiles: {
     full_name: string | null;
     phone_number: string | null;
+    user_id: string;
   };
 };
 
