@@ -8,6 +8,15 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+interface VerificationCode {
+  id: string;
+  user_id: string;
+  email_code: string;
+  sms_code: string;
+  expires_at: string;
+  created_at: string;
+}
+
 export default function VerificationForm() {
   const navigate = useNavigate();
   const [emailCode, setEmailCode] = useState("");
@@ -33,7 +42,7 @@ export default function VerificationForm() {
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(1)
-        .single();
+        .single<VerificationCode>();
 
       if (error) {
         throw error;
@@ -61,7 +70,7 @@ export default function VerificationForm() {
           is_email_verified: true,
           is_phone_verified: true,
         })
-        .eq("user_id", user.id);
+        .eq("id", user.id);
 
       if (updateError) {
         throw updateError;
