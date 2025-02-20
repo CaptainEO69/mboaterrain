@@ -22,6 +22,7 @@ type Property = {
   is_furnished: boolean | null;
   distance_from_road: number | null;
   owner_id: string;
+  owner_profile_id: string;
   property_images: {
     id: string;
     image_url: string;
@@ -49,13 +50,13 @@ export default function PropertyDetails() {
           .select(`
             *,
             property_images (*),
-            profiles:owner_id (
+            profiles:owner_profile_id (
               full_name,
               phone_number
             )
           `)
           .eq("id", id)
-          .maybeSingle();
+          .single();
 
         if (error) throw error;
         
@@ -79,8 +80,27 @@ export default function PropertyDetails() {
       }
     };
 
+    const fetchFavoriteStatus = async () => {
+      if (!user?.profile?.id) return;
+
+      try {
+        const { data, error } = await supabase
+          .from("favorites")
+          .select()
+          .eq("user_id", user.profile.id)
+          .eq("property_id", id)
+          .maybeSingle();
+
+        if (error) throw error;
+        setIsFavorite(!!data);
+      } catch (error: any) {
+        console.error("Error fetching favorite status:", error);
+      }
+    };
+
     fetchProperty();
-  }, [id, navigate]);
+    fetchFavoriteStatus();
+  }, [id, navigate, user?.profile?.id]);
 
   const handleDelete = async () => {
     if (!property || !window.confirm("Êtes-vous sûr de vouloir supprimer cette propriété ?")) {
@@ -99,6 +119,37 @@ export default function PropertyDetails() {
       navigate("/");
     } catch (error: any) {
       toast.error("Erreur lors de la suppression");
+    }
+  };
+
+  const handleToggleFavorite = async () => {
+    if (!user?.profile?.id || !property) return;
+
+    try {
+      if (isFavorite) {
+        const { error } = await supabase
+          .from("favorites")
+          .delete()
+          .eq("user_id", user.profile.id)
+          .eq("property_id", property.id);
+
+        if (error) throw error;
+        toast.success("Retiré des favoris");
+      } else {
+        const { error } = await supabase
+          .from("favorites")
+          .insert({
+            user_id: user.profile.id,
+            property_id: property.id
+          });
+
+        if (error) throw error;
+        toast.success("Ajouté aux favoris");
+      }
+
+      setIsFavorite(!isFavorite);
+    } catch (error: any) {
+      toast.error("Erreur lors de la modification des favoris");
     }
   };
 
@@ -135,7 +186,7 @@ export default function PropertyDetails() {
               variant="secondary"
               size="icon"
               className="absolute top-4 right-4"
-              onClick={() => setIsFavorite(!isFavorite)}
+              onClick={handleToggleFavorite}
             >
               <Heart className={`h-5 w-5 ${isFavorite ? "fill-current text-red-500" : ""}`} />
             </Button>
