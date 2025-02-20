@@ -78,8 +78,9 @@ export function Header({ mobileMenuOpen, setMobileMenuOpen }: HeaderProps) {
   return (
     <header className="bg-white py-4 shadow-md">
       <div className="container mx-auto px-4 flex items-center justify-between">
-        <Link to="/" className="text-2xl font-bold text-cmr-green">
-          Mboater
+        <Link to="/" className="flex items-center gap-2">
+          <img src="/logo-mboater.png" alt="Mboater Logo" className="h-8 w-auto" />
+          <span className="text-2xl font-bold text-cmr-green">Mboater</span>
         </Link>
 
         <nav className="hidden md:flex items-center space-x-6">
