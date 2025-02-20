@@ -54,6 +54,13 @@ export type Database = {
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       neighborhoods: {
@@ -94,8 +101,6 @@ export type Database = {
           id: string
           id_number: string | null
           is_certified: boolean | null
-          is_email_verified: boolean | null
-          is_phone_verified: boolean | null
           notary_office: string | null
           phone_number: string | null
           profession: string | null
@@ -115,8 +120,6 @@ export type Database = {
           id?: string
           id_number?: string | null
           is_certified?: boolean | null
-          is_email_verified?: boolean | null
-          is_phone_verified?: boolean | null
           notary_office?: string | null
           phone_number?: string | null
           profession?: string | null
@@ -136,8 +139,6 @@ export type Database = {
           id?: string
           id_number?: string | null
           is_certified?: boolean | null
-          is_email_verified?: boolean | null
-          is_phone_verified?: boolean | null
           notary_office?: string | null
           phone_number?: string | null
           profession?: string | null
@@ -164,7 +165,6 @@ export type Database = {
           is_furnished: boolean | null
           neighborhood: string
           owner_id: string
-          owner_profile_id: string | null
           price: number
           property_type: string
           title: string
@@ -183,7 +183,6 @@ export type Database = {
           is_furnished?: boolean | null
           neighborhood: string
           owner_id: string
-          owner_profile_id?: string | null
           price: number
           property_type: string
           title: string
@@ -202,7 +201,6 @@ export type Database = {
           is_furnished?: boolean | null
           neighborhood?: string
           owner_id?: string
-          owner_profile_id?: string | null
           price?: number
           property_type?: string
           title?: string
@@ -211,8 +209,8 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "properties_owner_profile_id_fkey"
-            columns: ["owner_profile_id"]
+            foreignKeyName: "properties_owner_id_fkey"
+            columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -276,34 +274,15 @@ export type Database = {
           service_type?: string
           updated_at?: string | null
         }
-        Relationships: []
-      }
-      verification_codes: {
-        Row: {
-          created_at: string
-          email_code: string
-          expires_at: string
-          id: string
-          sms_code: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          email_code: string
-          expires_at?: string
-          id?: string
-          sms_code: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          email_code?: string
-          expires_at?: string
-          id?: string
-          sms_code?: string
-          user_id?: string
-        }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "service_prices_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

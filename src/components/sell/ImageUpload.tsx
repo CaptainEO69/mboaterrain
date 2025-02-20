@@ -1,43 +1,56 @@
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, Camera as CameraIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useCamera } from "@/lib/native";
 
 interface ImageUploadProps {
   onChange: (files: FileList | null) => void;
 }
 
 export function ImageUpload({ onChange }: ImageUploadProps) {
-  const [files, setFiles] = useState<FileList | null>(null);
+  const [images, setImages] = useState<FileList | null>(null);
   const [previews, setPreviews] = useState<string[]>([]);
+  const { takePicture } = useCamera();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      setFiles(files);
+      setImages(files);
       onChange(files);
       
-      // Create previews for images only
+      // Create previews
       const newPreviews: string[] = [];
       Array.from(files).forEach(file => {
-        if (file.type.startsWith('image/')) {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            newPreviews.push(reader.result as string);
-            if (newPreviews.length === files.length) {
-              setPreviews(newPreviews);
-            }
-          };
-          reader.readAsDataURL(file);
-        }
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          newPreviews.push(reader.result as string);
+          if (newPreviews.length === files.length) {
+            setPreviews(newPreviews);
+          }
+        };
+        reader.readAsDataURL(file);
       });
     }
   };
 
+  const handleTakePicture = async () => {
+    const photoPath = await takePicture();
+    if (photoPath) {
+      setPreviews(prev => [...prev, photoPath]);
+      // Convert the photo path to a File object and trigger onChange
+      const response = await fetch(photoPath);
+      const blob = await response.blob();
+      const file = new File([blob], "photo.jpg", { type: "image/jpeg" });
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      onChange(dataTransfer.files);
+    }
+  };
+
   const handleRemoveAll = () => {
-    setFiles(null);
+    setImages(null);
     setPreviews([]);
     onChange(null);
   };
@@ -45,18 +58,29 @@ export function ImageUpload({ onChange }: ImageUploadProps) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="files">Sélectionner fichiers</Label>
-        <Input
-          id="files"
-          name="files"
-          type="file"
-          accept="image/*,.pdf"
-          multiple
-          onChange={handleChange}
-          className="cursor-pointer"
-        />
+        <Label htmlFor="images">Photos</Label>
+        <div className="flex gap-2">
+          <Input
+            id="images"
+            name="images"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleChange}
+            className="cursor-pointer"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleTakePicture}
+            className="flex items-center gap-2"
+          >
+            <CameraIcon className="w-4 h-4" />
+            Photo
+          </Button>
+        </div>
         <p className="text-sm text-gray-500">
-          Vous pouvez sélectionner plusieurs photos (JPG, PNG, GIF) ou documents PDF. Pour les photos, la première sera l'image principale.
+          Vous pouvez sélectionner plusieurs photos ou utiliser l'appareil photo. La première sera l'image principale.
         </p>
       </div>
 

@@ -2,9 +2,6 @@
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { AuthResponse } from "@supabase/supabase-js";
 
 export function useRegistrationForm(type: string | null) {
   const navigate = useNavigate();
@@ -27,52 +24,10 @@ export function useRegistrationForm(type: string | null) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Inscription de l'utilisateur
-      const result = await signUp(email, password);
-      const signUpResult = result as unknown as AuthResponse;
-      if (signUpResult.error) throw signUpResult.error;
-
-      const user = signUpResult.data?.user;
-      if (!user) {
-        throw new Error("Erreur lors de l'inscription");
-      }
-
-      // Créer le profil utilisateur
-      const birthYearNum = birthYear ? parseInt(birthYear, 10) : null;
-      const { error: profileError } = await supabase.from("profiles").insert({
-        user_id: user.id,
-        full_name: fullName,
-        phone_number: phoneNumber,
-        birth_place: birthPlace,
-        birth_year: birthYearNum,
-        id_number: idNumber,
-        profession,
-        residence_place: residencePlace,
-        sale_reason: saleReason,
-        is_certified: isCertified,
-        notary_office: notaryOffice,
-        user_type: type,
-        service_prices: servicePrices,
-      });
-
-      if (profileError) throw profileError;
-
-      // Envoyer les codes de vérification
-      const { error: verificationError } = await supabase.functions.invoke("send-verification-codes", {
-        body: {
-          user_id: user.id,
-          email,
-          phone_number: phoneNumber,
-        },
-      });
-
-      if (verificationError) throw verificationError;
-
-      toast.success("Inscription réussie ! Veuillez vérifier votre compte.");
-      navigate("/verify");
+      await signUp(email, password);
+      navigate("/login");
     } catch (error: any) {
       console.error("Registration error:", error);
-      toast.error(error.message);
     }
   };
 

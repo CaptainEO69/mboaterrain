@@ -27,11 +27,7 @@ type AuthContextType = {
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(() => {
-    // Initialiser l'état utilisateur à partir du localStorage
-    const savedUser = localStorage.getItem('auth_user');
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -52,29 +48,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .single();
 
           if (mounted) {
-            const userData = {
+            setUser({
               id: session.user.id,
               email: session.user.email!,
               profile: profile || undefined,
-            };
-            setUser(userData);
-            // Sauvegarder l'utilisateur dans le localStorage
-            localStorage.setItem('auth_user', JSON.stringify(userData));
+            });
             console.log("Auth initialized with user:", session.user.id);
           }
         } else {
           if (mounted) {
             console.log("No session found");
             setUser(null);
-            localStorage.removeItem('auth_user');
           }
         }
       } catch (error) {
         console.error("Error during auth initialization:", error);
-        if (mounted) {
-          setUser(null);
-          localStorage.removeItem('auth_user');
-        }
+        if (mounted) setUser(null);
       } finally {
         if (mounted) {
           console.log("Auth initialization complete");
@@ -97,25 +86,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .single();
 
           if (mounted) {
-            const userData = {
+            setUser({
               id: session.user.id,
               email: session.user.email!,
               profile: profile || undefined,
-            };
-            setUser(userData);
-            // Mettre à jour le localStorage quand l'état de l'auth change
-            localStorage.setItem('auth_user', JSON.stringify(userData));
+            });
           }
         } catch (error) {
           console.error("Error fetching profile:", error);
-          if (mounted) {
-            setUser(null);
-            localStorage.removeItem('auth_user');
-          }
+          if (mounted) setUser(null);
         }
       } else if (mounted) {
         setUser(null);
-        localStorage.removeItem('auth_user');
       }
     });
 
@@ -152,7 +134,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       setUser(null);
-      localStorage.removeItem('auth_user');
       navigate('/login');
       toast.success('Déconnexion réussie');
     } catch (error: any) {
