@@ -7,14 +7,14 @@ import { MessageSquare } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Link } from "react-router-dom";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 type Message = {
   id: string;
   content: string;
   created_at: string;
   read: boolean;
-  property: {
+  property?: {
     id: string;
     title: string;
   } | null;
