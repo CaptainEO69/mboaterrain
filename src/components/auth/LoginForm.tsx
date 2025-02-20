@@ -1,9 +1,11 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { toast } from "sonner";
 
 export const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -17,6 +19,13 @@ export const LoginForm = () => {
     
     try {
       await signIn(email, password);
+      toast.success("Connexion réussie");
+    } catch (error: any) {
+      console.error("Erreur de connexion:", error);
+      toast.error(error.message === "Invalid login credentials"
+        ? "Email ou mot de passe incorrect"
+        : "Erreur lors de la connexion"
+      );
     } finally {
       setIsLoading(false);
     }

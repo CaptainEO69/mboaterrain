@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { User } from "@supabase/supabase-js";
+import { toast } from "sonner";
 
 interface Profile {
   id: string;
@@ -30,7 +31,6 @@ interface AuthContextType extends AuthState {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Routes qui ne nécessitent pas d'authentification
 const PUBLIC_ROUTES = [
   '/',
   '/login',
@@ -41,7 +41,6 @@ const PUBLIC_ROUTES = [
   '/contact',
 ];
 
-// Fonction pour vérifier si une route commence par un chemin public
 const isPublicRoute = (path: string) => {
   return PUBLIC_ROUTES.some(route => {
     if (route === '/property') {
@@ -62,7 +61,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const location = useLocation();
 
   useEffect(() => {
-    // Restore session from localStorage if it exists
     const savedSession = localStorage.getItem('supabase_session');
     if (savedSession) {
       try {
@@ -82,17 +80,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .eq("user_id", userId)
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error("Error fetching profile:", error);
+          return null;
+        }
         return profile;
       } catch (error) {
-        console.error("Error fetching user profile:", error);
+        console.error("Error in fetchUserProfile:", error);
         return null;
       }
     };
 
-    console.info("Initializing auth...");
-    
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    const setupAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
       if (session?.user) {
         const profile = await fetchUserProfile(session.user.id);
         setState({
@@ -105,7 +106,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setState({ user: null, loading: false, isReady: true });
         localStorage.removeItem('supabase_session');
       }
-    });
+    };
+
+    setupAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -120,7 +123,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           });
           localStorage.setItem('supabase_session', JSON.stringify(session));
 
-          // Si on est sur une page de login/register et qu'on est connecté, rediriger vers l'accueil
           if (location.pathname === "/login" || location.pathname === "/register") {
             navigate("/");
           }
@@ -128,9 +130,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setState({ user: null, loading: false, isReady: true });
           localStorage.removeItem('supabase_session');
 
-          // Rediriger vers login uniquement si la route actuelle nécessite une authentification
           if (!isPublicRoute(location.pathname)) {
-            navigate("/login", { state: { from: location.pathname } });
+            const from = location.pathname;
+            navigate("/login", { state: { from } });
           }
         }
       }
@@ -164,9 +166,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    localStorage.removeItem('supabase_session');
-    navigate("/login");
+    try {
+      await supabase.auth.signOut();
+      localStorage.removeItem('supabase_session');
+      navigate("/login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast.error("Erreur lors de la déconnexion");
+    }
   };
 
   return (
