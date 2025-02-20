@@ -1,193 +1,171 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import type { User } from "@supabase/supabase-js";
 import { toast } from "sonner";
 
-type AuthUser = {
+interface Profile {
   id: string;
-  email: string;
-  profile?: {
-    id: string;
-    full_name: string | null;
-    phone_number: string | null;
-    user_type: string;
-  };
-};
+  user_id: string;
+  full_name: string | null;
+  user_type: string | null;
+  phone_number: string | null;
+}
 
-type AuthContextType = {
-  user: AuthUser | null;
+interface UserWithProfile extends User {
+  profile?: Profile;
+}
+
+interface AuthContextType {
+  user: UserWithProfile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
-  createProfile: (profile: Omit<AuthUser['profile'], 'id'>) => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const PUBLIC_ROUTES = [
+  '/',
+  '/login',
+  '/register',
+  '/register/form',
+  '/buy',
+  '/property',
+  '/reset-password',
+  '/update-password',
+  '/privacy-policy',
+  '/terms',
+];
+
+const isPublicRoute = (path: string) => {
+  return PUBLIC_ROUTES.some(route => {
+    if (route === '/property') {
+      return path.startsWith('/property/');
+    }
+    return path === route;
+  });
 };
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(() => {
-    // Initialiser l'état utilisateur à partir du localStorage
-    const savedUser = localStorage.getItem('auth_user');
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
+  const [user, setUser] = useState<UserWithProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    let mounted = true;
+    console.info("Initializing auth...");
 
-    const initializeAuth = async () => {
+    const setupAuth = async () => {
       try {
-        console.log("Initializing auth...");
         const { data: { session } } = await supabase.auth.getSession();
         
-        if (session && mounted) {
-          console.log("Session found, fetching profile...");
+        if (session?.user) {
           const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('user_id', session.user.id)
+            .from("profiles")
+            .select("*")
+            .eq("user_id", session.user.id)
             .single();
 
-          if (mounted) {
-            const userData = {
-              id: session.user.id,
-              email: session.user.email!,
-              profile: profile || undefined,
-            };
-            setUser(userData);
-            // Sauvegarder l'utilisateur dans le localStorage
-            localStorage.setItem('auth_user', JSON.stringify(userData));
-            console.log("Auth initialized with user:", session.user.id);
-          }
+          setUser({ ...session.user, profile });
+          console.info("Auth state changed: SIGNED_IN");
         } else {
-          if (mounted) {
-            console.log("No session found");
-            setUser(null);
-            localStorage.removeItem('auth_user');
-          }
+          console.info("No session found");
+          setUser(null);
         }
       } catch (error) {
-        console.error("Error during auth initialization:", error);
-        if (mounted) {
-          setUser(null);
-          localStorage.removeItem('auth_user');
-        }
-      } finally {
-        if (mounted) {
-          console.log("Auth initialization complete");
-          setLoading(false);
-        }
+        console.error("Error in setupAuth:", error);
+        setUser(null);
       }
+      
+      console.info("Auth initialization complete");
+      setLoading(false);
     };
 
-    initializeAuth();
+    setupAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event);
-      
-      if (session && mounted) {
-        try {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.info("Auth state changed:", event);
+
+        if (session?.user) {
           const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('user_id', session.user.id)
+            .from("profiles")
+            .select("*")
+            .eq("user_id", session.user.id)
             .single();
 
-          if (mounted) {
-            const userData = {
-              id: session.user.id,
-              email: session.user.email!,
-              profile: profile || undefined,
-            };
-            setUser(userData);
-            // Mettre à jour le localStorage quand l'état de l'auth change
-            localStorage.setItem('auth_user', JSON.stringify(userData));
+          setUser({ ...session.user, profile });
+
+          // Si on est sur une page de connexion/inscription et qu'on est connecté,
+          // rediriger vers la page d'accueil
+          if (location.pathname === "/login" || location.pathname === "/register") {
+            navigate("/");
+            toast.success("Connexion réussie");
           }
-        } catch (error) {
-          console.error("Error fetching profile:", error);
-          if (mounted) {
-            setUser(null);
-            localStorage.removeItem('auth_user');
+        } else {
+          setUser(null);
+
+          // Si on n'est pas sur une route publique et qu'on n'est pas connecté,
+          // rediriger vers la page de connexion
+          if (!isPublicRoute(location.pathname)) {
+            navigate("/login", { state: { from: location.pathname } });
           }
         }
-      } else if (mounted) {
-        setUser(null);
-        localStorage.removeItem('auth_user');
       }
-    });
+    );
 
     return () => {
-      mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [navigate, location.pathname]);
 
   const signIn = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      navigate('/');
-      toast.success('Connexion réussie');
-    } catch (error: any) {
-      toast.error(error.message);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      throw error;
     }
   };
 
   const signUp = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signUp({ email, password });
-      if (error) throw error;
-      toast.success('Inscription réussie. Veuillez vérifier votre email.');
-      navigate('/login');
-    } catch (error: any) {
-      toast.error(error.message);
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) {
+      throw error;
     }
   };
 
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      setUser(null);
-      localStorage.removeItem('auth_user');
-      navigate('/login');
-      toast.success('Déconnexion réussie');
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
-
-  const createProfile = async (profile: Omit<AuthUser['profile'], 'id'>) => {
-    try {
-      if (!user) throw new Error("Utilisateur non connecté");
-      
-      const { error } = await supabase
-        .from('profiles')
-        .insert([{ ...profile, user_id: user.id }]);
-        
-      if (error) throw error;
-      
-      toast.success('Profil créé avec succès');
-      navigate('/');
-    } catch (error: any) {
-      toast.error(error.message);
+      await supabase.auth.signOut();
+      navigate("/login");
+      toast.success("Déconnexion réussie");
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast.error("Erreur lors de la déconnexion");
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, createProfile }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
-};
+}

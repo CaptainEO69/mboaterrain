@@ -1,29 +1,20 @@
 
 import { useAuth } from "@/lib/auth";
 import { Navigate, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const location = useLocation();
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    if (!loading) {
-      setIsReady(true);
-    }
-  }, [loading]);
 
   // Logs pour debug
   console.log("ProtectedRoute - Current state:", {
     loading,
     user,
-    isReady,
     pathname: location.pathname
   });
 
   // Si l'authentification est en cours de chargement, afficher le loader
-  if (loading || !isReady) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
