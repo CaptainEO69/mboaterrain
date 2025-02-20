@@ -56,7 +56,7 @@ export function ImageUpload({ onChange }: ImageUploadProps) {
           className="cursor-pointer"
         />
         <p className="text-sm text-gray-500">
-          Vous pouvez sélectionner plusieurs photos ou documents PDF. Pour les photos, la première sera l'image principale.
+          Vous pouvez sélectionner plusieurs photos (JPG, PNG, GIF) ou documents PDF. Pour les photos, la première sera l'image principale.
         </p>
       </div>
 
