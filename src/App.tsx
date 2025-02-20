@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
 import Root from "@/components/Root";
 import NotFound from "@/pages/NotFound";
 import Index from "@/pages/Index";
@@ -16,73 +16,29 @@ import Profile from "@/pages/Profile";
 import Messages from "@/pages/Messages";
 import { AuthProvider } from "@/lib/auth";
 import { Toaster } from "@/components/ui/toaster";
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Root />,
-    errorElement: <NotFound />,
-    children: [
-      {
-        index: true,
-        element: <Index />,
-      },
-      {
-        path: "/login",
-        element: <Login />,
-      },
-      {
-        path: "/register",
-        element: <Register />,
-      },
-      {
-        path: "/reset-password",
-        element: <ResetPassword />,
-      },
-      {
-        path: "/update-password",
-        element: <UpdatePassword />,
-      },
-      {
-        path: "/property/:id",
-        element: <PropertyDetails />,
-      },
-      {
-        path: "/add-property",
-        element: <AddProperty />,
-      },
-      {
-        path: "/edit-property/:id",
-        element: <EditProperty />,
-      },
-      {
-        path: "/buy",
-        element: <Buy />,
-      },
-      {
-        path: "/rent",
-        element: <Rent />,
-      },
-      {
-        path: "/sell",
-        element: <Sell />,
-      },
-      {
-        path: "/profile",
-        element: <Profile />,
-      },
-      {
-        path: "/messages",
-        element: <Messages />,
-      },
-    ],
-  },
-]);
+import { Routes, Route } from "react-router-dom";
 
 export default function App() {
   return (
     <AuthProvider>
-      <RouterProvider router={router} />
+      <Routes>
+        <Route path="/" element={<Root />}>
+          <Route index element={<Index />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/update-password" element={<UpdatePassword />} />
+          <Route path="/property/:id" element={<PropertyDetails />} />
+          <Route path="/add-property" element={<AddProperty />} />
+          <Route path="/edit-property/:id" element={<EditProperty />} />
+          <Route path="/buy" element={<Buy />} />
+          <Route path="/rent" element={<Rent />} />
+          <Route path="/sell" element={<Sell />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/messages" element={<Messages />} />
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
       <Toaster />
     </AuthProvider>
   );
