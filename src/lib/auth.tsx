@@ -30,6 +30,22 @@ interface AuthContextType extends AuthState {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Routes qui ne nécessitent pas d'authentification
+const PUBLIC_ROUTES = [
+  '/',
+  '/login',
+  '/register',
+  '/reset-password',
+  '/update-password',
+  '/buy',
+  '/rent',
+];
+
+// Fonction pour vérifier si une route commence par un chemin public
+const isPublicRoute = (path: string) => {
+  return PUBLIC_ROUTES.some(route => path === route || path.startsWith('/property/'));
+};
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AuthState>({
     user: null,
@@ -79,7 +95,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           loading: false,
           isReady: true,
         });
-        // Save session to localStorage
         localStorage.setItem('supabase_session', JSON.stringify(session));
       } else {
         setState({ user: null, loading: false, isReady: true });
@@ -98,9 +113,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             loading: false,
             isReady: true,
           });
-          // Save session to localStorage on auth state change
           localStorage.setItem('supabase_session', JSON.stringify(session));
 
+          // Si on est sur une page de login/register et qu'on est connecté, rediriger vers l'accueil
           if (location.pathname === "/login" || location.pathname === "/register") {
             navigate("/");
           }
@@ -108,11 +123,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setState({ user: null, loading: false, isReady: true });
           localStorage.removeItem('supabase_session');
 
-          if (location.pathname !== "/login" && 
-              location.pathname !== "/register" && 
-              location.pathname !== "/reset-password" && 
-              location.pathname !== "/update-password" &&
-              !location.pathname.startsWith("/property/")) {
+          // Rediriger vers login uniquement si la route actuelle nécessite une authentification
+          if (!isPublicRoute(location.pathname)) {
             navigate("/login");
           }
         }
