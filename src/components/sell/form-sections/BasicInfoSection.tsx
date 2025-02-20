@@ -67,18 +67,6 @@ export function BasicInfoSection({ errors, onPropertyTypeChange }: BasicInfoSect
         </Select>
       </div>
 
-      <div>
-        <Label htmlFor="transaction_type">Type de transaction</Label>
-        <Select name="transaction_type" defaultValue="sale">
-          <SelectTrigger>
-            <SelectValue placeholder="Sélectionnez le type de transaction" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="sale">Vente</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
       <div className="flex items-center justify-between">
         <div className="space-y-0.5">
           <div className="flex items-center gap-2">
