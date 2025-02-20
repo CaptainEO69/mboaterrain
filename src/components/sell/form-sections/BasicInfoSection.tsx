@@ -21,9 +21,10 @@ import {
 interface BasicInfoSectionProps {
   errors: Record<string, string>;
   onPropertyTypeChange: (value: string) => void;
+  transactionType?: "sell" | "rent";
 }
 
-export function BasicInfoSection({ errors, onPropertyTypeChange }: BasicInfoSectionProps) {
+export function BasicInfoSection({ errors, onPropertyTypeChange, transactionType }: BasicInfoSectionProps) {
   return (
     <div className="space-y-4">
       <div>
@@ -62,9 +63,13 @@ export function BasicInfoSection({ errors, onPropertyTypeChange }: BasicInfoSect
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="house">Maison</SelectItem>
-            <SelectItem value="apartment">Appartement</SelectItem>
+            {transactionType === "rent" && (
+              <>
+                <SelectItem value="apartment">Appartement</SelectItem>
+                <SelectItem value="commercial">Local commercial</SelectItem>
+              </>
+            )}
             <SelectItem value="land">Terrain</SelectItem>
-            <SelectItem value="commercial">Local commercial</SelectItem>
           </SelectContent>
         </Select>
       </div>
