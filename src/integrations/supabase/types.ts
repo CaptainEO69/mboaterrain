@@ -164,6 +164,7 @@ export type Database = {
           is_furnished: boolean | null
           neighborhood: string
           owner_id: string
+          owner_profile_id: string | null
           price: number
           property_type: string
           title: string
@@ -182,6 +183,7 @@ export type Database = {
           is_furnished?: boolean | null
           neighborhood: string
           owner_id: string
+          owner_profile_id?: string | null
           price: number
           property_type: string
           title: string
@@ -200,13 +202,22 @@ export type Database = {
           is_furnished?: boolean | null
           neighborhood?: string
           owner_id?: string
+          owner_profile_id?: string | null
           price?: number
           property_type?: string
           title?: string
           transaction_type?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "properties_owner_profile_id_fkey"
+            columns: ["owner_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       property_images: {
         Row: {

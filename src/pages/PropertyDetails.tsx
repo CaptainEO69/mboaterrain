@@ -7,6 +7,19 @@ import { Button } from "@/components/ui/button";
 import { Heart, Edit, Trash2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
+type PropertyImage = {
+  id: string;
+  image_url: string;
+  is_main: boolean | null;
+  property_id: string;
+  created_at: string;
+};
+
+type ProfileData = {
+  full_name: string | null;
+  phone_number: string | null;
+};
+
 type Property = {
   id: string;
   title: string;
@@ -23,15 +36,10 @@ type Property = {
   distance_from_road: number | null;
   owner_id: string;
   owner_profile_id: string;
-  property_images: {
-    id: string;
-    image_url: string;
-    is_main: boolean;
-  }[];
-  profiles: {
-    full_name: string | null;
-    phone_number: string | null;
-  };
+  property_images: PropertyImage[];
+  profiles: ProfileData;
+  created_at: string;
+  updated_at: string;
 };
 
 export default function PropertyDetails() {
@@ -63,12 +71,12 @@ export default function PropertyDetails() {
         if (data) {
           const propertyData = {
             ...data,
-            property_images: data.property_images || [],
+            property_images: (data.property_images || []) as PropertyImage[],
             profiles: {
               full_name: data.profiles?.full_name || null,
               phone_number: data.profiles?.phone_number || null
             }
-          } as Property;
+          } as unknown as Property;
           
           setProperty(propertyData);
         }
