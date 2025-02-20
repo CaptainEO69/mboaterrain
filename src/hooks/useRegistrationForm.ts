@@ -28,7 +28,8 @@ export function useRegistrationForm(type: string | null) {
     e.preventDefault();
     try {
       // Inscription de l'utilisateur
-      const signUpResult = await signUp(email, password) as AuthResponse;
+      const result = await signUp(email, password);
+      const signUpResult = result as unknown as AuthResponse;
       if (signUpResult.error) throw signUpResult.error;
 
       const user = signUpResult.data?.user;

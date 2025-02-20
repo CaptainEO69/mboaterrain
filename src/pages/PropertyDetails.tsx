@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,16 +49,28 @@ export default function PropertyDetails() {
           .select(`
             *,
             property_images (*),
-            profiles (
+            profiles:owner_id (
               full_name,
               phone_number
             )
           `)
           .eq("id", id)
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
-        setProperty(data);
+        
+        if (data) {
+          const propertyData = {
+            ...data,
+            property_images: data.property_images || [],
+            profiles: {
+              full_name: data.profiles?.full_name || null,
+              phone_number: data.profiles?.phone_number || null
+            }
+          } as Property;
+          
+          setProperty(propertyData);
+        }
       } catch (error: any) {
         toast.error("Erreur lors du chargement de la propriété");
         navigate("/");
