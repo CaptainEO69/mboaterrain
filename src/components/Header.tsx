@@ -82,7 +82,7 @@ export function Header({ mobileMenuOpen, setMobileMenuOpen }: HeaderProps) {
           <img 
             src="/lovable-uploads/9bc95231-71ad-4886-9f52-e0ba2d37f3c6.png" 
             alt="Mboater Logo" 
-            className="h-16 w-16"
+            className="h-20 w-20"
           />
           <span className="text-2xl font-bold text-cmr-green">Mboater</span>
         </Link>
