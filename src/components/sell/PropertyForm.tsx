@@ -6,7 +6,6 @@ import { BasicInfoSection } from "./form-sections/BasicInfoSection";
 import { PriceLocationSection } from "./form-sections/PriceLocationSection";
 import { LandDocumentsSection } from "./form-sections/land-documents/LandDocumentsSection";
 import { LandTitleSection } from "./form-sections/LandTitleSection";
-import { HouseTitleSection } from "./form-sections/HouseTitleSection";
 import { usePropertyFormValidation } from "./form-validation/usePropertyFormValidation";
 import { toast } from "sonner";
 
@@ -59,7 +58,10 @@ export function PropertyForm({ onSubmit, isSubmitting = false, transactionType }
       )}
 
       {propertyType === "house" && (
-        <HouseTitleSection errors={validationErrors} />
+        <>
+          <LandTitleSection errors={validationErrors} />
+          <LandDocumentsSection errors={validationErrors} forHouse={true} />
+        </>
       )}
 
       <div className={validationErrors.images ? "border border-red-500 rounded-lg p-4" : ""}>
