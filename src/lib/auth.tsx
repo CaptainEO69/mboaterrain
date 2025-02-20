@@ -55,91 +55,106 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    console.info("Initializing auth...");
+  // Fonction pour charger le profil utilisateur
+  const loadUserProfile = async (userId: string) => {
+    try {
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", userId)
+        .single();
 
-    const setupAuth = async () => {
+      if (error) throw error;
+      return profile;
+    } catch (error) {
+      console.error("Error loading user profile:", error);
+      return null;
+    }
+  };
+
+  // Fonction pour gérer le changement d'état de l'authentification
+  const handleAuthChange = async (session: any | null) => {
+    try {
+      if (session?.user) {
+        const profile = await loadUserProfile(session.user.id);
+        setUser({ ...session.user, profile });
+      } else {
+        setUser(null);
+        if (!isPublicRoute(location.pathname)) {
+          navigate("/login", { state: { from: location.pathname } });
+        }
+      }
+    } catch (error) {
+      console.error("Error in handleAuthChange:", error);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Vérifier la session initiale
+    const initializeAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session?.user) {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("user_id", session.user.id)
-            .single();
-
-          setUser({ ...session.user, profile });
-          console.info("Auth state changed: SIGNED_IN");
-        } else {
-          console.info("No session found");
-          setUser(null);
-        }
+        await handleAuthChange(session);
       } catch (error) {
-        console.error("Error in setupAuth:", error);
-        setUser(null);
+        console.error("Error in initializeAuth:", error);
+        setLoading(false);
       }
-      
-      console.info("Auth initialization complete");
-      setLoading(false);
     };
 
-    setupAuth();
+    initializeAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.info("Auth state changed:", event);
+    // S'abonner aux changements d'état de l'authentification
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event);
+      await handleAuthChange(session);
 
-        if (session?.user) {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("user_id", session.user.id)
-            .single();
-
-          setUser({ ...session.user, profile });
-
-          // Si on est sur une page de connexion/inscription et qu'on est connecté,
-          // rediriger vers la page d'accueil
-          if (location.pathname === "/login" || location.pathname === "/register") {
-            navigate("/");
-            toast.success("Connexion réussie");
-          }
-        } else {
-          setUser(null);
-
-          // Si on n'est pas sur une route publique et qu'on n'est pas connecté,
-          // rediriger vers la page de connexion
-          if (!isPublicRoute(location.pathname)) {
-            navigate("/login", { state: { from: location.pathname } });
-          }
-        }
+      if (event === 'SIGNED_IN') {
+        toast.success("Connexion réussie");
+        navigate("/");
+      } else if (event === 'SIGNED_OUT') {
+        toast.success("Déconnexion réussie");
+        navigate("/login");
       }
-    );
+    });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate, location.pathname]);
+  }, [navigate]);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
+      if (error) throw error;
+    } catch (error: any) {
+      console.error("Error signing in:", error);
+      if (error.message === "Invalid login credentials") {
+        toast.error("Email ou mot de passe incorrect");
+      } else {
+        toast.error("Erreur lors de la connexion");
+      }
       throw error;
     }
   };
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
 
-    if (error) {
+      if (error) throw error;
+    } catch (error: any) {
+      console.error("Error signing up:", error);
+      toast.error("Erreur lors de l'inscription");
       throw error;
     }
   };
@@ -147,8 +162,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-      navigate("/login");
-      toast.success("Déconnexion réussie");
     } catch (error) {
       console.error("Error signing out:", error);
       toast.error("Erreur lors de la déconnexion");
