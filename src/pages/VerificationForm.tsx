@@ -36,29 +36,27 @@ export default function VerificationForm() {
       }
 
       // Vérifier les codes
-      const { data, error } = await supabase
+      const { data: verificationCode, error: verificationError } = await supabase
         .from("verification_codes")
-        .select("*")
+        .select()
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(1)
-        .single<VerificationCode>();
+        .maybeSingle();
 
-      if (error) {
-        throw error;
-      }
-
-      if (!data) {
+      if (verificationError || !verificationCode) {
         toast.error("Aucun code de vérification trouvé");
         return;
       }
 
-      if (data.expires_at < new Date().toISOString()) {
+      const typedVerificationCode = verificationCode as unknown as VerificationCode;
+
+      if (new Date(typedVerificationCode.expires_at) < new Date()) {
         toast.error("Les codes de vérification ont expiré");
         return;
       }
 
-      if (data.email_code !== emailCode || data.sms_code !== smsCode) {
+      if (typedVerificationCode.email_code !== emailCode || typedVerificationCode.sms_code !== smsCode) {
         toast.error("Codes de vérification incorrects");
         return;
       }
@@ -69,8 +67,8 @@ export default function VerificationForm() {
         .update({
           is_email_verified: true,
           is_phone_verified: true,
-        })
-        .eq("id", user.id);
+        } as any)
+        .eq("user_id", user.id);
 
       if (updateError) {
         throw updateError;

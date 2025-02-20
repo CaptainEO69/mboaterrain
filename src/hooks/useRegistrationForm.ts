@@ -27,17 +27,18 @@ export function useRegistrationForm(type: string | null) {
     e.preventDefault();
     try {
       // Inscription de l'utilisateur
-      const { data, error } = await signUp(email, password);
-      if (error) throw error;
+      const signUpResult = await signUp(email, password);
+      if (signUpResult.error) throw signUpResult.error;
 
-      if (!data?.user) {
+      const user = signUpResult.data?.user;
+      if (!user) {
         throw new Error("Erreur lors de l'inscription");
       }
 
       // Créer le profil utilisateur
       const birthYearNum = birthYear ? parseInt(birthYear, 10) : null;
       const { error: profileError } = await supabase.from("profiles").insert({
-        id: data.user.id,
+        user_id: user.id,
         full_name: fullName,
         phone_number: phoneNumber,
         birth_place: birthPlace,
@@ -57,7 +58,7 @@ export function useRegistrationForm(type: string | null) {
       // Envoyer les codes de vérification
       const { error: verificationError } = await supabase.functions.invoke("send-verification-codes", {
         body: {
-          user_id: data.user.id,
+          user_id: user.id,
           email,
           phone_number: phoneNumber,
         },
