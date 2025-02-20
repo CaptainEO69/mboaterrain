@@ -3,11 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { Heart, Edit, Trash2, ArrowLeft, AlertTriangle } from "lucide-react";
+import { Heart, Edit, Trash2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
-import { RatingDialog } from "@/components/ratings/RatingDialog";
-import { MessageDialog } from "@/components/messages/MessageDialog";
-import { Star } from "lucide-react";
 
 type Property = {
   id: string;
@@ -32,7 +29,6 @@ type Property = {
   profiles: {
     full_name: string | null;
     phone_number: string | null;
-    user_id: string;
   };
 };
 
@@ -43,10 +39,6 @@ export default function PropertyDetails() {
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [sellerRating, setSellerRating] = useState<{
-    average_rating: number;
-    total_ratings: number;
-  } | null>(null);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -58,8 +50,7 @@ export default function PropertyDetails() {
             property_images (*),
             profiles (
               full_name,
-              phone_number,
-              user_id
+              phone_number
             )
           `)
           .eq("id", id)
@@ -67,17 +58,6 @@ export default function PropertyDetails() {
 
         if (error) throw error;
         setProperty(data);
-
-        if (data.profiles?.user_id) {
-          const { data: ratingData, error: ratingError } = await supabase
-            .rpc('get_seller_rating', {
-              seller_id: data.profiles.user_id
-            });
-
-          if (!ratingError && ratingData) {
-            setSellerRating(ratingData[0]);
-          }
-        }
       } catch (error: any) {
         toast.error("Erreur lors du chargement de la propriété");
         navigate("/");
@@ -239,52 +219,9 @@ export default function PropertyDetails() {
           )}
 
           <div className="border-t pt-4">
-            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4 rounded">
-              <div className="flex">
-                <AlertTriangle className="h-5 w-5 text-yellow-400 mr-2" />
-                <p className="text-sm text-yellow-700">
-                  Avant toute transaction, veillez à vérifier l'authenticité des documents fournis par le propriétaire auprès des autorités compétentes
-                </p>
-              </div>
-            </div>
-
             <h2 className="font-semibold mb-2">Contact</h2>
-            <div className="space-y-4">
-              <div>
-                <p className="font-medium">{property.profiles.full_name || "Nom non renseigné"}</p>
-                <p className="text-gray-600">{property.profiles.phone_number || "Téléphone non renseigné"}</p>
-                
-                {sellerRating && (
-                  <div className="flex items-center gap-2 mt-2">
-                    <div className="flex items-center">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star
-                          key={star}
-                          className={`w-4 h-4 ${
-                            star <= sellerRating.average_rating
-                              ? "fill-yellow-400 text-yellow-400"
-                              : "text-gray-300"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-sm text-gray-600">
-                      ({sellerRating.average_rating}/5 - {sellerRating.total_ratings} avis)
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <MessageDialog 
-                  recipientId={property.profiles.user_id}
-                  propertyId={property.id}
-                />
-                {!isOwner && user && (
-                  <RatingDialog sellerId={property.profiles.user_id} />
-                )}
-              </div>
-            </div>
+            <p>{property.profiles.full_name || "Nom non renseigné"}</p>
+            <p>{property.profiles.phone_number || "Téléphone non renseigné"}</p>
           </div>
         </div>
       </div>

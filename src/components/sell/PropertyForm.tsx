@@ -5,7 +5,6 @@ import { ImageUpload } from "./ImageUpload";
 import { BasicInfoSection } from "./form-sections/BasicInfoSection";
 import { PriceLocationSection } from "./form-sections/PriceLocationSection";
 import { LandDocumentsSection } from "./form-sections/land-documents/LandDocumentsSection";
-import { HouseDocumentsSection } from "./form-sections/house-documents/HouseDocumentsSection";
 import { LandTitleSection } from "./form-sections/LandTitleSection";
 import { usePropertyFormValidation } from "./form-validation/usePropertyFormValidation";
 import { toast } from "sonner";
@@ -46,8 +45,7 @@ export function PropertyForm({ onSubmit, isSubmitting = false, transactionType }
         errors={validationErrors} 
         onPropertyTypeChange={(value) => {
           setPropertyType(value);
-        }}
-        transactionType={transactionType}
+        }} 
       />
 
       <PriceLocationSection errors={validationErrors} />
@@ -56,13 +54,6 @@ export function PropertyForm({ onSubmit, isSubmitting = false, transactionType }
         <>
           <LandTitleSection errors={validationErrors} />
           <LandDocumentsSection errors={validationErrors} />
-        </>
-      )}
-
-      {propertyType === "house" && (
-        <>
-          <LandTitleSection errors={validationErrors} />
-          <HouseDocumentsSection errors={validationErrors} />
         </>
       )}
 

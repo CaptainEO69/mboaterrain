@@ -1,4 +1,3 @@
-
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,10 +20,9 @@ import {
 interface BasicInfoSectionProps {
   errors: Record<string, string>;
   onPropertyTypeChange: (value: string) => void;
-  transactionType?: "sell" | "rent";
 }
 
-export function BasicInfoSection({ errors, onPropertyTypeChange, transactionType }: BasicInfoSectionProps) {
+export function BasicInfoSection({ errors, onPropertyTypeChange }: BasicInfoSectionProps) {
   return (
     <div className="space-y-4">
       <div>
@@ -63,13 +61,21 @@ export function BasicInfoSection({ errors, onPropertyTypeChange, transactionType
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="house">Maison</SelectItem>
-            {transactionType === "rent" && (
-              <>
-                <SelectItem value="apartment">Appartement</SelectItem>
-                <SelectItem value="commercial">Local commercial</SelectItem>
-              </>
-            )}
+            <SelectItem value="apartment">Appartement</SelectItem>
             <SelectItem value="land">Terrain</SelectItem>
+            <SelectItem value="commercial">Local commercial</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Label htmlFor="transaction_type">Type de transaction</Label>
+        <Select name="transaction_type" defaultValue="sale">
+          <SelectTrigger>
+            <SelectValue placeholder="Sélectionnez le type de transaction" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="sale">Vente</SelectItem>
           </SelectContent>
         </Select>
       </div>

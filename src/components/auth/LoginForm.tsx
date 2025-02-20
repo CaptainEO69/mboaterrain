@@ -1,44 +1,22 @@
-
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { useAuth } from "@/lib/auth";
 
 export const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+  const { signIn } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      if (data.user) {
-        toast.success("Connexion réussie");
-        navigate("/");
-      }
-    } catch (error: any) {
-      console.error("Erreur de connexion:", error);
-      
-      if (error.message === "Invalid login credentials") {
-        toast.error("Email ou mot de passe incorrect");
-      } else if (error.message.includes("Email not confirmed")) {
-        toast.error("Veuillez confirmer votre email avant de vous connecter");
-      } else {
-        toast.error(error.message || "Erreur lors de la connexion");
-      }
+      await signIn(email, password);
     } finally {
       setIsLoading(false);
     }
