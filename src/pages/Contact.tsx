@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Mail, Phone } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Contact() {
   const [name, setName] = useState("");
