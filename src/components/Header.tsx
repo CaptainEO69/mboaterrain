@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
@@ -23,7 +24,12 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-export function Header() {
+interface HeaderProps {
+  mobileMenuOpen: boolean;
+  setMobileMenuOpen: (value: boolean) => void;
+}
+
+export function Header({ mobileMenuOpen, setMobileMenuOpen }: HeaderProps) {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -109,7 +115,7 @@ export function Header() {
           )}
         </nav>
 
-        <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <SheetTrigger asChild className="md:hidden">
             <Button variant="ghost" size="icon">
               <Home className="w-5 h-5" />
@@ -128,7 +134,7 @@ export function Header() {
                   key={item.title}
                   to={item.href}
                   className="text-gray-700 hover:text-cmr-green transition-colors duration-200 flex items-center space-x-2 py-2"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={() => setMobileMenuOpen(false)}
                 >
                   <item.icon className="w-5 h-5" />
                   <span>{item.title}</span>
@@ -139,7 +145,7 @@ export function Header() {
                   <Link
                     to="/profile"
                     className="text-gray-700 hover:text-cmr-green transition-colors duration-200 flex items-center space-x-2 py-2"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={() => setMobileMenuOpen(false)}
                   >
                     <User className="w-5 h-5" />
                     <span>Profil</span>
@@ -147,7 +153,7 @@ export function Header() {
                   <Link
                     to="/settings"
                     className="text-gray-700 hover:text-cmr-green transition-colors duration-200 flex items-center space-x-2 py-2"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={() => setMobileMenuOpen(false)}
                   >
                     <Settings className="w-5 h-5" />
                     <span>Paramètres</span>
@@ -162,14 +168,14 @@ export function Header() {
                   <Link
                     to="/login"
                     className="text-gray-700 hover:text-cmr-green transition-colors duration-200 flex items-center space-x-2 py-2"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={() => setMobileMenuOpen(false)}
                   >
                     <span>Se connecter</span>
                   </Link>
                   <Link
                     to="/register"
                     className="bg-cmr-green text-white py-2 px-4 rounded-md hover:bg-cmr-green/90 transition-colors duration-200 block text-center"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={() => setMobileMenuOpen(false)}
                   >
                     S'inscrire
                   </Link>
