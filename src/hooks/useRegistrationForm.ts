@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export function useRegistrationForm(type: string | null) {
   const navigate = useNavigate();
@@ -24,10 +26,49 @@ export function useRegistrationForm(type: string | null) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await signUp(email, password);
-      navigate("/login");
+      // Inscription de l'utilisateur
+      const { data: authData, error: authError } = await signUp(email, password);
+      if (authError) throw authError;
+
+      if (!authData.user) {
+        throw new Error("Erreur lors de l'inscription");
+      }
+
+      // Créer le profil utilisateur
+      const { error: profileError } = await supabase.from("profiles").insert({
+        user_id: authData.user.id,
+        full_name: fullName,
+        phone_number: phoneNumber,
+        birth_place: birthPlace,
+        birth_year: birthYear,
+        id_number: idNumber,
+        profession,
+        residence_place: residencePlace,
+        sale_reason: saleReason,
+        is_certified: isCertified,
+        notary_office: notaryOffice,
+        user_type: type,
+        service_prices: servicePrices,
+      });
+
+      if (profileError) throw profileError;
+
+      // Envoyer les codes de vérification
+      const { error: verificationError } = await supabase.functions.invoke("send-verification-codes", {
+        body: {
+          user_id: authData.user.id,
+          email,
+          phone_number: phoneNumber,
+        },
+      });
+
+      if (verificationError) throw verificationError;
+
+      toast.success("Inscription réussie ! Veuillez vérifier votre compte.");
+      navigate("/verify");
     } catch (error: any) {
       console.error("Registration error:", error);
+      toast.error(error.message);
     }
   };
 

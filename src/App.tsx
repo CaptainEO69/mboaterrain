@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/lib/auth";
@@ -20,11 +19,13 @@ import UpdatePassword from "@/pages/UpdatePassword";
 import NotFound from "@/pages/NotFound";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Terms from "@/pages/Terms";
+import VerificationForm from "@/pages/VerificationForm";
 
-function App() {
+export default function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <AuthProvider>
+        <Toaster />
         <div className="flex flex-col min-h-screen">
           <Header />
           <main className="flex-1">
@@ -60,14 +61,12 @@ function App() {
                 </ProtectedRoute>
               } />
               <Route path="*" element={<NotFound />} />
+              <Route path="/verify" element={<VerificationForm />} />
             </Routes>
           </main>
           <BottomNav />
         </div>
-        <Toaster />
       </AuthProvider>
-    </Router>
+    </BrowserRouter>
   );
 }
-
-export default App;
