@@ -11,7 +11,7 @@ export default function Root() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header isOpen={isOpen} setIsOpen={setIsOpen} />
+      <Header mobileMenuOpen={isOpen} setMobileMenuOpen={setIsOpen} />
       <main className="flex-1 pb-20 md:pb-0">
         <Outlet />
       </main>

@@ -3,7 +3,7 @@ import { useAuth } from "@/lib/auth";
 import { Navigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 
-export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
+export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
   const [isReady, setIsReady] = useState(false);
