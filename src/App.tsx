@@ -14,6 +14,7 @@ import Rent from "@/pages/Rent";
 import Sell from "@/pages/Sell";
 import Profile from "@/pages/Profile";
 import Messages from "@/pages/Messages";
+import Contact from "@/pages/Contact";
 import { AuthProvider } from "@/lib/auth";
 import { Toaster } from "@/components/ui/toaster";
 import { Routes, Route } from "react-router-dom";
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="/sell" element={<Sell />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/messages" element={<Messages />} />
+          <Route path="/contact" element={<Contact />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
