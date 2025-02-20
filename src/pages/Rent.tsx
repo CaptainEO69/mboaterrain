@@ -6,11 +6,13 @@ import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { PropertyTypeSelect } from "@/components/property-search/PropertyTypeSelect";
 
 export default function Rent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [propertyType, setPropertyType] = useState<string>("");
 
   const handleSubmit = async (formData: FormData) => {
     if (!user?.profile?.id) {
@@ -76,6 +78,9 @@ export default function Rent() {
 
       <div className="container mx-auto px-4 -mt-6">
         <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="mb-4">
+            <PropertyTypeSelect onValueChange={(value) => setPropertyType(value)} />
+          </div>
           <PropertyForm 
             onSubmit={handleSubmit} 
             isSubmitting={isSubmitting}
