@@ -35,15 +35,20 @@ const PUBLIC_ROUTES = [
   '/',
   '/login',
   '/register',
-  '/reset-password',
-  '/update-password',
+  '/register/form',
   '/buy',
-  '/rent',
+  '/property',
+  '/contact',
 ];
 
 // Fonction pour vérifier si une route commence par un chemin public
 const isPublicRoute = (path: string) => {
-  return PUBLIC_ROUTES.some(route => path === route || path.startsWith('/property/'));
+  return PUBLIC_ROUTES.some(route => {
+    if (route === '/property') {
+      return path.startsWith('/property/');
+    }
+    return path === route;
+  });
 };
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
