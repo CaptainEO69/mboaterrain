@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/lib/auth";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -60,8 +61,8 @@ export default function App() {
                   <Favorites />
                 </ProtectedRoute>
               } />
-              <Route path="*" element={<NotFound />} />
               <Route path="/verify" element={<VerificationForm />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
           <BottomNav />
