@@ -4,6 +4,7 @@ import { useAuth } from "@/lib/auth";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AuthResponse } from "@supabase/supabase-js";
 
 export function useRegistrationForm(type: string | null) {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ export function useRegistrationForm(type: string | null) {
     e.preventDefault();
     try {
       // Inscription de l'utilisateur
-      const signUpResult = await signUp(email, password);
+      const signUpResult = await signUp(email, password) as AuthResponse;
       if (signUpResult.error) throw signUpResult.error;
 
       const user = signUpResult.data?.user;

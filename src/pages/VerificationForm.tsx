@@ -7,15 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Database } from "@/lib/database.types";
 
-interface VerificationCode {
-  id: string;
-  user_id: string;
-  email_code: string;
-  sms_code: string;
-  expires_at: string;
-  created_at: string;
-}
+type VerificationCode = Database['public']['Tables']['verification_codes']['Row'];
 
 export default function VerificationForm() {
   const navigate = useNavigate();
@@ -42,21 +36,19 @@ export default function VerificationForm() {
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(1)
-        .maybeSingle();
+        .single();
 
       if (verificationError || !verificationCode) {
         toast.error("Aucun code de vérification trouvé");
         return;
       }
 
-      const typedVerificationCode = verificationCode as unknown as VerificationCode;
-
-      if (new Date(typedVerificationCode.expires_at) < new Date()) {
+      if (new Date(verificationCode.expires_at) < new Date()) {
         toast.error("Les codes de vérification ont expiré");
         return;
       }
 
-      if (typedVerificationCode.email_code !== emailCode || typedVerificationCode.sms_code !== smsCode) {
+      if (verificationCode.email_code !== emailCode || verificationCode.sms_code !== smsCode) {
         toast.error("Codes de vérification incorrects");
         return;
       }
@@ -67,7 +59,7 @@ export default function VerificationForm() {
         .update({
           is_email_verified: true,
           is_phone_verified: true,
-        } as any)
+        })
         .eq("user_id", user.id);
 
       if (updateError) {

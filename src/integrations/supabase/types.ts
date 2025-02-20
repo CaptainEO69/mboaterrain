@@ -54,13 +54,6 @@ export type Database = {
             referencedRelation: "properties"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "favorites_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       neighborhoods: {
@@ -101,6 +94,8 @@ export type Database = {
           id: string
           id_number: string | null
           is_certified: boolean | null
+          is_email_verified: boolean | null
+          is_phone_verified: boolean | null
           notary_office: string | null
           phone_number: string | null
           profession: string | null
@@ -120,6 +115,8 @@ export type Database = {
           id?: string
           id_number?: string | null
           is_certified?: boolean | null
+          is_email_verified?: boolean | null
+          is_phone_verified?: boolean | null
           notary_office?: string | null
           phone_number?: string | null
           profession?: string | null
@@ -139,6 +136,8 @@ export type Database = {
           id?: string
           id_number?: string | null
           is_certified?: boolean | null
+          is_email_verified?: boolean | null
+          is_phone_verified?: boolean | null
           notary_office?: string | null
           phone_number?: string | null
           profession?: string | null
@@ -207,15 +206,7 @@ export type Database = {
           transaction_type?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "properties_owner_id_fkey"
-            columns: ["owner_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       property_images: {
         Row: {
@@ -274,15 +265,34 @@ export type Database = {
           service_type?: string
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "service_prices_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
+      }
+      verification_codes: {
+        Row: {
+          created_at: string
+          email_code: string
+          expires_at: string
+          id: string
+          sms_code: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_code: string
+          expires_at?: string
+          id?: string
+          sms_code: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_code?: string
+          expires_at?: string
+          id?: string
+          sms_code?: string
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {
