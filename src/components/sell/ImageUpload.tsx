@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
@@ -20,17 +21,19 @@ export function ImageUpload({ onChange }: ImageUploadProps) {
       setImages(files);
       onChange(files);
       
-      // Create previews
+      // Create previews for images only
       const newPreviews: string[] = [];
       Array.from(files).forEach(file => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          newPreviews.push(reader.result as string);
-          if (newPreviews.length === files.length) {
-            setPreviews(newPreviews);
-          }
-        };
-        reader.readAsDataURL(file);
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            newPreviews.push(reader.result as string);
+            if (newPreviews.length === Array.from(files).filter(f => f.type.startsWith('image/')).length) {
+              setPreviews(newPreviews);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
       });
     }
   };
@@ -58,13 +61,13 @@ export function ImageUpload({ onChange }: ImageUploadProps) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="images">Photos</Label>
+        <Label htmlFor="files">Sélectionner fichiers</Label>
         <div className="flex gap-2">
           <Input
-            id="images"
-            name="images"
+            id="files"
+            name="files"
             type="file"
-            accept="image/*"
+            accept="image/*,.pdf"
             multiple
             onChange={handleChange}
             className="cursor-pointer"
@@ -80,7 +83,7 @@ export function ImageUpload({ onChange }: ImageUploadProps) {
           </Button>
         </div>
         <p className="text-sm text-gray-500">
-          Vous pouvez sélectionner plusieurs photos ou utiliser l'appareil photo. La première sera l'image principale.
+          Vous pouvez sélectionner plusieurs photos ou documents PDF. La première photo sera l'image principale.
         </p>
       </div>
 
