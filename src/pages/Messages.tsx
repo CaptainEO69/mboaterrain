@@ -14,6 +14,10 @@ type Message = {
   content: string;
   created_at: string;
   read: boolean;
+  property_id?: string;
+  sender_id: string;
+  receiver_id: string;
+  updated_at?: string;
   property?: {
     id: string;
     title: string;
@@ -43,14 +47,22 @@ export default function Messages() {
           .select(`
             *,
             property:properties(id, title),
-            sender:profiles!messages_sender_id_fkey(id, full_name),
-            receiver:profiles!messages_receiver_id_fkey(id, full_name)
+            sender:profiles!sender_id(id, full_name),
+            receiver:profiles!receiver_id(id, full_name)
           `)
           .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
-        setMessages(data || []);
+        
+        // Assurons-nous que les données correspondent au type Message
+        const typedMessages = data?.map(msg => ({
+          ...msg,
+          sender: msg.sender || { id: msg.sender_id, full_name: null },
+          receiver: msg.receiver || { id: msg.receiver_id, full_name: null },
+        })) as Message[];
+        
+        setMessages(typedMessages || []);
       } catch (error) {
         console.error('Error fetching messages:', error);
       } finally {
