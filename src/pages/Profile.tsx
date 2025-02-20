@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -6,16 +7,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
   const { user, signOut } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     full_name: user?.profile?.full_name || "",
     phone_number: user?.profile?.phone_number || "",
   });
 
+  // Si l'utilisateur n'est pas connecté, rediriger vers la page de connexion
   if (!user) {
+    navigate("/login");
     return null;
   }
 
