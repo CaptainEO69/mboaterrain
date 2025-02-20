@@ -2,9 +2,8 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { X, Camera as CameraIcon } from "lucide-react";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useCamera } from "@/lib/native";
 
 interface ImageUploadProps {
   onChange: (files: FileList | null) => void;
@@ -13,7 +12,6 @@ interface ImageUploadProps {
 export function ImageUpload({ onChange }: ImageUploadProps) {
   const [images, setImages] = useState<FileList | null>(null);
   const [previews, setPreviews] = useState<string[]>([]);
-  const { takePicture } = useCamera();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -38,20 +36,6 @@ export function ImageUpload({ onChange }: ImageUploadProps) {
     }
   };
 
-  const handleTakePicture = async () => {
-    const photoPath = await takePicture();
-    if (photoPath) {
-      setPreviews(prev => [...prev, photoPath]);
-      // Convert the photo path to a File object and trigger onChange
-      const response = await fetch(photoPath);
-      const blob = await response.blob();
-      const file = new File([blob], "photo.jpg", { type: "image/jpeg" });
-      const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(file);
-      onChange(dataTransfer.files);
-    }
-  };
-
   const handleRemoveAll = () => {
     setImages(null);
     setPreviews([]);
@@ -62,26 +46,15 @@ export function ImageUpload({ onChange }: ImageUploadProps) {
     <div className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="files">Sélectionner fichiers</Label>
-        <div className="flex gap-2">
-          <Input
-            id="files"
-            name="files"
-            type="file"
-            accept="image/*,.pdf"
-            multiple
-            onChange={handleChange}
-            className="cursor-pointer"
-          />
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleTakePicture}
-            className="flex items-center gap-2"
-          >
-            <CameraIcon className="w-4 h-4" />
-            Photo
-          </Button>
-        </div>
+        <Input
+          id="files"
+          name="files"
+          type="file"
+          accept="image/*,.pdf"
+          multiple
+          onChange={handleChange}
+          className="cursor-pointer"
+        />
         <p className="text-sm text-gray-500">
           Vous pouvez sélectionner plusieurs photos ou documents PDF. La première photo sera l'image principale.
         </p>
