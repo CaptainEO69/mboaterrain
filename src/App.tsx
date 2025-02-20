@@ -4,6 +4,7 @@ import NotFound from "@/pages/NotFound";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import RegisterForm from "@/pages/RegisterForm";
 import ResetPassword from "@/pages/ResetPassword";
 import UpdatePassword from "@/pages/UpdatePassword";
 import PropertyDetails from "@/pages/PropertyDetails";
@@ -27,6 +28,7 @@ export default function App() {
           <Route index element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/register/form" element={<RegisterForm />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/update-password" element={<UpdatePassword />} />
           <Route path="/property/:id" element={<PropertyDetails />} />
