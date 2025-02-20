@@ -61,50 +61,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const location = useLocation();
 
   useEffect(() => {
-    const savedSession = localStorage.getItem('supabase_session');
-    if (savedSession) {
-      try {
-        const session = JSON.parse(savedSession);
-        supabase.auth.setSession(session);
-      } catch (error) {
-        console.error('Error restoring session:', error);
-        localStorage.removeItem('supabase_session');
-      }
-    }
-
-    const fetchUserProfile = async (userId: string) => {
-      try {
-        const { data: profile, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("user_id", userId)
-          .single();
-
-        if (error) {
-          console.error("Error fetching profile:", error);
-          return null;
-        }
-        return profile;
-      } catch (error) {
-        console.error("Error in fetchUserProfile:", error);
-        return null;
-      }
-    };
-
     const setupAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session?.user) {
-        const profile = await fetchUserProfile(session.user.id);
-        setState({
-          user: { ...session.user, profile },
-          loading: false,
-          isReady: true,
-        });
-        localStorage.setItem('supabase_session', JSON.stringify(session));
-      } else {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session?.user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("user_id", session.user.id)
+            .single();
+
+          setState({
+            user: { ...session.user, profile },
+            loading: false,
+            isReady: true,
+          });
+        } else {
+          setState({ user: null, loading: false, isReady: true });
+        }
+      } catch (error) {
+        console.error("Error in setupAuth:", error);
         setState({ user: null, loading: false, isReady: true });
-        localStorage.removeItem('supabase_session');
       }
     };
 
@@ -115,20 +93,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.info("Auth state changed:", event);
 
         if (session?.user) {
-          const profile = await fetchUserProfile(session.user.id);
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("user_id", session.user.id)
+            .single();
+
           setState({
             user: { ...session.user, profile },
             loading: false,
             isReady: true,
           });
-          localStorage.setItem('supabase_session', JSON.stringify(session));
 
           if (location.pathname === "/login" || location.pathname === "/register") {
             navigate("/");
+            toast.success("Connexion réussie");
           }
         } else {
           setState({ user: null, loading: false, isReady: true });
-          localStorage.removeItem('supabase_session');
 
           if (!isPublicRoute(location.pathname)) {
             const from = location.pathname;
@@ -168,8 +150,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-      localStorage.removeItem('supabase_session');
       navigate("/login");
+      toast.success("Déconnexion réussie");
     } catch (error) {
       console.error("Error signing out:", error);
       toast.error("Erreur lors de la déconnexion");

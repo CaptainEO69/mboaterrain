@@ -19,13 +19,18 @@ export const LoginForm = () => {
     
     try {
       await signIn(email, password);
-      toast.success("Connexion réussie");
+      // Le toast de succès et la redirection sont gérés dans le AuthProvider
     } catch (error: any) {
       console.error("Erreur de connexion:", error);
-      toast.error(error.message === "Invalid login credentials"
-        ? "Email ou mot de passe incorrect"
-        : "Erreur lors de la connexion"
-      );
+      
+      // Message d'erreur plus détaillé
+      if (error.message === "Invalid login credentials") {
+        toast.error("Email ou mot de passe incorrect");
+      } else if (error.message.includes("Email not confirmed")) {
+        toast.error("Veuillez confirmer votre email avant de vous connecter");
+      } else {
+        toast.error(error.message || "Erreur lors de la connexion");
+      }
     } finally {
       setIsLoading(false);
     }
