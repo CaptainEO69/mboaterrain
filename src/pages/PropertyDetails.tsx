@@ -1,9 +1,10 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { Heart, Edit, Trash2, ArrowLeft } from "lucide-react";
+import { Heart, Edit, Trash2, ArrowLeft, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 type Property = {
@@ -219,6 +220,15 @@ export default function PropertyDetails() {
           )}
 
           <div className="border-t pt-4">
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4 rounded">
+              <div className="flex">
+                <AlertTriangle className="h-5 w-5 text-yellow-400 mr-2" />
+                <p className="text-sm text-yellow-700">
+                  Avant toute transaction, veillez à vérifier l'authenticité des documents fournis par le propriétaire auprès des autorités compétentes
+                </p>
+              </div>
+            </div>
+
             <h2 className="font-semibold mb-2">Contact</h2>
             <p>{property.profiles.full_name || "Nom non renseigné"}</p>
             <p>{property.profiles.phone_number || "Téléphone non renseigné"}</p>
