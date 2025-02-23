@@ -38,6 +38,7 @@ export function PropertySearchForm({ transactionType, onSearch }: PropertySearch
         <div>
           <PropertyTypeSelect
             onValueChange={(value) => setFilters({ ...filters, propertyType: value })}
+            transactionType={transactionType}
           />
         </div>
 
