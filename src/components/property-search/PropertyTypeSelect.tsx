@@ -1,3 +1,4 @@
+
 import {
   Select,
   SelectContent,
@@ -18,9 +19,7 @@ export function PropertyTypeSelect({ onValueChange }: PropertyTypeSelectProps) {
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="house">Maison</SelectItem>
-        <SelectItem value="apartment">Appartement</SelectItem>
         <SelectItem value="land">Terrain</SelectItem>
-        <SelectItem value="commercial">Local commercial</SelectItem>
       </SelectContent>
     </Select>
   );
