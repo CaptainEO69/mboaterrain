@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -38,7 +39,7 @@ export function ServicePricesForm({ type, servicePrices, onChange }: ServicePric
 
   return (
     <div className="space-y-4">
-      <h3 className="font-medium">Prix des services</h3>
+      <h3 className="font-medium">Prix des prestations de services</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {services.map(({ key, label }) => (
           <div key={key}>
