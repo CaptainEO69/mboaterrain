@@ -1,18 +1,29 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { format } from "date-fns";
+import fr from "date-fns/locale/fr";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface PersonalInfoSectionProps {
   formData: {
     birthPlace: string;
-    birthYear: string;
+    birthDate: Date | undefined;
     idNumber: string;
     profession: string;
     residencePlace: string;
   };
   setters: {
     setBirthPlace: (value: string) => void;
-    setBirthYear: (value: string) => void;
+    setBirthDate: (value: Date | undefined) => void;
     setIdNumber: (value: string) => void;
     setProfession: (value: string) => void;
     setResidencePlace: (value: string) => void;
@@ -31,13 +42,34 @@ export function PersonalInfoSection({ formData, setters }: PersonalInfoSectionPr
         />
       </div>
       <div className="space-y-2">
-        <Label>Année de naissance</Label>
-        <Input
-          type="number"
-          value={formData.birthYear}
-          onChange={(e) => setters.setBirthYear(e.target.value)}
-          required
-        />
+        <Label>Date de naissance</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                "w-full justify-start text-left font-normal",
+                !formData.birthDate && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {formData.birthDate ? (
+                format(formData.birthDate, "P", { locale: fr })
+              ) : (
+                <span>Sélectionner une date</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={formData.birthDate}
+              onSelect={setters.setBirthDate}
+              initialFocus
+              locale={fr}
+            />
+          </PopoverContent>
+        </Popover>
       </div>
       <div className="space-y-2">
         <Label>Numéro CNI</Label>

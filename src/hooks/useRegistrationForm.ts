@@ -9,10 +9,11 @@ export function useRegistrationForm(type: string | null) {
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [birthPlace, setBirthPlace] = useState("");
-  const [birthYear, setBirthYear] = useState("");
+  const [birthDate, setBirthDate] = useState<Date | undefined>(undefined);
   const [idNumber, setIdNumber] = useState("");
   const [profession, setProfession] = useState("");
   const [residencePlace, setResidencePlace] = useState("");
@@ -20,6 +21,7 @@ export function useRegistrationForm(type: string | null) {
   const [isCertified, setIsCertified] = useState(false);
   const [notaryOffice, setNotaryOffice] = useState("");
   const [servicePrices, setServicePrices] = useState<Record<string, number>>({});
+  const [profileImage, setProfileImage] = useState<File | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,10 +37,11 @@ export function useRegistrationForm(type: string | null) {
     formData: {
       email,
       password,
-      fullName,
+      firstName,
+      lastName,
       phoneNumber,
       birthPlace,
-      birthYear,
+      birthDate,
       idNumber,
       profession,
       residencePlace,
@@ -46,14 +49,16 @@ export function useRegistrationForm(type: string | null) {
       isCertified,
       notaryOffice,
       servicePrices,
+      profileImage,
     },
     setters: {
       setEmail,
       setPassword,
-      setFullName,
+      setFirstName,
+      setLastName,
       setPhoneNumber,
       setBirthPlace,
-      setBirthYear,
+      setBirthDate,
       setIdNumber,
       setProfession,
       setResidencePlace,
@@ -61,6 +66,7 @@ export function useRegistrationForm(type: string | null) {
       setIsCertified,
       setNotaryOffice,
       setServicePrices,
+      setProfileImage,
     },
     handleSubmit,
   };
