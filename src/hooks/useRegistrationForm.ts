@@ -13,7 +13,7 @@ export function useRegistrationForm(type: string | null) {
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [birthPlace, setBirthPlace] = useState("");
-  const [birthDate, setBirthDate] = useState<Date | undefined>(undefined);
+  const [birthDate, setBirthDate] = useState<Date | null>(null);
   const [idNumber, setIdNumber] = useState("");
   const [profession, setProfession] = useState("");
   const [residencePlace, setResidencePlace] = useState("");

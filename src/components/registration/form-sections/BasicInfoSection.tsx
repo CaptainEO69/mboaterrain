@@ -2,6 +2,16 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ImageUpload } from "@/components/sell/ImageUpload";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 interface BasicInfoSectionProps {
   formData: {
@@ -10,6 +20,7 @@ interface BasicInfoSectionProps {
     email: string;
     phoneNumber: string;
     password: string;
+    birthDate: Date | null;
     profileImage: File | null;
   };
   setters: {
@@ -18,6 +29,7 @@ interface BasicInfoSectionProps {
     setEmail: (value: string) => void;
     setPhoneNumber: (value: string) => void;
     setPassword: (value: string) => void;
+    setBirthDate: (value: Date | null) => void;
     setProfileImage: (value: File | null) => void;
   };
 }
@@ -68,6 +80,35 @@ export function BasicInfoSection({ formData, setters }: BasicInfoSectionProps) {
         />
       </div>
       <div className="space-y-2">
+        <Label>Date de naissance</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={`w-full justify-start text-left font-normal ${
+                !formData.birthDate && "text-muted-foreground"
+              }`}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {formData.birthDate ? (
+                format(formData.birthDate, "P", { locale: fr })
+              ) : (
+                <span>Sélectionner une date</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={formData.birthDate || undefined}
+              onSelect={(date) => setters.setBirthDate(date)}
+              initialFocus
+              locale={fr}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+      <div className="space-y-2">
         <Label>Mot de passe</Label>
         <Input
           type="password"
@@ -77,7 +118,7 @@ export function BasicInfoSection({ formData, setters }: BasicInfoSectionProps) {
           minLength={6}
         />
       </div>
-      <div className="space-y-2">
+      <div className="space-y-2 col-span-2">
         <Label>Photo de profil</Label>
         <ImageUpload onChange={handleImageChange} />
       </div>
