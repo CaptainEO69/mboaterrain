@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -6,13 +7,28 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { Calendar } from "@/components/ui/calendar";
+import { fr } from "date-fns/locale";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
 
 export default function Profile() {
   const { user, signOut } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    full_name: user?.profile?.full_name || "",
+    first_name: user?.profile?.first_name || "",
+    last_name: user?.profile?.last_name || "",
     phone_number: user?.profile?.phone_number || "",
+    birth_place: user?.profile?.birth_place || "",
+    id_number: user?.profile?.id_number || "",
+    profession: user?.profile?.profession || "",
+    residence_place: user?.profile?.residence_place || "",
+    birth_date: user?.profile?.birth_date ? new Date(user.profile.birth_date) : null,
   });
 
   if (!user) {
@@ -33,8 +49,14 @@ export default function Profile() {
       const { error } = await supabase
         .from("profiles")
         .update({
-          full_name: formData.full_name,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
           phone_number: formData.phone_number,
+          birth_place: formData.birth_place,
+          id_number: formData.id_number,
+          profession: formData.profession,
+          residence_place: formData.residence_place,
+          birth_date: formData.birth_date?.toISOString(),
           updated_at: new Date().toISOString(),
         })
         .eq("user_id", user.id);
@@ -58,7 +80,7 @@ export default function Profile() {
         <CardContent className="space-y-6 p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
-              <div>
+              <div className="space-y-2">
                 <Label className="text-cmr-green font-medium">Email</Label>
                 <Input
                   type="email"
@@ -68,18 +90,29 @@ export default function Profile() {
                 />
               </div>
 
-              <div>
-                <Label className="text-cmr-green font-medium">Nom complet</Label>
+              <div className="space-y-2">
+                <Label className="text-cmr-green font-medium">Nom</Label>
                 <Input
-                  name="full_name"
-                  value={formData.full_name}
+                  name="last_name"
+                  value={formData.last_name}
                   onChange={handleInputChange}
                   disabled={!isEditing}
                   className={!isEditing ? "bg-gray-50" : ""}
                 />
               </div>
 
-              <div>
+              <div className="space-y-2">
+                <Label className="text-cmr-green font-medium">Prénom</Label>
+                <Input
+                  name="first_name"
+                  value={formData.first_name}
+                  onChange={handleInputChange}
+                  disabled={!isEditing}
+                  className={!isEditing ? "bg-gray-50" : ""}
+                />
+              </div>
+
+              <div className="space-y-2">
                 <Label className="text-cmr-green font-medium">Téléphone</Label>
                 <Input
                   name="phone_number"
@@ -90,7 +123,82 @@ export default function Profile() {
                 />
               </div>
 
-              <div>
+              <div className="space-y-2">
+                <Label className="text-cmr-green font-medium">Date de naissance</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      disabled={!isEditing}
+                      className={`w-full justify-start text-left font-normal ${
+                        !formData.birth_date && "text-muted-foreground"
+                      } ${!isEditing ? "bg-gray-50" : ""}`}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {formData.birth_date ? (
+                        format(formData.birth_date, "P", { locale: fr })
+                      ) : (
+                        <span>Sélectionner une date</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={formData.birth_date || undefined}
+                      onSelect={(date) => setFormData(prev => ({ ...prev, birth_date: date }))}
+                      initialFocus
+                      locale={fr}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-cmr-green font-medium">Lieu de naissance</Label>
+                <Input
+                  name="birth_place"
+                  value={formData.birth_place}
+                  onChange={handleInputChange}
+                  disabled={!isEditing}
+                  className={!isEditing ? "bg-gray-50" : ""}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-cmr-green font-medium">Numéro CNI</Label>
+                <Input
+                  name="id_number"
+                  value={formData.id_number}
+                  onChange={handleInputChange}
+                  disabled={!isEditing}
+                  className={!isEditing ? "bg-gray-50" : ""}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-cmr-green font-medium">Profession</Label>
+                <Input
+                  name="profession"
+                  value={formData.profession}
+                  onChange={handleInputChange}
+                  disabled={!isEditing}
+                  className={!isEditing ? "bg-gray-50" : ""}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-cmr-green font-medium">Lieu d'habitation</Label>
+                <Input
+                  name="residence_place"
+                  value={formData.residence_place}
+                  onChange={handleInputChange}
+                  disabled={!isEditing}
+                  className={!isEditing ? "bg-gray-50" : ""}
+                />
+              </div>
+
+              <div className="space-y-2">
                 <Label className="text-cmr-green font-medium">Type de compte</Label>
                 <Input
                   value={user.profile?.user_type || "Non spécifié"}
