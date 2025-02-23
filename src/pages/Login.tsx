@@ -1,3 +1,4 @@
+
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { Card } from "@/components/ui/card";
