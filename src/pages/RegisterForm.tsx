@@ -1,5 +1,5 @@
 
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRegistrationForm } from "@/hooks/useRegistrationForm";
@@ -20,7 +20,8 @@ const userTypes = [
 
 export default function RegisterForm() {
   const navigate = useNavigate();
-  const { formData, setters, handleSubmit } = useRegistrationForm();
+  const currentUserType = getCurrentUserType();
+  const { formData, setters, handleSubmit } = useRegistrationForm(currentUserType);
 
   const handleUserTypeChange = (value: string) => {
     navigate(`/register/form?type=${value}`);
