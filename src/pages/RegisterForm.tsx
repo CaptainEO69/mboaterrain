@@ -1,34 +1,39 @@
 
-import { useSearchParams, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRegistrationForm } from "@/hooks/useRegistrationForm";
 import { BasicInfoSection } from "@/components/registration/form-sections/BasicInfoSection";
 import { PersonalInfoSection } from "@/components/registration/form-sections/PersonalInfoSection";
 import { ProfessionalSection } from "@/components/registration/form-sections/ProfessionalSection";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+
+const userTypes = [
+  { value: "owner", label: "Propriétaire" },
+  { value: "seller", label: "Vendeur" },
+  { value: "buyer", label: "Acheteur" },
+  { value: "surveyor", label: "Géomètre" },
+  { value: "notary", label: "Notaire" },
+  { value: "notary_clerk", label: "Clerc de notaire" },
+];
 
 export default function RegisterForm() {
-  const [searchParams] = useSearchParams();
-  const type = searchParams.get("type");
-  const { formData, setters, handleSubmit } = useRegistrationForm(type);
+  const navigate = useNavigate();
+  const { formData, setters, handleSubmit } = useRegistrationForm();
 
-  const getUserTypeLabel = () => {
-    switch (type) {
-      case "owner":
-        return "Propriétaire";
-      case "seller":
-        return "Vendeur";
-      case "buyer":
-        return "Acheteur";
-      case "surveyor":
-        return "Géomètre";
-      case "notary":
-        return "Notaire";
-      case "notary_clerk":
-        return "Clerc de notaire";
-      default:
-        return "";
-    }
+  const handleUserTypeChange = (value: string) => {
+    navigate(`/register/form?type=${value}`);
+  };
+
+  const getCurrentUserType = () => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("type") || "";
+  };
+
+  const getUserTypeLabel = (type: string) => {
+    const userType = userTypes.find(ut => ut.value === type);
+    return userType ? userType.label : "";
   };
 
   return (
@@ -36,7 +41,7 @@ export default function RegisterForm() {
       <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle className="text-center text-2xl font-bold">
-            Inscription {getUserTypeLabel()}
+            Inscription
           </CardTitle>
           <CardDescription className="text-center">
             Créez votre compte MboaTer
@@ -44,24 +49,55 @@ export default function RegisterForm() {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
-            <BasicInfoSection formData={formData} setters={setters} />
+            <div className="space-y-2">
+              <Label>Type de compte</Label>
+              <Select
+                value={getCurrentUserType()}
+                onValueChange={handleUserTypeChange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionnez un type de compte" />
+                </SelectTrigger>
+                <SelectContent>
+                  {userTypes.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-            {(type === "owner" || type === "seller" || type === "surveyor" || type === "notary" || type === "notary_clerk") && (
-              <PersonalInfoSection formData={formData} setters={setters} />
-            )}
+            {getCurrentUserType() && (
+              <>
+                <BasicInfoSection formData={formData} setters={setters} />
 
-            {(type === "surveyor" || type === "notary" || type === "notary_clerk") && (
-              <ProfessionalSection
-                type={type as "surveyor" | "notary" | "notary_clerk"}
-                formData={formData}
-                setters={setters}
-              />
+                {(getCurrentUserType() === "owner" || 
+                  getCurrentUserType() === "seller" || 
+                  getCurrentUserType() === "surveyor" || 
+                  getCurrentUserType() === "notary" || 
+                  getCurrentUserType() === "notary_clerk") && (
+                  <PersonalInfoSection formData={formData} setters={setters} />
+                )}
+
+                {(getCurrentUserType() === "surveyor" || 
+                  getCurrentUserType() === "notary" || 
+                  getCurrentUserType() === "notary_clerk") && (
+                  <ProfessionalSection
+                    type={getCurrentUserType() as "surveyor" | "notary" | "notary_clerk"}
+                    formData={formData}
+                    setters={setters}
+                  />
+                )}
+              </>
             )}
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full">
-              S'inscrire
-            </Button>
+            {getCurrentUserType() && (
+              <Button type="submit" className="w-full">
+                S'inscrire
+              </Button>
+            )}
             <p className="text-center text-sm">
               Déjà inscrit ?{" "}
               <Link to="/login" className="font-medium text-cmr-green hover:text-cmr-green/80">
