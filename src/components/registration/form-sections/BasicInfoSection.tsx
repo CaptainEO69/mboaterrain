@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ImageUpload } from "@/components/sell/ImageUpload";
@@ -127,7 +126,7 @@ export function BasicInfoSection({ formData, setters }: BasicInfoSectionProps) {
 
         <div className="space-y-2">
           <Label>Photo de profil</Label>
-          <ImageUpload onChange={handleImageChange} />
+          <ImageUpload onChange={handleImageChange} isProfilePhoto={true} />
         </div>
       </div>
     </div>

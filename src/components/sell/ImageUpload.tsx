@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 
 interface ImageUploadProps {
   onChange: (files: FileList | null) => void;
+  isProfilePhoto?: boolean;
 }
 
-export function ImageUpload({ onChange }: ImageUploadProps) {
+export function ImageUpload({ onChange, isProfilePhoto = false }: ImageUploadProps) {
   const [files, setFiles] = useState<FileList | null>(null);
   const [previews, setPreviews] = useState<string[]>([]);
 
@@ -19,7 +20,6 @@ export function ImageUpload({ onChange }: ImageUploadProps) {
       setFiles(files);
       onChange(files);
       
-      // Create previews for images only
       const newPreviews: string[] = [];
       Array.from(files).forEach(file => {
         if (file.type.startsWith('image/')) {
@@ -45,19 +45,21 @@ export function ImageUpload({ onChange }: ImageUploadProps) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="files">Sélectionner fichiers</Label>
+        {!isProfilePhoto && <Label htmlFor="files">Sélectionner fichiers</Label>}
         <Input
           id="files"
           name="files"
           type="file"
-          accept="image/*,.pdf"
-          multiple
+          accept={isProfilePhoto ? ".jpg,.jpeg,.png" : "image/*,.pdf"}
+          multiple={!isProfilePhoto}
           onChange={handleChange}
           className="cursor-pointer"
         />
-        <p className="text-sm text-gray-500">
-          Vous pouvez sélectionner plusieurs photos (JPG, PNG, GIF) ou documents PDF. Pour les photos, la première sera l'image principale.
-        </p>
+        {!isProfilePhoto && (
+          <p className="text-sm text-gray-500">
+            Vous pouvez sélectionner plusieurs photos (JPG, PNG, GIF) ou documents PDF. Pour les photos, la première sera l'image principale.
+          </p>
+        )}
       </div>
 
       {previews.length > 0 && (
@@ -82,7 +84,7 @@ export function ImageUpload({ onChange }: ImageUploadProps) {
                   alt={`Preview ${index + 1}`}
                   className="w-full h-full object-cover"
                 />
-                {index === 0 && (
+                {!isProfilePhoto && index === 0 && (
                   <div className="absolute top-2 left-2 bg-cmr-green text-white px-2 py-1 rounded text-xs">
                     Image principale
                   </div>
