@@ -17,18 +17,29 @@ import {
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 
+interface ProfileFormData {
+  first_name: string;
+  last_name: string;
+  phone_number: string;
+  birth_place: string;
+  id_number: string;
+  profession: string;
+  residence_place: string;
+  birth_date: Date | null;
+}
+
 export default function Profile() {
   const { user, signOut } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    first_name: user?.profile?.first_name || "",
-    last_name: user?.profile?.last_name || "",
+  const [formData, setFormData] = useState<ProfileFormData>({
+    first_name: user?.profile?.full_name?.split(' ')[1] || "",
+    last_name: user?.profile?.full_name?.split(' ')[0] || "",
     phone_number: user?.profile?.phone_number || "",
-    birth_place: user?.profile?.birth_place || "",
-    id_number: user?.profile?.id_number || "",
-    profession: user?.profile?.profession || "",
-    residence_place: user?.profile?.residence_place || "",
-    birth_date: user?.profile?.birth_date ? new Date(user.profile.birth_date) : null,
+    birth_place: "",
+    id_number: "",
+    profession: "",
+    residence_place: "",
+    birth_date: null,
   });
 
   if (!user) {
@@ -49,14 +60,8 @@ export default function Profile() {
       const { error } = await supabase
         .from("profiles")
         .update({
-          first_name: formData.first_name,
-          last_name: formData.last_name,
+          full_name: `${formData.last_name} ${formData.first_name}`.trim(),
           phone_number: formData.phone_number,
-          birth_place: formData.birth_place,
-          id_number: formData.id_number,
-          profession: formData.profession,
-          residence_place: formData.residence_place,
-          birth_date: formData.birth_date?.toISOString(),
           updated_at: new Date().toISOString(),
         })
         .eq("user_id", user.id);
