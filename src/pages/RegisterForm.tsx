@@ -18,6 +18,11 @@ const userTypes = [
   { value: "notary_clerk", label: "Clerc de notaire" },
 ];
 
+const getCurrentUserType = () => {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("type") || "";
+};
+
 export default function RegisterForm() {
   const navigate = useNavigate();
   const currentUserType = getCurrentUserType();
@@ -25,11 +30,6 @@ export default function RegisterForm() {
 
   const handleUserTypeChange = (value: string) => {
     navigate(`/register/form?type=${value}`);
-  };
-
-  const getCurrentUserType = () => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("type") || "";
   };
 
   const getUserTypeLabel = (type: string) => {
