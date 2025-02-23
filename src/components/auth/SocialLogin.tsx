@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -15,7 +16,8 @@ export const SocialLogin = () => {
         options: {
           redirectTo: `${window.location.origin}/`,
           queryParams: {
-            prompt: 'select_account',
+            access_type: 'offline',
+            prompt: 'consent'
           },
         }
       });
