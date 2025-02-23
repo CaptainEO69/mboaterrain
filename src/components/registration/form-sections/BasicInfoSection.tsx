@@ -44,83 +44,91 @@ export function BasicInfoSection({ formData, setters }: BasicInfoSectionProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div className="space-y-2">
-        <Label>Nom</Label>
-        <Input
-          value={formData.lastName}
-          onChange={(e) => setters.setLastName(e.target.value)}
-          required
-        />
-      </div>
-      <div className="space-y-2">
-        <Label>Prénom</Label>
-        <Input
-          value={formData.firstName}
-          onChange={(e) => setters.setFirstName(e.target.value)}
-          required
-        />
-      </div>
-      <div className="space-y-2">
-        <Label>Email</Label>
-        <Input
-          type="email"
-          value={formData.email}
-          onChange={(e) => setters.setEmail(e.target.value)}
-          required
-        />
-      </div>
-      <div className="space-y-2">
-        <Label>Téléphone</Label>
-        <Input
-          type="tel"
-          value={formData.phoneNumber}
-          onChange={(e) => setters.setPhoneNumber(e.target.value)}
-          required
-        />
-      </div>
-      <div className="space-y-2">
-        <Label>Date de naissance</Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={`w-full justify-start text-left font-normal ${
-                !formData.birthDate && "text-muted-foreground"
-              }`}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {formData.birthDate ? (
-                format(formData.birthDate, "P", { locale: fr })
-              ) : (
-                <span>Sélectionner une date</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={formData.birthDate || undefined}
-              onSelect={(date) => setters.setBirthDate(date)}
-              initialFocus
-              locale={fr}
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
-      <div className="space-y-2">
-        <Label>Mot de passe</Label>
-        <Input
-          type="password"
-          value={formData.password}
-          onChange={(e) => setters.setPassword(e.target.value)}
-          required
-          minLength={6}
-        />
-      </div>
-      <div className="space-y-2 col-span-2">
-        <Label>Photo de profil</Label>
-        <ImageUpload onChange={handleImageChange} />
+    <div className="flex flex-col space-y-4">
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label>Nom</Label>
+          <Input
+            value={formData.lastName}
+            onChange={(e) => setters.setLastName(e.target.value)}
+            required
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label>Prénom</Label>
+          <Input
+            value={formData.firstName}
+            onChange={(e) => setters.setFirstName(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Email</Label>
+          <Input
+            type="email"
+            value={formData.email}
+            onChange={(e) => setters.setEmail(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Téléphone</Label>
+          <Input
+            type="tel"
+            value={formData.phoneNumber}
+            onChange={(e) => setters.setPhoneNumber(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Date de naissance</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={`w-full justify-start text-left font-normal ${
+                  !formData.birthDate && "text-muted-foreground"
+                }`}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {formData.birthDate ? (
+                  format(formData.birthDate, "P", { locale: fr })
+                ) : (
+                  <span>Sélectionner une date</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={formData.birthDate || undefined}
+                onSelect={(date) => setters.setBirthDate(date)}
+                initialFocus
+                locale={fr}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Mot de passe</Label>
+          <Input
+            type="password"
+            value={formData.password}
+            onChange={(e) => setters.setPassword(e.target.value)}
+            required
+            minLength={6}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Photo de profil</Label>
+          <ImageUpload onChange={handleImageChange} />
+        </div>
       </div>
     </div>
   );
