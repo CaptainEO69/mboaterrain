@@ -17,18 +17,40 @@ import {
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 
+interface Profile {
+  id: string;
+  user_id: string;
+  first_name: string | null;
+  last_name: string | null;
+  phone_number: string | null;
+  birth_place: string | null;
+  id_number: string | null;
+  profession: string | null;
+  residence_place: string | null;
+  birth_date: string | null;
+  user_type: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface ExtendedUser {
+  id: string;
+  email: string;
+  profile?: Profile;
+}
+
 export default function Profile() {
   const { user, signOut } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    first_name: user?.profile?.first_name || "",
-    last_name: user?.profile?.last_name || "",
-    phone_number: user?.profile?.phone_number || "",
-    birth_place: user?.profile?.birth_place || "",
-    id_number: user?.profile?.id_number || "",
-    profession: user?.profile?.profession || "",
-    residence_place: user?.profile?.residence_place || "",
-    birth_date: user?.profile?.birth_date ? new Date(user.profile.birth_date) : null,
+    first_name: (user as ExtendedUser)?.profile?.first_name || "",
+    last_name: (user as ExtendedUser)?.profile?.last_name || "",
+    phone_number: (user as ExtendedUser)?.profile?.phone_number || "",
+    birth_place: (user as ExtendedUser)?.profile?.birth_place || "",
+    id_number: (user as ExtendedUser)?.profile?.id_number || "",
+    profession: (user as ExtendedUser)?.profile?.profession || "",
+    residence_place: (user as ExtendedUser)?.profile?.residence_place || "",
+    birth_date: (user as ExtendedUser)?.profile?.birth_date ? new Date((user as ExtendedUser).profile.birth_date) : null,
   });
 
   if (!user) {
@@ -201,7 +223,7 @@ export default function Profile() {
               <div className="space-y-2">
                 <Label className="text-cmr-green font-medium">Type de compte</Label>
                 <Input
-                  value={user.profile?.user_type || "Non spécifié"}
+                  value={(user as ExtendedUser)?.profile?.user_type || "Non spécifié"}
                   disabled
                   className="bg-gray-50"
                 />
