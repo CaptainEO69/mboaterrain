@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import {
   Select,
@@ -6,38 +7,59 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
+import { RegionSelect } from "./RegionSelect";
 
 interface LocationSelectProps {
   onCityChange: (city: string) => void;
   onNeighborhoodChange: (neighborhood: string) => void;
+  onDepartmentChange: (department: string) => void;
+  onDistrictChange: (district: string) => void;
 }
 
-export function LocationSelect({ onCityChange, onNeighborhoodChange }: LocationSelectProps) {
+export function LocationSelect({ 
+  onCityChange, 
+  onNeighborhoodChange,
+  onDepartmentChange,
+  onDistrictChange
+}: LocationSelectProps) {
   const [cities, setCities] = useState<{ id: string; name: string }[]>([]);
   const [neighborhoods, setNeighborhoods] = useState<string[]>([]);
+  const [selectedRegion, setSelectedRegion] = useState<string>("");
   const [selectedCity, setSelectedCity] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchCities() {
-      try {
-        const { data, error } = await supabase
-          .from('cities')
-          .select('*')
-          .order('name');
-        
-        if (error) throw error;
-        setCities(data || []);
-      } catch (error) {
-        console.error('Erreur lors du chargement des villes:', error);
-      } finally {
-        setLoading(false);
+      if (selectedRegion) {
+        try {
+          const { data, error } = await supabase
+            .from('cities')
+            .select('*')
+            .eq('region_id', (await supabase
+              .from('regions')
+              .select('id')
+              .eq('name', selectedRegion)
+              .single()).data?.id)
+            .order('name');
+          
+          if (error) throw error;
+          setCities(data || []);
+        } catch (error) {
+          console.error('Erreur lors du chargement des villes:', error);
+          setCities([]);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setCities([]);
       }
     }
 
     fetchCities();
-  }, []);
+  }, [selectedRegion]);
 
   useEffect(() => {
     async function fetchNeighborhoods() {
@@ -73,40 +95,76 @@ export function LocationSelect({ onCityChange, onNeighborhoodChange }: LocationS
 
   return (
     <div className="space-y-4">
-      <Select
-        onValueChange={(value) => {
-          setSelectedCity(value);
-          onCityChange(value);
-        }}
-        disabled={loading}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Ville" />
-        </SelectTrigger>
-        <SelectContent>
-          {cities.map((city) => (
-            <SelectItem key={city.id} value={city.name}>
-              {city.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div>
+        <Label>Région</Label>
+        <RegionSelect
+          onRegionChange={(region) => {
+            setSelectedRegion(region);
+            setSelectedCity("");
+            setCities([]);
+            setNeighborhoods([]);
+          }}
+        />
+      </div>
 
-      <Select
-        onValueChange={onNeighborhoodChange}
-        disabled={!selectedCity}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Quartier" />
-        </SelectTrigger>
-        <SelectContent>
-          {neighborhoods.map((neighborhood) => (
-            <SelectItem key={neighborhood} value={neighborhood}>
-              {neighborhood}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div>
+        <Label>Département</Label>
+        <Input
+          placeholder="Entrez le département"
+          onChange={(e) => onDepartmentChange(e.target.value)}
+          className="w-full"
+        />
+      </div>
+
+      <div>
+        <Label>Ville</Label>
+        <Select
+          onValueChange={(value) => {
+            setSelectedCity(value);
+            onCityChange(value);
+          }}
+          disabled={loading || !selectedRegion}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Ville" />
+          </SelectTrigger>
+          <SelectContent>
+            {cities.map((city) => (
+              <SelectItem key={city.id} value={city.name}>
+                {city.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Label>Arrondissement</Label>
+        <Input
+          placeholder="Entrez l'arrondissement"
+          onChange={(e) => onDistrictChange(e.target.value)}
+          className="w-full"
+        />
+      </div>
+
+      <div>
+        <Label>Quartier</Label>
+        <Select
+          onValueChange={onNeighborhoodChange}
+          disabled={!selectedCity}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Quartier" />
+          </SelectTrigger>
+          <SelectContent>
+            {neighborhoods.map((neighborhood) => (
+              <SelectItem key={neighborhood} value={neighborhood}>
+                {neighborhood}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 }

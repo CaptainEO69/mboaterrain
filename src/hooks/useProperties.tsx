@@ -14,6 +14,8 @@ interface BaseProperty {
   price: number;
   city: string;
   neighborhood: string;
+  department: string;
+  district: string;
   area_size: number;
   property_type: string;
   transaction_type: "sale" | "rent";
@@ -44,6 +46,9 @@ export function useProperties(transactionType: "sale" | "rent") {
       // Apply filters conditionally
       if (filters.propertyType) query.eq("property_type", filters.propertyType);
       if (filters.city) query.eq("city", filters.city);
+      if (filters.department) query.eq("department", filters.department);
+      if (filters.district) query.eq("district", filters.district);
+      if (filters.neighborhood) query.eq("neighborhood", filters.neighborhood);
       if (filters.maxPrice) query.lte("price", filters.maxPrice);
       if (filters.minSize) query.gte("area_size", filters.minSize);
       if (filters.isFurnished !== undefined) query.eq("is_furnished", filters.isFurnished);

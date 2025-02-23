@@ -14,18 +14,29 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          region_id: string | null
         }
         Insert: {
           created_at?: string
           id?: string
           name: string
+          region_id?: string | null
         }
         Update: {
           created_at?: string
           id?: string
           name?: string
+          region_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "cities_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       favorites: {
         Row: {
@@ -199,8 +210,10 @@ export type Database = {
           bedrooms: number | null
           city: string
           created_at: string
+          department: string | null
           description: string | null
           distance_from_road: number | null
+          district: string | null
           id: string
           is_furnished: boolean | null
           neighborhood: string
@@ -218,8 +231,10 @@ export type Database = {
           bedrooms?: number | null
           city: string
           created_at?: string
+          department?: string | null
           description?: string | null
           distance_from_road?: number | null
+          district?: string | null
           id?: string
           is_furnished?: boolean | null
           neighborhood: string
@@ -237,8 +252,10 @@ export type Database = {
           bedrooms?: number | null
           city?: string
           created_at?: string
+          department?: string | null
           description?: string | null
           distance_from_road?: number | null
+          district?: string | null
           id?: string
           is_furnished?: boolean | null
           neighborhood?: string
@@ -319,6 +336,24 @@ export type Database = {
           reviewer_id?: string
           seller_id?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      regions: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
         }
         Relationships: []
       }
