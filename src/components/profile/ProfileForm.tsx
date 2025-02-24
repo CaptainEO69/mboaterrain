@@ -82,37 +82,39 @@ export function ProfileForm({
         />
       </div>
 
-      <div className="flex gap-4 pt-4">
-        {!isEditing ? (
-          <Button
-            type="button"
-            onClick={onEdit}
-            className="bg-cmr-yellow text-black hover:bg-cmr-yellow/90"
-          >
-            Modifier le profil
-          </Button>
-        ) : (
-          <>
-            <Button
-              type="submit"
-              className="bg-cmr-green hover:bg-cmr-green/90"
-            >
-              Enregistrer
-            </Button>
+      <div className="flex flex-wrap gap-4 justify-between items-center pt-4">
+        <div className="flex gap-4 flex-wrap">
+          {!isEditing ? (
             <Button
               type="button"
-              variant="outline"
-              onClick={onCancel}
-              className="border-cmr-red text-cmr-red hover:bg-cmr-red/10"
+              onClick={onEdit}
+              className="bg-cmr-yellow text-black hover:bg-cmr-yellow/90"
             >
-              Annuler
+              Modifier le profil
             </Button>
-          </>
-        )}
+          ) : (
+            <>
+              <Button
+                type="submit"
+                className="bg-cmr-green hover:bg-cmr-green/90"
+              >
+                Enregistrer
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+                className="border-cmr-red text-cmr-red hover:bg-cmr-red/10"
+              >
+                Annuler
+              </Button>
+            </>
+          )}
+        </div>
         <Button
           type="button"
           onClick={onSignOut}
-          className="bg-cmr-red hover:bg-cmr-red/90 ml-auto"
+          className="bg-cmr-red hover:bg-cmr-red/90"
         >
           Se déconnecter
         </Button>

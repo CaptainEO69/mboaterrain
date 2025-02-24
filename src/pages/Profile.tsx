@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -11,16 +11,32 @@ export default function Profile() {
   const { user, signOut } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<ProfileFormData>({
-    first_name: user?.user_metadata?.full_name?.split(' ')[1] || "",
-    last_name: user?.user_metadata?.full_name?.split(' ')[0] || "",
-    phone_number: user?.user_metadata?.phone_number || "",
-    birth_place: user?.user_metadata?.birth_place || "",
-    id_number: user?.user_metadata?.id_number || "",
-    profession: user?.user_metadata?.profession || "",
-    residence_place: user?.user_metadata?.residence_place || "",
-    birth_date: user?.user_metadata?.birth_date ? new Date(user.user_metadata.birth_date) : null,
-    user_type: user?.user_metadata?.user_type || "",
+    first_name: "",
+    last_name: "",
+    phone_number: "",
+    birth_place: "",
+    id_number: "",
+    profession: "",
+    residence_place: "",
+    birth_date: null,
+    user_type: "",
   });
+
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        first_name: user.user_metadata?.first_name || "",
+        last_name: user.user_metadata?.last_name || "",
+        phone_number: user.user_metadata?.phone_number || "",
+        birth_place: user.user_metadata?.birth_place || "",
+        id_number: user.user_metadata?.id_number || "",
+        profession: user.user_metadata?.profession || "",
+        residence_place: user.user_metadata?.residence_place || "",
+        birth_date: user.user_metadata?.birth_date ? new Date(user.user_metadata.birth_date) : null,
+        user_type: user.user_metadata?.user_type || "",
+      });
+    }
+  }, [user]);
 
   if (!user) {
     return null;
@@ -36,13 +52,13 @@ export default function Profile() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted", formData); // Debug log
+    console.log("Form submitted", formData);
 
     try {
-      // Mettre à jour les métadonnées de l'utilisateur
       const { error: updateError } = await supabase.auth.updateUser({
         data: {
-          full_name: `${formData.last_name} ${formData.first_name}`.trim(),
+          first_name: formData.first_name,
+          last_name: formData.last_name,
           phone_number: formData.phone_number,
           birth_place: formData.birth_place,
           id_number: formData.id_number,
@@ -58,11 +74,11 @@ export default function Profile() {
         throw updateError;
       }
 
-      // Mettre à jour la table profiles
       const { error: profileError } = await supabase
         .from("profiles")
         .update({
-          full_name: `${formData.last_name} ${formData.first_name}`.trim(),
+          first_name: formData.first_name,
+          last_name: formData.last_name,
           phone_number: formData.phone_number,
           birth_place: formData.birth_place,
           id_number: formData.id_number,
@@ -88,7 +104,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
+    <div className="container mx-auto px-4 py-8 pb-24 max-w-2xl">
       <Card className="border-cmr-green">
         <CardHeader className="bg-cmr-green text-white">
           <CardTitle className="text-2xl font-playfair">Mon Profil</CardTitle>
@@ -103,7 +119,7 @@ export default function Profile() {
             onCancel={() => setIsEditing(false)}
             onSignOut={signOut}
             userEmail={user.email || ""}
-            userType={user.user_metadata?.user_type || null}
+            userType={formData.user_type}
           />
         </CardContent>
       </Card>
