@@ -178,10 +178,12 @@ export function ProfileForm({
               <SelectValue placeholder="Choisir un type de compte" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="buyer">Acheteur</SelectItem>
+              <SelectItem value="owner">Propriétaire</SelectItem>
               <SelectItem value="seller">Vendeur</SelectItem>
-              <SelectItem value="agent">Agent immobilier</SelectItem>
+              <SelectItem value="buyer">Acheteur</SelectItem>
+              <SelectItem value="surveyor">Géomètre</SelectItem>
               <SelectItem value="notary">Notaire</SelectItem>
+              <SelectItem value="notary_clerk">Clerc de notaire</SelectItem>
             </SelectContent>
           </Select>
         </div>
