@@ -38,10 +38,6 @@ export default function Profile() {
     }
   }, [user]);
 
-  if (!user) {
-    return null;
-  }
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement> | { target: { name: string; value: any } }) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -52,8 +48,7 @@ export default function Profile() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted", formData);
-
+    
     try {
       const { error: updateError } = await supabase.auth.updateUser({
         data: {
@@ -69,10 +64,7 @@ export default function Profile() {
         },
       });
 
-      if (updateError) {
-        console.error("Error updating user metadata:", updateError);
-        throw updateError;
-      }
+      if (updateError) throw updateError;
 
       const { error: profileError } = await supabase
         .from("profiles")
@@ -88,20 +80,19 @@ export default function Profile() {
           user_type: formData.user_type,
           updated_at: new Date().toISOString(),
         })
-        .eq("user_id", user.id);
+        .eq("user_id", user?.id);
 
-      if (profileError) {
-        console.error("Error updating profile:", profileError);
-        throw profileError;
-      }
+      if (profileError) throw profileError;
 
       toast.success("Profil mis à jour avec succès");
       setIsEditing(false);
     } catch (error: any) {
-      console.error("Error in form submission:", error);
+      console.error("Error updating profile:", error);
       toast.error("Erreur lors de la mise à jour du profil");
     }
   };
+
+  if (!user) return null;
 
   return (
     <div className="container mx-auto px-4 py-8 pb-24 max-w-2xl">
@@ -116,7 +107,20 @@ export default function Profile() {
             onInputChange={handleInputChange}
             onSubmit={handleSubmit}
             onEdit={() => setIsEditing(true)}
-            onCancel={() => setIsEditing(false)}
+            onCancel={() => {
+              setIsEditing(false);
+              setFormData({
+                first_name: user.user_metadata?.first_name || "",
+                last_name: user.user_metadata?.last_name || "",
+                phone_number: user.user_metadata?.phone_number || "",
+                birth_place: user.user_metadata?.birth_place || "",
+                id_number: user.user_metadata?.id_number || "",
+                profession: user.user_metadata?.profession || "",
+                residence_place: user.user_metadata?.residence_place || "",
+                birth_date: user.user_metadata?.birth_date ? new Date(user.user_metadata.birth_date) : null,
+                user_type: user.user_metadata?.user_type || "",
+              });
+            }}
             onSignOut={signOut}
             userEmail={user.email || ""}
             userType={formData.user_type}

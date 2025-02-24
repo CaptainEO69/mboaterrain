@@ -55,7 +55,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Fonction pour charger le profil utilisateur
   const loadUserProfile = async (userId: string) => {
     try {
       const { data: profile, error } = await supabase
@@ -72,7 +71,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Fonction pour gérer le changement d'état de l'authentification
   const handleAuthChange = async (session: any | null) => {
     try {
       if (session?.user) {
@@ -81,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         setUser(null);
         if (!isPublicRoute(location.pathname)) {
-          navigate("/login", { state: { from: location.pathname } });
+          navigate("/login");
         }
       }
     } catch (error) {
@@ -93,7 +91,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    // Vérifier la session initiale
     const initializeAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -106,24 +103,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initializeAuth();
 
-    // S'abonner aux changements d'état de l'authentification
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       await handleAuthChange(session);
-
-      if (event === 'SIGNED_IN') {
-        toast.success("Connexion réussie");
-        navigate("/");
-      } else if (event === 'SIGNED_OUT') {
-        toast.success("Déconnexion réussie");
-        navigate("/login");
-      }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -133,13 +122,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (error) throw error;
+      navigate("/");
+      toast.success("Connexion réussie");
     } catch (error: any) {
       console.error("Error signing in:", error);
-      if (error.message === "Invalid login credentials") {
-        toast.error("Email ou mot de passe incorrect");
-      } else {
-        toast.error("Erreur lors de la connexion");
-      }
+      toast.error(error.message === "Invalid login credentials" 
+        ? "Email ou mot de passe incorrect" 
+        : "Erreur lors de la connexion");
       throw error;
     }
   };
@@ -152,6 +141,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (error) throw error;
+      toast.success("Inscription réussie");
     } catch (error: any) {
       console.error("Error signing up:", error);
       toast.error("Erreur lors de l'inscription");
@@ -161,8 +151,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
-    } catch (error) {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      setUser(null);
+      navigate("/login");
+      toast.success("Déconnexion réussie");
+    } catch (error: any) {
       console.error("Error signing out:", error);
       toast.error("Erreur lors de la déconnexion");
     }
@@ -182,4 +177,3 @@ export function useAuth() {
   }
   return context;
 }
-
