@@ -11,15 +11,15 @@ export default function Profile() {
   const { user, signOut } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<ProfileFormData>({
-    first_name: user?.profile?.full_name?.split(' ')[1] || "",
-    last_name: user?.profile?.full_name?.split(' ')[0] || "",
-    phone_number: user?.profile?.phone_number || "",
-    birth_place: user?.profile?.birth_place || "",
-    id_number: user?.profile?.id_number || "",
-    profession: user?.profile?.profession || "",
-    residence_place: user?.profile?.residence_place || "",
+    first_name: user?.user_metadata?.full_name?.split(' ')[1] || "",
+    last_name: user?.user_metadata?.full_name?.split(' ')[0] || "",
+    phone_number: user?.user_metadata?.phone_number || "",
+    birth_place: user?.user_metadata?.birth_place || "",
+    id_number: user?.user_metadata?.id_number || "",
+    profession: user?.user_metadata?.profession || "",
+    residence_place: user?.user_metadata?.residence_place || "",
     birth_date: null,
-    user_type: user?.profile?.user_type || "",
+    user_type: user?.user_metadata?.user_type || "",
   });
 
   if (!user) {
@@ -78,7 +78,7 @@ export default function Profile() {
             onCancel={() => setIsEditing(false)}
             onSignOut={signOut}
             userEmail={user.email || ""}
-            userType={user.profile?.user_type}
+            userType={user.user_metadata?.user_type || null}
           />
         </CardContent>
       </Card>
