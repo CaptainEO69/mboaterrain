@@ -21,14 +21,12 @@ type Property = {
 
 export default function Favorites() {
   const [properties, setProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
   const { favorites } = useFavorites();
 
   useEffect(() => {
     const fetchFavoriteProperties = async () => {
       if (favorites.length === 0) {
         setProperties([]);
-        setLoading(false);
         return;
       }
 
@@ -52,8 +50,6 @@ export default function Favorites() {
         setProperties(data || []);
       } catch (error: any) {
         console.error("Erreur lors du chargement des propriétés:", error.message);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -65,11 +61,7 @@ export default function Favorites() {
       <h1 className="text-xl font-bold p-4">Mes Favoris</h1>
 
       <div className="p-4">
-        {loading ? (
-          <div className="flex items-center justify-center py-8">
-            <p className="text-gray-500">Chargement des favoris...</p>
-          </div>
-        ) : properties.length === 0 ? (
+        {properties.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-gray-500">
             <Heart className="w-16 h-16 mb-4 stroke-1" />
             <p className="text-lg">Vous n'avez aucun favori</p>
