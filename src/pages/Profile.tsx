@@ -18,7 +18,7 @@ export default function Profile() {
     id_number: user?.user_metadata?.id_number || "",
     profession: user?.user_metadata?.profession || "",
     residence_place: user?.user_metadata?.residence_place || "",
-    birth_date: null,
+    birth_date: user?.user_metadata?.birth_date ? new Date(user.user_metadata.birth_date) : null,
     user_type: user?.user_metadata?.user_type || "",
   });
 
@@ -37,7 +37,24 @@ export default function Profile() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { error } = await supabase
+      // Mettre à jour les métadonnées de l'utilisateur
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: {
+          full_name: `${formData.last_name} ${formData.first_name}`.trim(),
+          phone_number: formData.phone_number,
+          birth_place: formData.birth_place,
+          id_number: formData.id_number,
+          profession: formData.profession,
+          residence_place: formData.residence_place,
+          birth_date: formData.birth_date?.toISOString(),
+          user_type: formData.user_type,
+        },
+      });
+
+      if (updateError) throw updateError;
+
+      // Mettre à jour la table profiles
+      const { error: profileError } = await supabase
         .from("profiles")
         .update({
           full_name: `${formData.last_name} ${formData.first_name}`.trim(),
@@ -52,7 +69,7 @@ export default function Profile() {
         })
         .eq("user_id", user.id);
 
-      if (error) throw error;
+      if (profileError) throw profileError;
 
       toast.success("Profil mis à jour avec succès");
       setIsEditing(false);
