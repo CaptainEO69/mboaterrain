@@ -6,6 +6,13 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   const { user, loading } = useAuth();
   const location = useLocation();
 
+  // Logs pour debug
+  console.log("ProtectedRoute - Current state:", {
+    loading,
+    user,
+    pathname: location.pathname
+  });
+
   // Si l'authentification est en cours de chargement, afficher le loader
   if (loading) {
     return (
@@ -20,7 +27,8 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
 
   // Si l'utilisateur n'est pas connecté, rediriger vers la page de connexion
   if (!user) {
-    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+    console.log("ProtectedRoute - Redirecting to login from:", location.pathname);
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   // Si l'utilisateur est connecté, afficher le contenu protégé

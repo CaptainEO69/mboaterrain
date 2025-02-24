@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/lib/auth";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { Header } from "@/components/Header";
+import { BottomNav } from "@/components/BottomNav";
 import Index from "@/pages/Index";
 import Buy from "@/pages/Buy";
 import Rent from "@/pages/Rent";
@@ -61,6 +62,7 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
+          <BottomNav />
         </div>
         <Toaster />
       </AuthProvider>
@@ -69,3 +71,4 @@ function App() {
 }
 
 export default App;
+
