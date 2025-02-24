@@ -8,4 +8,5 @@ export interface ProfileFormData {
   profession: string;
   residence_place: string;
   birth_date: Date | null;
+  user_type?: string;
 }

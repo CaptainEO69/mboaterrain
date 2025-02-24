@@ -14,18 +14,19 @@ export default function Profile() {
     first_name: user?.profile?.full_name?.split(' ')[1] || "",
     last_name: user?.profile?.full_name?.split(' ')[0] || "",
     phone_number: user?.profile?.phone_number || "",
-    birth_place: "",
-    id_number: "",
-    profession: "",
-    residence_place: "",
+    birth_place: user?.profile?.birth_place || "",
+    id_number: user?.profile?.id_number || "",
+    profession: user?.profile?.profession || "",
+    residence_place: user?.profile?.residence_place || "",
     birth_date: null,
+    user_type: user?.profile?.user_type || "",
   });
 
   if (!user) {
     return null;
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement> | { target: { name: string; value: any } }) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -41,6 +42,12 @@ export default function Profile() {
         .update({
           full_name: `${formData.last_name} ${formData.first_name}`.trim(),
           phone_number: formData.phone_number,
+          birth_place: formData.birth_place,
+          id_number: formData.id_number,
+          profession: formData.profession,
+          residence_place: formData.residence_place,
+          birth_date: formData.birth_date,
+          user_type: formData.user_type,
           updated_at: new Date().toISOString(),
         })
         .eq("user_id", user.id);

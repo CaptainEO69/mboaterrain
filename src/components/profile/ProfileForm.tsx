@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +8,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { ProfileFormData } from "@/types/profile";
@@ -16,7 +22,7 @@ import { ProfileFormData } from "@/types/profile";
 interface ProfileFormProps {
   formData: ProfileFormData;
   isEditing: boolean;
-  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement> | { target: { name: string; value: any } }) => void;
   onSubmit: (e: React.FormEvent) => void;
   onEdit: () => void;
   onCancel: () => void;
@@ -161,11 +167,23 @@ export function ProfileForm({
 
         <div className="space-y-2">
           <Label className="text-cmr-green font-medium">Type de compte</Label>
-          <Input
-            value={userType || "Non spécifié"}
-            disabled
-            className="bg-gray-50"
-          />
+          <Select
+            value={formData.user_type || ""}
+            onValueChange={(value) => 
+              onInputChange({ target: { name: 'user_type', value } })
+            }
+            disabled={!isEditing}
+          >
+            <SelectTrigger className={!isEditing ? "bg-gray-50" : ""}>
+              <SelectValue placeholder="Choisir un type de compte" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="buyer">Acheteur</SelectItem>
+              <SelectItem value="seller">Vendeur</SelectItem>
+              <SelectItem value="agent">Agent immobilier</SelectItem>
+              <SelectItem value="notary">Notaire</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
