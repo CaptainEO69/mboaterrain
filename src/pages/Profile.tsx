@@ -36,6 +36,8 @@ export default function Profile() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Form submitted", formData); // Debug log
+
     try {
       // Mettre à jour les métadonnées de l'utilisateur
       const { error: updateError } = await supabase.auth.updateUser({
@@ -51,7 +53,10 @@ export default function Profile() {
         },
       });
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error("Error updating user metadata:", updateError);
+        throw updateError;
+      }
 
       // Mettre à jour la table profiles
       const { error: profileError } = await supabase
@@ -69,13 +74,16 @@ export default function Profile() {
         })
         .eq("user_id", user.id);
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error("Error updating profile:", profileError);
+        throw profileError;
+      }
 
       toast.success("Profil mis à jour avec succès");
       setIsEditing(false);
     } catch (error: any) {
+      console.error("Error in form submission:", error);
       toast.error("Erreur lors de la mise à jour du profil");
-      console.error("Error updating profile:", error);
     }
   };
 
