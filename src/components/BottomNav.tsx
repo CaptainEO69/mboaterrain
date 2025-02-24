@@ -5,18 +5,24 @@ import { Home, Search, Heart, PlusCircle, UserRound, Key } from "lucide-react";
 
 export function BottomNav() {
   const location = useLocation();
+  console.log("Current pathname:", location.pathname);
+  console.log("Is root path?", location.pathname === "/");
 
   const isActive = (path: string) => {
-    const currentPath = location.pathname.toLowerCase();
+    const currentPath = location.pathname;
+    console.log(`Checking path: ${path} against current: ${currentPath}`);
     
-    // Cas spécial pour la page d'accueil
+    // Cas spécial pour la page d'accueil avec plus de logs
     if (path === "/") {
-      return currentPath === "/";
+      const isRoot = currentPath === "/";
+      console.log("Is homepage and matches?", isRoot);
+      return isRoot;
     }
     
-    // Pour toutes les autres routes, on compare exactement les chemins
-    // sans tenir compte des sous-routes pour éviter les faux positifs
-    return currentPath === path.toLowerCase();
+    // Pour toutes les autres routes
+    const matches = currentPath === path;
+    console.log(`Path ${path} matches current? ${matches}`);
+    return matches;
   };
 
   return (
