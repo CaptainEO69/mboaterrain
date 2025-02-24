@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Home, Search, Heart, PlusCircle, UserRound, Key } from "lucide-react";
@@ -5,7 +6,13 @@ import { Home, Search, Heart, PlusCircle, UserRound, Key } from "lucide-react";
 export function BottomNav() {
   const location = useLocation();
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => {
+    if (path === '/') {
+      return location.pathname === path;
+    }
+    // Pour les autres routes, vérifie si le pathname commence par le chemin
+    return location.pathname.startsWith(path);
+  };
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
