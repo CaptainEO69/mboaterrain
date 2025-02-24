@@ -96,6 +96,7 @@ export function ProfileForm({
             <>
               <Button
                 type="submit"
+                onClick={(e) => onSubmit(e)}
                 className="bg-cmr-green hover:bg-cmr-green/90"
               >
                 Enregistrer

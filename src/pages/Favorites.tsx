@@ -42,10 +42,12 @@ export default function Favorites() {
               is_main
             )
           `)
-          .in("id", favorites)
-          .order("created_at", { ascending: false });
+          .in("id", favorites);
 
-        if (error) throw error;
+        if (error) {
+          console.error("Erreur lors du chargement des propriétés:", error);
+          throw error;
+        }
 
         setProperties(data || []);
       } catch (error: any) {
@@ -64,7 +66,9 @@ export default function Favorites() {
 
       <div className="p-4">
         {loading ? (
-          <p className="text-center text-gray-500">Chargement des favoris...</p>
+          <div className="flex items-center justify-center py-8">
+            <p className="text-gray-500">Chargement des favoris...</p>
+          </div>
         ) : properties.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-gray-500">
             <Heart className="w-16 h-16 mb-4 stroke-1" />
