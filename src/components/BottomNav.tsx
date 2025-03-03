@@ -1,7 +1,7 @@
 
 import { useLocation } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-import { HomeIcon, ShoppingBagIcon, KeyIcon, UserIcon, HeartIcon, MessageSquareIcon, PhoneIcon } from "lucide-react";
+import { HomeIcon, ShoppingBagIcon, KeyIcon, UserIcon, HeartIcon, MessageSquareIcon, Mail } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { useMobile } from "@/hooks/useMobile";
@@ -62,7 +62,7 @@ export function BottomNav() {
         />
         <NavItem 
           to="/contact" 
-          icon={<PhoneIcon className={cn("h-5 w-5", isActive("/contact") ? "text-cmr-green" : "text-gray-600")} />} 
+          icon={<Mail className={cn("h-5 w-5", isActive("/contact") ? "text-cmr-green" : "text-gray-600")} />} 
           label="Contact" 
           active={isActive("/contact")} 
         />
