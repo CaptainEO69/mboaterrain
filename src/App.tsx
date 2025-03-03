@@ -21,6 +21,8 @@ import NotFound from "@/pages/NotFound";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Terms from "@/pages/Terms";
 import Contact from "@/pages/Contact";
+import Messaging from "@/pages/Messaging";
+import { ChatWindow } from "@/components/chat/ChatWindow";
 
 function App() {
   return (
@@ -42,6 +44,7 @@ function App() {
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/messaging" element={<Messaging />} />
 
               <Route path="/favorites" element={
                 <ProtectedRoute>
@@ -63,6 +66,7 @@ function App() {
             </Routes>
           </main>
           <BottomNav />
+          <ChatWindow />
         </div>
         <Toaster />
       </AuthProvider>
