@@ -7,6 +7,7 @@ import { Loader2, Mail, Phone, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { BottomNav } from "@/components/BottomNav";
 import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Contact() {
   const { user } = useAuth();
@@ -20,13 +21,30 @@ export default function Contact() {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simuler l'envoi d'un message
-    setTimeout(() => {
+    try {
+      const { data, error } = await supabase.functions.invoke("send-contact-email", {
+        body: {
+          name,
+          email,
+          subject,
+          message
+        }
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
       toast.success("Votre message a été envoyé. Nous vous répondrons dans les plus brefs délais.");
+      // Réinitialiser uniquement le sujet et le message
       setSubject("");
       setMessage("");
+    } catch (error: any) {
+      console.error("Erreur lors de l'envoi du message:", error);
+      toast.error("Erreur lors de l'envoi du message. Veuillez réessayer plus tard.");
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (
