@@ -1,7 +1,7 @@
 
 import { useLocation } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-import { HomeIcon, ShoppingBagIcon, KeyIcon, UserIcon, HeartIcon, MessageSquareIcon } from "lucide-react";
+import { HomeIcon, ShoppingBagIcon, KeyIcon, UserIcon, HeartIcon, MessageSquareIcon, PhoneIcon } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { useMobile } from "@/hooks/useMobile";
@@ -41,7 +41,7 @@ export function BottomNav() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 z-10 md:hidden">
-      <div className="grid grid-cols-5 gap-1">
+      <div className="grid grid-cols-6 gap-1">
         <NavItem 
           to="/" 
           icon={<HomeIcon className={cn("h-5 w-5", isActive("/") ? "text-cmr-green" : "text-gray-600")} />} 
@@ -60,6 +60,13 @@ export function BottomNav() {
           label="Louer" 
           active={isActive("/rent")} 
         />
+        <NavItem 
+          to="/contact" 
+          icon={<PhoneIcon className={cn("h-5 w-5", isActive("/contact") ? "text-cmr-green" : "text-gray-600")} />} 
+          label="Contact" 
+          active={isActive("/contact")} 
+        />
+        
         {user ? (
           <>
             <NavItem 
