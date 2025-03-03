@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/lib/auth";
@@ -42,11 +43,21 @@ function App() {
               <Route path="/terms" element={<Terms />} />
               <Route path="/contact" element={<Contact />} />
 
-              <Route element={<ProtectedRoute />}>
-                <Route path="/favorites" element={<Favorites />} />
-                <Route path="/sell" element={<Sell />} />
-                <Route path="/profile" element={<Profile />} />
-              </Route>
+              <Route path="/favorites" element={
+                <ProtectedRoute>
+                  <Favorites />
+                </ProtectedRoute>
+              } />
+              <Route path="/sell" element={
+                <ProtectedRoute>
+                  <Sell />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              } />
 
               <Route path="*" element={<NotFound />} />
             </Routes>
