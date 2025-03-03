@@ -5,6 +5,8 @@ import { PropertyCard } from "@/components/PropertyCard";
 import { BottomNav } from "@/components/BottomNav";
 import { useFavorites } from "@/hooks/useFavorites";
 import { Heart } from "lucide-react";
+import { useAuth } from "@/lib/auth";
+import { useNavigate } from "react-router-dom";
 
 type Property = {
   id: string;
@@ -21,16 +23,30 @@ type Property = {
 
 export default function Favorites() {
   const [properties, setProperties] = useState<Property[]>([]);
-  const { favorites } = useFavorites();
+  const [isLoading, setIsLoading] = useState(true);
+  const { favorites, isLoading: favoritesLoading } = useFavorites();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchFavoriteProperties = async () => {
-      if (favorites.length === 0) {
-        setProperties([]);
-        return;
-      }
+    if (!user) {
+      // Si l'utilisateur n'est pas connecté, on redirige vers la page de connexion
+      navigate("/login");
+      return;
+    }
 
+    if (favoritesLoading) return;
+
+    const fetchFavoriteProperties = async () => {
+      setIsLoading(true);
+      
       try {
+        if (favorites.length === 0) {
+          setProperties([]);
+          setIsLoading(false);
+          return;
+        }
+
         const { data, error } = await supabase
           .from("properties")
           .select(`
@@ -50,18 +66,24 @@ export default function Favorites() {
         setProperties(data || []);
       } catch (error: any) {
         console.error("Erreur lors du chargement des propriétés:", error.message);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchFavoriteProperties();
-  }, [favorites]);
+  }, [favorites, favoritesLoading, user, navigate]);
 
   return (
     <div className="min-h-screen pb-20">
       <h1 className="text-xl font-bold p-4">Mes Favoris</h1>
 
       <div className="p-4">
-        {properties.length === 0 ? (
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cmr-green"></div>
+          </div>
+        ) : properties.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-gray-500">
             <Heart className="w-16 h-16 mb-4 stroke-1" />
             <p className="text-lg">Vous n'avez aucun favori</p>

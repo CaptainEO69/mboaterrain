@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/lib/auth";
@@ -20,6 +19,7 @@ import UpdatePassword from "@/pages/UpdatePassword";
 import NotFound from "@/pages/NotFound";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Terms from "@/pages/Terms";
+import Contact from "@/pages/Contact";
 
 function App() {
   return (
@@ -30,35 +30,24 @@ function App() {
           <main className="flex-1">
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/buy" element={<Buy />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/register/form" element={<RegisterForm />} />
+              <Route path="/buy" element={<Buy />} />
+              <Route path="/rent" element={<Rent />} />
+              <Route path="/property/:id" element={<PropertyDetails />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/update-password" element={<UpdatePassword />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<Terms />} />
-              <Route path="/property/:id" element={<PropertyDetails />} />
-              <Route path="/rent" element={
-                <ProtectedRoute>
-                  <Rent />
-                </ProtectedRoute>
-              } />
-              <Route path="/sell" element={
-                <ProtectedRoute>
-                  <Sell />
-                </ProtectedRoute>
-              } />
-              <Route path="/profile" element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              } />
-              <Route path="/favorites" element={
-                <ProtectedRoute>
-                  <Favorites />
-                </ProtectedRoute>
-              } />
+              <Route path="/contact" element={<Contact />} />
+
+              <Route element={<ProtectedRoute />}>
+                <Route path="/favorites" element={<Favorites />} />
+                <Route path="/sell" element={<Sell />} />
+                <Route path="/profile" element={<Profile />} />
+              </Route>
+
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
@@ -71,4 +60,3 @@ function App() {
 }
 
 export default App;
-

@@ -19,6 +19,8 @@ export const LoginForm = () => {
     
     try {
       await signIn(email, password);
+    } catch (error) {
+      console.error("Erreur de connexion:", error);
     } finally {
       setIsLoading(false);
     }
@@ -66,6 +68,7 @@ export const LoginForm = () => {
           placeholder="••••••••"
           minLength={6}
         />
+        {password && <PasswordStrength password={password} />}
       </div>
 
       <Button 
@@ -84,4 +87,4 @@ export const LoginForm = () => {
       </Button>
     </form>
   );
-};
+}

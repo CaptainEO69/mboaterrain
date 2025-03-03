@@ -12,17 +12,23 @@ export function useFavorites() {
     queryKey: ["favorites", user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
-      const { data, error } = await supabase
-        .from("favorites")
-        .select("property_id")
-        .eq("user_id", user.id);
+      
+      try {
+        const { data, error } = await supabase
+          .from("favorites")
+          .select("property_id")
+          .eq("user_id", user.id);
 
-      if (error) {
-        console.error("Error fetching favorites:", error);
+        if (error) {
+          console.error("Error fetching favorites:", error);
+          return [];
+        }
+
+        return data?.map(fav => fav.property_id) || [];
+      } catch (error) {
+        console.error("Unexpected error fetching favorites:", error);
         return [];
       }
-
-      return data?.map(fav => fav.property_id) || [];
     },
     enabled: !!user?.id,
   });
@@ -41,7 +47,8 @@ export function useFavorites() {
       queryClient.invalidateQueries({ queryKey: ["favorites"] });
       toast.success("Ajouté aux favoris");
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Erreur lors de l'ajout aux favoris:", error);
       toast.error("Erreur lors de l'ajout aux favoris");
     },
   });
@@ -62,7 +69,8 @@ export function useFavorites() {
       queryClient.invalidateQueries({ queryKey: ["favorites"] });
       toast.success("Retiré des favoris");
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Erreur lors de la suppression des favoris:", error);
       toast.error("Erreur lors de la suppression des favoris");
     },
   });
