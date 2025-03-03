@@ -40,30 +40,40 @@ export function useRegistrationForm(type: string | null) {
     
     try {
       // Create the user in Supabase Auth
-      await signUp(email, password);
+      const { data: authData, error: authError } = await signUp(email, password);
+      
+      if (authError) throw authError;
+      
+      // Extraire l'ID de l'utilisateur
+      const userId = authData?.user?.id;
+      
+      if (!userId) {
+        throw new Error("Impossible de créer le compte utilisateur");
+      }
+      
+      // Convertir la date de naissance en année de naissance pour la BD
+      const birthYear = birthDate ? birthDate.getFullYear() : null;
       
       // Create a profile record with additional information
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .insert([
-          {
-            full_name: `${firstName} ${lastName}`,
-            phone_number: phoneNumber,
-            birth_place: birthPlace,
-            birth_date: birthDate,
-            id_number: idNumber,
-            profession: profession,
-            residence_place: residencePlace,
-            user_type: type,
-            // Add other fields as needed
-          },
-        ])
+        .insert({
+          user_id: userId,
+          full_name: `${firstName} ${lastName}`,
+          phone_number: phoneNumber,
+          birth_place: birthPlace,
+          birth_year: birthYear,
+          id_number: idNumber,
+          profession: profession,
+          residence_place: residencePlace,
+          user_type: type || "buyer", // Valeur par défaut si type est null
+        })
         .select();
 
       if (profileError) throw profileError;
       
       // Upload profile image if available
-      if (profileImage) {
+      if (profileImage && profile && profile.length > 0) {
         const fileExt = profileImage.name.split('.').pop();
         const fileName = `${Date.now()}.${fileExt}`;
         const filePath = `profile-images/${fileName}`;
@@ -79,7 +89,7 @@ export function useRegistrationForm(type: string | null) {
           // Update profile with image URL
           const { error: updateError } = await supabase
             .from("profiles")
-            .update({ avatar_url: filePath })
+            .update({ sale_proof_url: filePath }) // Utiliser sale_proof_url au lieu de avatar_url
             .eq("id", profile[0].id);
             
           if (updateError) {

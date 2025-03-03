@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocation, useNavigate } from "react-router-dom";
-import type { User } from "@supabase/supabase-js";
+import type { User, AuthResponse } from "@supabase/supabase-js";
 import { toast } from "sonner";
 
 interface Profile {
@@ -21,7 +21,7 @@ interface AuthContextType {
   user: UserWithProfile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<AuthResponse>;
   signOut: () => Promise<void>;
 }
 
@@ -156,13 +156,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error("Le mot de passe doit contenir au moins un caractère spécial");
       }
 
-      const { error } = await supabase.auth.signUp({
+      const response = await supabase.auth.signUp({
         email,
         password,
       });
 
-      if (error) throw error;
-      toast.success("Inscription réussie");
+      if (response.error) throw response.error;
+      return response;
     } catch (error: any) {
       console.error("Error signing up:", error);
       toast.error(error.message || "Erreur lors de l'inscription");
