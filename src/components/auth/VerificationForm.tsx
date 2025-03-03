@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
@@ -29,16 +29,10 @@ export function VerificationForm({
   isResending,
 }: VerificationFormProps) {
   const [timer, setTimer] = useState(60);
+  const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(null);
 
-  const handleVerify = async () => {
-    if (verifyCode(verificationCode)) {
-      onVerificationSuccess();
-    }
-  };
-
-  const handleResend = async () => {
-    await onResendCode();
-    setTimer(60);
+  // Set up the timer when component mounts
+  useEffect(() => {
     const interval = setInterval(() => {
       setTimer((prev) => {
         if (prev <= 1) {
@@ -48,7 +42,52 @@ export function VerificationForm({
         return prev - 1;
       });
     }, 1000);
+    
+    setTimerInterval(interval);
+    
+    // Clean up the interval when component unmounts
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, []);
+
+  const handleVerify = async () => {
+    if (verifyCode(verificationCode)) {
+      onVerificationSuccess();
+    }
   };
+
+  const handleResend = async () => {
+    await onResendCode();
+    
+    // Reset the timer
+    setTimer(60);
+    
+    // Clear existing interval if any
+    if (timerInterval) {
+      clearInterval(timerInterval);
+    }
+    
+    // Start a new timer
+    const interval = setInterval(() => {
+      setTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    
+    setTimerInterval(interval);
+  };
+
+  // Auto-verify when all 6 digits are entered
+  useEffect(() => {
+    if (verificationCode.length === 6 && !isVerifying) {
+      handleVerify();
+    }
+  }, [verificationCode]);
 
   return (
     <div className="space-y-4">

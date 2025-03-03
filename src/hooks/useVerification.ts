@@ -24,6 +24,8 @@ export function useVerification() {
       localStorage.setItem("verification_code", code);
       localStorage.setItem("verification_expires", (Date.now() + 600000).toString()); // 10 minutes
       
+      console.log("Sending SMS verification with code:", code);
+      
       const { data, error } = await supabase.functions.invoke("send-verification-sms", {
         body: { phoneNumber, code },
       });
@@ -46,11 +48,15 @@ export function useVerification() {
   const sendEmailVerification = async (email: string) => {
     try {
       setIsSendingCode(true);
-      const code = generateVerificationCode();
+      
+      // Use the same code for both SMS and email
+      const code = localStorage.getItem("verification_code") || generateVerificationCode();
       
       // Store the code in localStorage temporarily (in a real app, use a more secure method)
       localStorage.setItem("verification_code", code);
       localStorage.setItem("verification_expires", (Date.now() + 600000).toString()); // 10 minutes
+      
+      console.log("Sending email verification with code:", code);
       
       const { data, error } = await supabase.functions.invoke("send-verification-email", {
         body: { email, code },
@@ -77,6 +83,8 @@ export function useVerification() {
     try {
       const storedCode = localStorage.getItem("verification_code");
       const expiresStr = localStorage.getItem("verification_expires");
+      
+      console.log("Verifying code:", code, "against stored code:", storedCode);
       
       if (!storedCode || !expiresStr) {
         toast.error("Aucun code de vérification trouvé");
