@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +9,8 @@ import { PersonalInfoSection } from "@/components/registration/form-sections/Per
 import { ProfessionalSection } from "@/components/registration/form-sections/ProfessionalSection";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { VerificationForm } from "@/components/auth/VerificationForm";
+import { useVerification } from "@/hooks/useVerification";
 
 const userTypes = [
   { value: "owner", label: "Propriétaire" },
@@ -26,15 +29,53 @@ const getCurrentUserType = () => {
 export default function RegisterForm() {
   const navigate = useNavigate();
   const currentUserType = getCurrentUserType();
-  const { formData, setters, handleSubmit } = useRegistrationForm(currentUserType);
+  const { formData, setters, handleSubmit: originalHandleSubmit } = useRegistrationForm(currentUserType);
+  const [isAwaitingVerification, setIsAwaitingVerification] = useState(false);
+  
+  const {
+    verificationCode,
+    setVerificationCode,
+    isCodeSent,
+    isVerifying,
+    isSendingCode,
+    sendSMSVerification,
+    sendEmailVerification,
+    verifyCode,
+  } = useVerification();
 
   const handleUserTypeChange = (value: string) => {
     navigate(`/register/form?type=${value}`);
   };
 
-  const getUserTypeLabel = (type: string) => {
-    const userType = userTypes.find(ut => ut.value === type);
-    return userType ? userType.label : "";
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // If we're not awaiting verification, send the codes first
+    if (!isAwaitingVerification) {
+      const emailSent = await sendEmailVerification(formData.email);
+      const smsSent = await sendSMSVerification(formData.phoneNumber);
+      
+      if (emailSent && smsSent) {
+        setIsAwaitingVerification(true);
+      }
+      return;
+    }
+    
+    // If we're here, it means verification was successful
+    // Now proceed with the actual registration
+    originalHandleSubmit(e);
+  };
+
+  const handleResendCode = async () => {
+    await Promise.all([
+      sendEmailVerification(formData.email),
+      sendSMSVerification(formData.phoneNumber)
+    ]);
+  };
+
+  const handleVerificationSuccess = () => {
+    // Proceed with the actual registration
+    originalHandleSubmit({ preventDefault: () => {} } as React.FormEvent);
   };
 
   return (
@@ -50,53 +91,73 @@ export default function RegisterForm() {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Type de compte</Label>
-              <Select
-                value={getCurrentUserType()}
-                onValueChange={handleUserTypeChange}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionnez un type de compte" />
-                </SelectTrigger>
-                <SelectContent>
-                  {userTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {getCurrentUserType() && (
+            {!isAwaitingVerification ? (
               <>
-                <BasicInfoSection formData={formData} setters={setters} />
+                <div className="space-y-2">
+                  <Label>Type de compte</Label>
+                  <Select
+                    value={getCurrentUserType()}
+                    onValueChange={handleUserTypeChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionnez un type de compte" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {userTypes.map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                {(getCurrentUserType() === "owner" || 
-                  getCurrentUserType() === "seller" || 
-                  getCurrentUserType() === "surveyor" || 
-                  getCurrentUserType() === "notary" || 
-                  getCurrentUserType() === "notary_clerk") && (
-                  <PersonalInfoSection formData={formData} setters={setters} />
-                )}
+                {getCurrentUserType() && (
+                  <>
+                    <BasicInfoSection formData={formData} setters={setters} />
 
-                {(getCurrentUserType() === "surveyor" || 
-                  getCurrentUserType() === "notary" || 
-                  getCurrentUserType() === "notary_clerk") && (
-                  <ProfessionalSection
-                    type={getCurrentUserType() as "surveyor" | "notary" | "notary_clerk"}
-                    formData={formData}
-                    setters={setters}
-                  />
+                    {(getCurrentUserType() === "owner" || 
+                      getCurrentUserType() === "seller" || 
+                      getCurrentUserType() === "surveyor" || 
+                      getCurrentUserType() === "notary" || 
+                      getCurrentUserType() === "notary_clerk") && (
+                      <PersonalInfoSection formData={formData} setters={setters} />
+                    )}
+
+                    {(getCurrentUserType() === "surveyor" || 
+                      getCurrentUserType() === "notary" || 
+                      getCurrentUserType() === "notary_clerk") && (
+                      <ProfessionalSection
+                        type={getCurrentUserType() as "surveyor" | "notary" | "notary_clerk"}
+                        formData={formData}
+                        setters={setters}
+                      />
+                    )}
+                  </>
                 )}
               </>
+            ) : (
+              <VerificationForm
+                phoneNumber={formData.phoneNumber}
+                email={formData.email}
+                onVerificationSuccess={handleVerificationSuccess}
+                onResendCode={handleResendCode}
+                verificationCode={verificationCode}
+                setVerificationCode={setVerificationCode}
+                verifyCode={verifyCode}
+                isVerifying={isVerifying}
+                isResending={isSendingCode}
+              />
             )}
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            {getCurrentUserType() && (
-              <Button type="submit" className="w-full">
-                S'inscrire
+            {getCurrentUserType() && !isAwaitingVerification && (
+              <Button 
+                type="submit" 
+                className="w-full"
+                disabled={isSendingCode}
+              >
+                {isSendingCode ? "Envoi du code..." : "S'inscrire"}
               </Button>
             )}
             <p className="text-center text-sm">

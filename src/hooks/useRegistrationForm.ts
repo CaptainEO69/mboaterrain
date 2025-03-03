@@ -4,6 +4,7 @@ import { useAuth } from "@/lib/auth";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { passwordStrength } from "@/lib/password-utils";
+import { supabase } from "@/integrations/supabase/client";
 
 export function useRegistrationForm(type: string | null) {
   const navigate = useNavigate();
@@ -26,7 +27,9 @@ export function useRegistrationForm(type: string | null) {
   const [profileImage, setProfileImage] = useState<File | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    if (e.preventDefault) {
+      e.preventDefault();
+    }
     
     // Vérification de la force du mot de passe
     const strength = passwordStrength(password);
@@ -36,7 +39,55 @@ export function useRegistrationForm(type: string | null) {
     }
     
     try {
+      // Create the user in Supabase Auth
       await signUp(email, password);
+      
+      // Create a profile record with additional information
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .insert([
+          {
+            full_name: `${firstName} ${lastName}`,
+            phone_number: phoneNumber,
+            birth_place: birthPlace,
+            birth_date: birthDate,
+            id_number: idNumber,
+            profession: profession,
+            residence_place: residencePlace,
+            user_type: type,
+            // Add other fields as needed
+          },
+        ])
+        .select();
+
+      if (profileError) throw profileError;
+      
+      // Upload profile image if available
+      if (profileImage) {
+        const fileExt = profileImage.name.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+        const filePath = `profile-images/${fileName}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('profiles')
+          .upload(filePath, profileImage);
+          
+        if (uploadError) {
+          console.error("Error uploading profile image:", uploadError);
+          // Continue with signup even if image upload fails
+        } else {
+          // Update profile with image URL
+          const { error: updateError } = await supabase
+            .from("profiles")
+            .update({ avatar_url: filePath })
+            .eq("id", profile[0].id);
+            
+          if (updateError) {
+            console.error("Error updating profile with image URL:", updateError);
+          }
+        }
+      }
+      
       toast.success("Inscription réussie! Veuillez vous connecter.");
       navigate("/login");
     } catch (error: any) {
