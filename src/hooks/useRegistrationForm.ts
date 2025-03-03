@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { passwordStrength } from "@/lib/password-utils";
 
 export function useRegistrationForm(type: string | null) {
   const navigate = useNavigate();
@@ -25,11 +27,21 @@ export function useRegistrationForm(type: string | null) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Vérification de la force du mot de passe
+    const strength = passwordStrength(password);
+    if (strength.score < 3) {
+      toast.error("Le mot de passe n'est pas assez sécurisé. Veuillez le renforcer.");
+      return;
+    }
+    
     try {
       await signUp(email, password);
+      toast.success("Inscription réussie! Veuillez vous connecter.");
       navigate("/login");
     } catch (error: any) {
       console.error("Registration error:", error);
+      toast.error(error.message || "Erreur lors de l'inscription");
     }
   };
 

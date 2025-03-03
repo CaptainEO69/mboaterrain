@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ImageUpload } from "@/components/sell/ImageUpload";
@@ -11,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { PasswordStrength } from "@/components/ui/password-strength";
 
 interface BasicInfoSectionProps {
   formData: {
@@ -122,6 +124,7 @@ export function BasicInfoSection({ formData, setters }: BasicInfoSectionProps) {
             required
             minLength={6}
           />
+          <PasswordStrength password={formData.password} />
         </div>
 
         <div className="space-y-2">

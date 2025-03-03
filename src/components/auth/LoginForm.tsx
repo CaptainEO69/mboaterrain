@@ -1,9 +1,11 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { PasswordStrength } from "@/components/ui/password-strength";
 
 export const LoginForm = () => {
   const [email, setEmail] = useState("");

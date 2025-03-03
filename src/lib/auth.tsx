@@ -135,6 +135,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string) => {
     try {
+      // Vérifie que le mot de passe répond aux exigences de sécurité
+      if (password.length < 8) {
+        throw new Error("Le mot de passe doit contenir au moins 8 caractères");
+      }
+
+      if (!/[A-Z]/.test(password)) {
+        throw new Error("Le mot de passe doit contenir au moins une lettre majuscule");
+      }
+
+      if (!/[a-z]/.test(password)) {
+        throw new Error("Le mot de passe doit contenir au moins une lettre minuscule");
+      }
+
+      if (!/[0-9]/.test(password)) {
+        throw new Error("Le mot de passe doit contenir au moins un chiffre");
+      }
+
+      if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+        throw new Error("Le mot de passe doit contenir au moins un caractère spécial");
+      }
+
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -144,7 +165,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       toast.success("Inscription réussie");
     } catch (error: any) {
       console.error("Error signing up:", error);
-      toast.error("Erreur lors de l'inscription");
+      toast.error(error.message || "Erreur lors de l'inscription");
       throw error;
     }
   };
