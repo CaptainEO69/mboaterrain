@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/lib/auth";
 import { Navigate, useLocation } from "react-router-dom";
 
@@ -34,4 +33,3 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   // Si l'utilisateur est connecté, afficher le contenu protégé
   return <>{children}</>;
 }
-
