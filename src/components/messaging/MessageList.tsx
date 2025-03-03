@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -57,16 +58,39 @@ export function MessageList() {
             content,
             created_at,
             read,
-            sender_profile:profiles!sender_id(full_name, avatar_url)
+            sender_profile:sender_id(
+              full_name, 
+              avatar_url
+            )
           `)
           .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
           .order('created_at', { ascending: false });
 
         if (messagesError) throw messagesError;
 
-        // Construction de la liste des contacts uniques
+        // Construction de la liste des contacts uniques avec les profils
         const contactMap = new Map<string, Contact>();
+        
+        // On récupère d'abord tous les IDs des contacts
+        const contactIds = messageData
+          .map((msg: any) => msg.sender_id === user.id ? msg.receiver_id : msg.sender_id)
+          .filter((id: string) => id !== user.id);
+        
+        // Récupération des profils des contacts
+        const { data: contactProfiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, full_name, avatar_url')
+          .in('id', [...new Set(contactIds)]);
+          
+        if (profilesError) throw profilesError;
+        
+        // Création d'un Map pour accéder facilement aux profils
+        const profileMap = new Map();
+        contactProfiles?.forEach((profile: any) => {
+          profileMap.set(profile.id, profile);
+        });
 
+        // Construction des contacts avec leurs messages
         messageData.forEach((message: any) => {
           // Déterminer si le message est entrant ou sortant
           const isIncoming = message.receiver_id === user.id;
@@ -75,14 +99,16 @@ export function MessageList() {
           // Ignorer si c'est un message à soi-même
           if (contactId === user.id) return;
           
+          const contactProfile = profileMap.get(contactId);
+          if (!contactProfile) return; // Ignorer si pas de profil
+          
           const existingContact = contactMap.get(contactId);
-          const contactName = isIncoming ? message.sender_profile?.full_name || 'Utilisateur' : 'Contact';
           
           if (!existingContact) {
             contactMap.set(contactId, {
               id: contactId,
-              full_name: contactName,
-              avatar_url: isIncoming ? message.sender_profile?.avatar_url : undefined,
+              full_name: contactProfile.full_name || 'Utilisateur',
+              avatar_url: contactProfile.avatar_url,
               last_message: message.content,
               last_message_date: message.created_at,
               unread_count: isIncoming && !message.read ? 1 : 0
