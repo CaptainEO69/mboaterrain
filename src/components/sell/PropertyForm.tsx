@@ -48,7 +48,7 @@ export function PropertyForm({ onSubmit, isSubmitting = false, transactionType }
         }} 
       />
 
-      <PriceLocationSection errors={validationErrors} />
+      <PriceLocationSection errors={validationErrors} isRental={transactionType === "rent"} />
 
       {propertyType === "land" && (
         <>

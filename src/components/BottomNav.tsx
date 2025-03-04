@@ -1,7 +1,7 @@
 
 import { useLocation } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-import { HomeIcon, ShoppingBagIcon, KeyIcon, UserIcon, HeartIcon, MessageSquareIcon, Mail } from "lucide-react";
+import { HomeIcon, ShoppingBagIcon, KeyIcon, UserIcon, HeartIcon, MessageSquareIcon, Mail, PencilIcon } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { useMobile } from "@/hooks/useMobile";
@@ -41,7 +41,7 @@ export function BottomNav() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 z-10 md:hidden">
-      <div className="grid grid-cols-6 gap-1">
+      <div className="grid grid-cols-5 gap-1">
         <NavItem 
           to="/" 
           icon={<HomeIcon className={cn("h-5 w-5", isActive("/") ? "text-cmr-green" : "text-gray-600")} />} 
@@ -55,6 +55,12 @@ export function BottomNav() {
           active={isActive("/buy")} 
         />
         <NavItem 
+          to="/sell" 
+          icon={<PencilIcon className={cn("h-5 w-5", isActive("/sell") ? "text-cmr-green" : "text-gray-600")} />} 
+          label="Vendre" 
+          active={isActive("/sell")} 
+        />
+        <NavItem 
           to="/rent" 
           icon={<KeyIcon className={cn("h-5 w-5", isActive("/rent") ? "text-cmr-green" : "text-gray-600")} />} 
           label="Louer" 
@@ -66,38 +72,6 @@ export function BottomNav() {
           label="Contact" 
           active={isActive("/contact")} 
         />
-        
-        {user ? (
-          <>
-            <NavItem 
-              to="/messaging" 
-              icon={<MessageSquareIcon className={cn("h-5 w-5", isActive("/messaging") ? "text-cmr-green" : "text-gray-600")} />} 
-              label="Messages" 
-              active={isActive("/messaging")} 
-            />
-            <NavItem 
-              to="/profile" 
-              icon={<UserIcon className={cn("h-5 w-5", isActive("/profile") ? "text-cmr-green" : "text-gray-600")} />} 
-              label="Profil" 
-              active={isActive("/profile")} 
-            />
-          </>
-        ) : (
-          <>
-            <NavItem 
-              to="/favorites" 
-              icon={<HeartIcon className={cn("h-5 w-5", isActive("/favorites") ? "text-cmr-green" : "text-gray-600")} />} 
-              label="Favoris" 
-              active={isActive("/favorites")} 
-            />
-            <NavItem 
-              to="/login" 
-              icon={<UserIcon className={cn("h-5 w-5", isActive("/login") ? "text-cmr-green" : "text-gray-600")} />} 
-              label="Connexion" 
-              active={isActive("/login")} 
-            />
-          </>
-        )}
       </div>
     </div>
   );

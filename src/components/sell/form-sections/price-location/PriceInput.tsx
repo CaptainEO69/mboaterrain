@@ -2,29 +2,54 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { CFAIcon } from "@/components/icons/CFAIcon";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 
 interface PriceInputProps {
   error?: string;
+  isRental?: boolean;
 }
 
-export function PriceInput({ error }: PriceInputProps) {
+export function PriceInput({ error, isRental = false }: PriceInputProps) {
   return (
-    <div>
-      <div className="flex items-center gap-2 mb-2">
-        <Label htmlFor="price">Prix de vente (FCFA)</Label>
-        <CFAIcon className="w-4 h-4 text-muted-foreground" />
+    <div className="space-y-4">
+      <div>
+        <div className="flex items-center gap-2 mb-2">
+          <Label htmlFor="price">{isRental ? "Prix de location (FCFA)" : "Prix de vente (FCFA)"}</Label>
+          <CFAIcon className="w-4 h-4 text-muted-foreground" />
+        </div>
+        <Input
+          id="price"
+          name="price"
+          type="number"
+          min="0"
+          step="1000"
+          required
+          className={error ? "border-red-500" : ""}
+        />
+        {error && (
+          <p className="text-red-500 text-sm mt-1">{error}</p>
+        )}
       </div>
-      <Input
-        id="price"
-        name="price"
-        type="number"
-        min="0"
-        step="1000"
-        required
-        className={error ? "border-red-500" : ""}
-      />
-      {error && (
-        <p className="text-red-500 text-sm mt-1">{error}</p>
+
+      {isRental && (
+        <div>
+          <Label htmlFor="price_type" className="block mb-2">Type de tarification</Label>
+          <Select name="price_type" defaultValue="monthly">
+            <SelectTrigger id="price_type" className="w-full">
+              <SelectValue placeholder="Choisir un type de tarification" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="monthly">Mensuel</SelectItem>
+              <SelectItem value="daily">Journalier</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       )}
     </div>
   );

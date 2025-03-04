@@ -122,8 +122,8 @@ export function ChatWindow() {
   }
 
   return (
-    <Card className="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-50 w-[90vw] md:w-80 shadow-xl h-[60vh] md:h-96 flex flex-col">
-      <CardHeader className="py-3 px-4 border-b flex flex-row items-center justify-between">
+    <Card className="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-50 w-[90vw] md:w-80 shadow-xl h-[60vh] md:h-96 flex flex-col bg-white">
+      <CardHeader className="py-3 px-4 border-b flex flex-row items-center justify-between bg-white">
         <CardTitle className="text-lg font-medium">Assistant CasaMali</CardTitle>
         <Button 
           onClick={toggleChat} 
@@ -137,7 +137,7 @@ export function ChatWindow() {
           </svg>
         </Button>
       </CardHeader>
-      <CardContent className="flex-1 p-4 overflow-hidden">
+      <CardContent className="flex-1 p-4 overflow-hidden bg-white">
         <ScrollArea className="h-full pr-4">
           {messages.map((message) => (
             <ChatMessage key={message.id} message={message} />
@@ -145,7 +145,7 @@ export function ChatWindow() {
           <div ref={messagesEndRef} />
         </ScrollArea>
       </CardContent>
-      <CardFooter className="p-3 border-t">
+      <CardFooter className="p-3 border-t bg-white">
         <form 
           className="flex w-full gap-2" 
           onSubmit={(e) => {
