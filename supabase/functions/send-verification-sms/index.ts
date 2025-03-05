@@ -4,6 +4,7 @@ import { Twilio } from "npm:twilio@4.18.1";
 
 const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
 const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
+const twilioPhoneNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
 
 const twilio = new Twilio(accountSid, authToken);
 
@@ -31,6 +32,9 @@ serve(async (req) => {
       );
     }
 
+    console.log("Attempting to send verification SMS to:", phoneNumber);
+    console.log("Verification code:", code);
+
     // Format the phone number (ensure it has country code)
     let formattedPhone = phoneNumber;
     if (!phoneNumber.startsWith("+")) {
@@ -38,10 +42,23 @@ serve(async (req) => {
       formattedPhone = "+237" + phoneNumber.replace(/^0+/, "");
     }
 
+    console.log("Formatted phone number:", formattedPhone);
+
+    if (!twilioPhoneNumber) {
+      console.error("Missing TWILIO_PHONE_NUMBER environment variable");
+      return new Response(
+        JSON.stringify({ error: "Server configuration error. Missing Twilio phone number." }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        }
+      );
+    }
+
     // Send the SMS with the verification code
     const message = await twilio.messages.create({
       body: `Votre code de vérification MboaTer est: ${code}. Ce code expire dans 10 minutes.`,
-      from: "+15017122661", // Replace with your Twilio phone number
+      from: twilioPhoneNumber, // Use the environment variable
       to: formattedPhone,
     });
 

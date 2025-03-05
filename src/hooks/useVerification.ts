@@ -24,13 +24,18 @@ export function useVerification() {
       localStorage.setItem("verification_code", code);
       localStorage.setItem("verification_expires", (Date.now() + 600000).toString()); // 10 minutes
       
-      console.log("Sending SMS verification with code:", code);
+      console.log("Sending SMS verification with code:", code, "to phone:", phoneNumber);
       
       const { data, error } = await supabase.functions.invoke("send-verification-sms", {
         body: { phoneNumber, code },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error response from function:", error);
+        throw error;
+      }
+      
+      console.log("SMS verification function response:", data);
       
       setIsCodeSent(true);
       toast.success("Un code de vérification a été envoyé par SMS");
