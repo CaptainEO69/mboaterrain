@@ -8,7 +8,7 @@ export function useFavorites() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: favorites = [], isLoading } = useQuery({
+  const { data: favorites = [], isLoading, error } = useQuery({
     queryKey: ["favorites", user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
@@ -44,7 +44,7 @@ export function useFavorites() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["favorites"] });
+      queryClient.invalidateQueries({ queryKey: ["favorites", user?.id] });
       toast.success("Ajouté aux favoris");
     },
     onError: (error) => {
@@ -66,7 +66,7 @@ export function useFavorites() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["favorites"] });
+      queryClient.invalidateQueries({ queryKey: ["favorites", user?.id] });
       toast.success("Retiré des favoris");
     },
     onError: (error) => {
@@ -78,6 +78,7 @@ export function useFavorites() {
   return {
     favorites,
     isLoading,
+    error,
     addToFavorites: addToFavorites.mutate,
     removeFromFavorites: removeFromFavorites.mutate,
     isFavorite: (propertyId: string) => favorites?.includes(propertyId),

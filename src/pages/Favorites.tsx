@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { PropertyCard } from "@/components/PropertyCard";
+import { PropertyList } from "@/components/PropertyList";
 import { BottomNav } from "@/components/BottomNav";
 import { useFavorites } from "@/hooks/useFavorites";
 import { Heart } from "lucide-react";
@@ -24,7 +24,7 @@ type Property = {
 export default function Favorites() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { favorites, isLoading: favoritesLoading } = useFavorites();
+  const { favorites, isLoading: favoritesLoading, error: favoritesError } = useFavorites();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -41,7 +41,7 @@ export default function Favorites() {
       setIsLoading(true);
       
       try {
-        if (favorites.length === 0) {
+        if (!favorites || favorites.length === 0) {
           setProperties([]);
           setIsLoading(false);
           return;
@@ -74,6 +74,11 @@ export default function Favorites() {
     fetchFavoriteProperties();
   }, [favorites, favoritesLoading, user, navigate]);
 
+  // Gérer les erreurs potentielles du hook useFavorites
+  if (favoritesError) {
+    console.error("Erreur lors du chargement des favoris:", favoritesError);
+  }
+
   return (
     <div className="min-h-screen pb-20">
       <h1 className="text-xl font-bold p-4">Mes Favoris</h1>
@@ -90,22 +95,7 @@ export default function Favorites() {
             <p className="text-sm mt-2">Ajoutez des propriétés à vos favoris pour les retrouver ici</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {properties.map((property) => (
-              <PropertyCard
-                key={property.id}
-                id={property.id}
-                title={property.title}
-                price={`${property.price.toLocaleString()} FCFA`}
-                location={`${property.neighborhood}, ${property.city}`}
-                size={`${property.area_size} m²`}
-                imageUrl={
-                  property.property_images.find((img) => img.is_main)?.image_url ||
-                  "/placeholder.svg"
-                }
-              />
-            ))}
-          </div>
+          <PropertyList properties={properties} loading={false} />
         )}
       </div>
 
