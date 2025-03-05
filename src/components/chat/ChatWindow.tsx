@@ -137,6 +137,8 @@ export function ChatWindow() {
           </svg>
         </Button>
       </CardHeader>
+      
+      {/* Image de fond avec position absolue */}
       <div 
         className="absolute inset-0 -z-10 opacity-25"
         style={{
@@ -146,6 +148,7 @@ export function ChatWindow() {
           filter: "brightness(1.3) contrast(0.85) blur(1px)",
         }}
       />
+      
       <CardContent className="flex-1 p-4 overflow-hidden bg-transparent backdrop-blur-[2px]">
         <ScrollArea className="h-full pr-4">
           {messages.map((message) => (
