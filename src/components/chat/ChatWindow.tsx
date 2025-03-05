@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -121,8 +122,8 @@ export function ChatWindow() {
   }
 
   return (
-    <Card className="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-50 w-[90vw] md:w-80 shadow-xl h-[60vh] md:h-96 flex flex-col bg-white">
-      <CardHeader className="py-3 px-4 border-b flex flex-row items-center justify-between bg-white">
+    <Card className="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-50 w-[90vw] md:w-80 shadow-xl h-[60vh] md:h-96 flex flex-col overflow-hidden">
+      <CardHeader className="py-3 px-4 border-b flex flex-row items-center justify-between bg-white/90 backdrop-blur-sm">
         <CardTitle className="text-lg font-medium">Mon Assistant</CardTitle>
         <Button 
           onClick={toggleChat} 
@@ -136,7 +137,16 @@ export function ChatWindow() {
           </svg>
         </Button>
       </CardHeader>
-      <CardContent className="flex-1 p-4 overflow-hidden bg-white">
+      <div 
+        className="absolute inset-0 -z-10 opacity-25"
+        style={{
+          backgroundImage: "url('/lovable-uploads/0a170a12-7e32-49fd-9da5-09bea79b1bab.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          filter: "brightness(1.3) contrast(0.85) blur(1px)",
+        }}
+      />
+      <CardContent className="flex-1 p-4 overflow-hidden bg-transparent backdrop-blur-[2px]">
         <ScrollArea className="h-full pr-4">
           {messages.map((message) => (
             <ChatMessage key={message.id} message={message} />
@@ -144,7 +154,7 @@ export function ChatWindow() {
           <div ref={messagesEndRef} />
         </ScrollArea>
       </CardContent>
-      <CardFooter className="p-3 border-t bg-white">
+      <CardFooter className="p-3 border-t bg-white/90 backdrop-blur-sm">
         <form 
           className="flex w-full gap-2" 
           onSubmit={(e) => {
@@ -156,9 +166,9 @@ export function ChatWindow() {
             placeholder="Envoyez un message..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            className="flex-1"
+            className="flex-1 bg-white/80"
           />
-          <Button type="submit" size="icon" className="h-10 w-10">
+          <Button type="submit" size="icon" className="h-10 w-10 bg-cmr-green hover:bg-cmr-green/90">
             <Send className="h-4 w-4" />
           </Button>
         </form>

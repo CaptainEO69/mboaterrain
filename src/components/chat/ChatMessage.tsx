@@ -1,6 +1,6 @@
 
+import React from "react";
 import { Message } from "./ChatWindow";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
 interface ChatMessageProps {
@@ -9,40 +9,35 @@ interface ChatMessageProps {
 
 export function ChatMessage({ message }: ChatMessageProps) {
   const isBot = message.sender === "bot";
-  const formattedTime = message.timestamp.toLocaleTimeString([], { 
-    hour: '2-digit', 
-    minute: '2-digit' 
-  });
+  const time = new Intl.DateTimeFormat("fr-FR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(message.timestamp);
 
   return (
     <div
       className={cn(
-        "flex items-start gap-2 mb-4",
-        isBot ? "flex-row" : "flex-row-reverse"
+        "flex w-full mb-4 gap-2",
+        isBot ? "justify-start" : "justify-end"
       )}
     >
-      <Avatar className={cn("h-8 w-8", isBot ? "bg-cmr-green text-white" : "bg-gray-200")}>
-        {isBot ? (
-          <AvatarImage src="/favicon.ico" alt="Assistant" />
-        ) : null}
-        <AvatarFallback>
-          {isBot ? "AI" : "Vous"}
-        </AvatarFallback>
-      </Avatar>
-      <div className="flex flex-col max-w-[75%]">
+      <div
+        className={cn(
+          "max-w-[80%] rounded-xl px-3 py-2 text-sm shadow-sm",
+          isBot
+            ? "bg-white/90 text-black rounded-tl-none"
+            : "bg-cmr-green text-white rounded-tr-none"
+        )}
+      >
+        <div className="mb-1">{message.content}</div>
         <div
           className={cn(
-            "px-3 py-2 rounded-lg",
-            isBot 
-              ? "bg-gray-100 text-gray-800" 
-              : "bg-cmr-green text-white"
+            "text-[10px] opacity-70 text-right",
+            isBot ? "text-gray-600" : "text-gray-100"
           )}
         >
-          <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+          {time}
         </div>
-        <span className="text-xs text-gray-500 mt-1">
-          {formattedTime}
-        </span>
       </div>
     </div>
   );
