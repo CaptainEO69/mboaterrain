@@ -54,8 +54,15 @@ export function ChatWindow() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const { user } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [backgroundImageLoaded, setBackgroundImageLoaded] = useState(false);
 
   useEffect(() => {
+    // Précharger l'image pour s'assurer qu'elle est disponible
+    const img = new Image();
+    img.src = "/lovable-uploads/d43f6569-f04e-4043-bbf1-6cb25d99b290.png";
+    img.onload = () => setBackgroundImageLoaded(true);
+    img.onerror = (e) => console.error("Erreur de chargement de l'image:", e);
+    
     scrollToBottom();
   }, [messages]);
 
@@ -142,12 +149,19 @@ export function ChatWindow() {
       <div 
         className="absolute inset-0 -z-10 opacity-25"
         style={{
-          backgroundImage: "url('/lovable-uploads/d43f6569-f04e-4043-bbf1-6cb25d99b290.png')",
+          backgroundImage: `url('/lovable-uploads/d43f6569-f04e-4043-bbf1-6cb25d99b290.png')`,
+          backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
-          backgroundPosition: "center",
+          backgroundPosition: "center center",
           filter: "brightness(1.3) contrast(0.85) blur(1px)",
+          display: backgroundImageLoaded ? "block" : "none"
         }}
       />
+      
+      {/* Fallback en cas d'échec du chargement de l'image */}
+      {!backgroundImageLoaded && (
+        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-gray-100 to-gray-200 opacity-50"></div>
+      )}
       
       <CardContent className="flex-1 p-4 overflow-hidden bg-transparent backdrop-blur-[2px]">
         <ScrollArea className="h-full pr-4">
