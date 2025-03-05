@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -121,58 +122,64 @@ export function ChatWindow() {
   }
 
   return (
-    <Card 
-      className="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-50 w-[90vw] md:w-80 shadow-xl h-[60vh] md:h-96 flex flex-col overflow-hidden"
-      style={{
-        backgroundImage: `url('/lovable-uploads/61bf705f-6a7f-4f57-aa11-ac8121c57d73.png')`,
-        backgroundPosition: 'center',
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundBlendMode: 'overlay',
-      }}
-    >
-      <CardHeader className="py-3 px-4 border-b flex flex-row items-center justify-between bg-white/90 backdrop-blur-sm">
-        <CardTitle className="text-lg font-medium">Mon Assistant</CardTitle>
-        <Button 
-          onClick={toggleChat} 
-          variant="ghost" 
-          size="sm" 
-          className="h-8 w-8 p-0"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </Button>
-      </CardHeader>
+    <div className="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-50 w-[90vw] md:w-80 h-[60vh] md:h-96">
+      <div 
+        className="absolute inset-0 rounded-lg shadow-xl overflow-hidden"
+        style={{
+          backgroundImage: `url('/lovable-uploads/61bf705f-6a7f-4f57-aa11-ac8121c57d73.png')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
+        <div className="absolute inset-0 bg-black/20"></div>
+      </div>
       
-      <CardContent className="flex-1 p-4 overflow-hidden bg-white/50">
-        <ScrollArea className="h-full pr-4">
-          {messages.map((message) => (
-            <ChatMessage key={message.id} message={message} />
-          ))}
-          <div ref={messagesEndRef} />
-        </ScrollArea>
-      </CardContent>
-      <CardFooter className="p-3 border-t bg-white/90 backdrop-blur-sm">
-        <form 
-          className="flex w-full gap-2" 
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSendMessage();
-          }}
-        >
-          <Input
-            placeholder="Envoyez un message..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            className="flex-1 bg-white/80"
-          />
-          <Button type="submit" size="icon" className="h-10 w-10 bg-cmr-green hover:bg-cmr-green/90">
-            <Send className="h-4 w-4" />
+      <div className="relative h-full flex flex-col rounded-lg overflow-hidden">
+        <div className="py-3 px-4 border-b flex flex-row items-center justify-between bg-white/90 backdrop-blur-sm">
+          <h3 className="text-lg font-medium">Mon Assistant</h3>
+          <Button 
+            onClick={toggleChat} 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 w-8 p-0"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
           </Button>
-        </form>
-      </CardFooter>
-    </Card>
+        </div>
+        
+        <div className="flex-1 p-4 overflow-hidden bg-white/60">
+          <ScrollArea className="h-full pr-4">
+            {messages.map((message) => (
+              <ChatMessage key={message.id} message={message} />
+            ))}
+            <div ref={messagesEndRef} />
+          </ScrollArea>
+        </div>
+        
+        <div className="p-3 border-t bg-white/90 backdrop-blur-sm">
+          <form 
+            className="flex w-full gap-2" 
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSendMessage();
+            }}
+          >
+            <Input
+              placeholder="Envoyez un message..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              className="flex-1 bg-white/80"
+            />
+            <Button type="submit" size="icon" className="h-10 w-10 bg-cmr-green hover:bg-cmr-green/90">
+              <Send className="h-4 w-4" />
+            </Button>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 }
