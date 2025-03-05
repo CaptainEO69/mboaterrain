@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -124,7 +123,7 @@ export function ChatWindow() {
   return (
     <Card className="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-50 w-[90vw] md:w-80 shadow-xl h-[60vh] md:h-96 flex flex-col bg-white">
       <CardHeader className="py-3 px-4 border-b flex flex-row items-center justify-between bg-white">
-        <CardTitle className="text-lg font-medium">Assistant CasaMali</CardTitle>
+        <CardTitle className="text-lg font-medium">Mon Assistant</CardTitle>
         <Button 
           onClick={toggleChat} 
           variant="ghost" 
