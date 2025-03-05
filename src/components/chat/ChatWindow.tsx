@@ -138,12 +138,15 @@ export function ChatWindow() {
         </Button>
       </CardHeader>
       
-      {/* Fond avec un dégradé de couleur au lieu d'une image */}
+      {/* Fond avec image de lion */}
       <div 
         className="absolute inset-0 -z-10"
         style={{
-          background: "linear-gradient(109.6deg, rgba(223,234,247,1) 11.2%, rgba(244,248,252,1) 91.1%)",
-          opacity: 0.8
+          backgroundImage: "url('/lovable-uploads/ff74bfca-be9a-4f99-9ec1-a7e93bc5c72f.png')",
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          opacity: 0.15
         }}
       />
       
