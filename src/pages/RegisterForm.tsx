@@ -14,8 +14,8 @@ import { useVerification } from "@/hooks/useVerification";
 
 const userTypes = [
   { value: "owner", label: "Propriétaire" },
-  { value: "seller", label: "Vendeur" },
-  { value: "buyer", label: "Acheteur" },
+  { value: "seller", label: "Agence/Mandataire" },
+  { value: "buyer", label: "Acheteur/Locataire" },
   { value: "surveyor", label: "Géomètre" },
   { value: "notary", label: "Notaire" },
   { value: "notary_clerk", label: "Clerc de notaire" },

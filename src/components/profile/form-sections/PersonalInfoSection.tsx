@@ -75,8 +75,8 @@ export function PersonalInfoSection({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="owner">Propriétaire</SelectItem>
-            <SelectItem value="seller">Vendeur</SelectItem>
-            <SelectItem value="buyer">Acheteur</SelectItem>
+            <SelectItem value="seller">Agence/Mandataire</SelectItem>
+            <SelectItem value="buyer">Acheteur/Locataire</SelectItem>
             <SelectItem value="surveyor">Géomètre</SelectItem>
             <SelectItem value="notary">Notaire</SelectItem>
             <SelectItem value="notary_clerk">Clerc de notaire</SelectItem>

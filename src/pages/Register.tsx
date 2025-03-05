@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { House, User, UserSquare2, Users, Scale, FileText } from "lucide-react";
@@ -13,14 +14,14 @@ const userTypes = [
   },
   {
     type: "seller",
-    title: "Vendeur",
+    title: "Agence/Mandataire",
     description: "Vendez des biens immobiliers",
     icon: UserSquare2,
     color: "red" as const,
   },
   {
     type: "buyer",
-    title: "Acheteur",
+    title: "Acheteur/Locataire",
     description: "Trouvez votre bien idéal",
     icon: User,
     color: "yellow" as const,
