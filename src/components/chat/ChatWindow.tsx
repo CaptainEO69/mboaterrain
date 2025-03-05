@@ -1,11 +1,9 @@
-
-import { useState, useRef, useEffect } from "react";
-import { Input } from "@/components/ui/input";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { ChatMessage } from "./ChatMessage";
+import { ChatHeader } from "./ChatHeader";
+import { ChatMessages } from "./ChatMessages";
+import { ChatInput } from "./ChatInput";
 
 // Types pour les messages
 export interface Message {
@@ -61,26 +59,18 @@ export function ChatWindow() {
       timestamp: new Date()
     }
   ]);
-  const [input, setInput] = useState("");
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const { user } = useAuth();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    scrollToBottom();
-    
     // Si le chat est ouvert, réinitialiser le compteur de messages non lus
     if (isChatOpen) {
       setUnreadCount(0);
     }
-  }, [messages, isChatOpen]);
+  }, [isChatOpen]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const handleSendMessage = () => {
+  const handleSendMessage = (input: string) => {
     if (!input.trim()) return;
 
     // Ajoute le message de l'utilisateur
@@ -92,7 +82,6 @@ export function ChatWindow() {
     };
 
     setMessages(prev => [...prev, userMessage]);
-    setInput("");
 
     // Génère une réponse automatique
     setTimeout(() => {
@@ -167,49 +156,9 @@ export function ChatWindow() {
       </div>
       
       <div className="relative h-full flex flex-col rounded-lg overflow-hidden">
-        <div className="py-3 px-4 border-b flex flex-row items-center justify-between bg-white/90 backdrop-blur-sm">
-          <h3 className="text-lg font-medium">Mon Assistant</h3>
-          <Button 
-            onClick={toggleChat} 
-            variant="ghost" 
-            size="sm" 
-            className="h-8 w-8 p-0"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </Button>
-        </div>
-        
-        <div className="flex-1 p-4 overflow-hidden bg-white/60">
-          <ScrollArea className="h-full pr-4">
-            {messages.map((message) => (
-              <ChatMessage key={message.id} message={message} />
-            ))}
-            <div ref={messagesEndRef} />
-          </ScrollArea>
-        </div>
-        
-        <div className="p-3 border-t bg-white/90 backdrop-blur-sm">
-          <form 
-            className="flex w-full gap-2" 
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSendMessage();
-            }}
-          >
-            <Input
-              placeholder="Envoyez un message..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              className="flex-1 bg-white/80"
-            />
-            <Button type="submit" size="icon" className="h-10 w-10 bg-cmr-green hover:bg-cmr-green/90">
-              <Send className="h-4 w-4" />
-            </Button>
-          </form>
-        </div>
+        <ChatHeader toggleChat={toggleChat} unreadCount={unreadCount} />
+        <ChatMessages messages={messages} />
+        <ChatInput onSendMessage={handleSendMessage} />
       </div>
     </div>
   );
