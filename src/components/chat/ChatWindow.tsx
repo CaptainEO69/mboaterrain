@@ -122,14 +122,7 @@ export function ChatWindow() {
   }
 
   return (
-    <Card className="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-50 w-[90vw] md:w-80 shadow-xl h-[60vh] md:h-96 flex flex-col overflow-hidden" 
-          style={{
-            backgroundImage: "url('/lovable-uploads/90f5860e-3aad-4988-9908-d85922d3f3d3.png')",
-            backgroundRepeat: "no-repeat",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundBlendMode: "overlay",
-          }}>
+    <Card className="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-50 w-[90vw] md:w-80 shadow-xl h-[60vh] md:h-96 flex flex-col overflow-hidden">
       <CardHeader className="py-3 px-4 border-b flex flex-row items-center justify-between bg-white/90 backdrop-blur-sm">
         <CardTitle className="text-lg font-medium">Mon Assistant</CardTitle>
         <Button 
@@ -145,7 +138,16 @@ export function ChatWindow() {
         </Button>
       </CardHeader>
       
-      <CardContent className="flex-1 p-4 overflow-hidden bg-white/30 backdrop-blur-[1px]">
+      {/* Fond avec un dégradé de couleur au lieu d'une image */}
+      <div 
+        className="absolute inset-0 -z-10"
+        style={{
+          background: "linear-gradient(109.6deg, rgba(223,234,247,1) 11.2%, rgba(244,248,252,1) 91.1%)",
+          opacity: 0.8
+        }}
+      />
+      
+      <CardContent className="flex-1 p-4 overflow-hidden backdrop-blur-[2px]">
         <ScrollArea className="h-full pr-4">
           {messages.map((message) => (
             <ChatMessage key={message.id} message={message} />
