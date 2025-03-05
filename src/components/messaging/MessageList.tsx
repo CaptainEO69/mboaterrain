@@ -1,34 +1,10 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { Avatar } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-
-interface Profile {
-  full_name: string;
-  avatar_url?: string;
-}
-
-interface Message {
-  id: string;
-  sender_id: string;
-  receiver_id: string;
-  content: string;
-  created_at: string;
-  read: boolean;
-  sender_profile: Profile;
-}
-
-interface Contact {
-  id: string;
-  full_name: string;
-  avatar_url?: string;
-  last_message: string;
-  last_message_date: string;
-  unread_count: number;
-}
+import { ContactList, Contact } from "./ContactList";
+import { MessageThread, Message } from "./MessageThread";
+import { MessageInput } from "./MessageInput";
 
 export function MessageList() {
   const { user } = useAuth();
@@ -36,7 +12,6 @@ export function MessageList() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [selectedContact, setSelectedContact] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [newMessage, setNewMessage] = useState("");
 
   useEffect(() => {
     if (!user) return;
@@ -171,6 +146,22 @@ export function MessageList() {
     };
   }, [user, selectedContact]);
 
+  const handleSendMessage = async (content: string) => {
+    if (!content.trim() || !selectedContact || !user) return;
+    
+    try {
+      await supabase.from('messages').insert({
+        sender_id: user.id,
+        receiver_id: selectedContact,
+        content: content,
+        read: false,
+      });
+    } catch (error) {
+      console.error("Erreur lors de l'envoi du message:", error);
+      throw error;
+    }
+  };
+
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] p-4">
@@ -185,134 +176,39 @@ export function MessageList() {
     <div className="container py-4 max-w-4xl">
       <h1 className="text-2xl font-bold mb-6">Messagerie</h1>
       
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="md:col-span-1">
-            <Card className="p-4">
-              <Skeleton className="h-8 w-full mb-4" />
-              <Skeleton className="h-20 w-full mb-2" />
-              <Skeleton className="h-20 w-full mb-2" />
-              <Skeleton className="h-20 w-full" />
-            </Card>
-          </div>
-          <div className="md:col-span-2">
-            <Card className="p-4 h-full">
-              <Skeleton className="h-8 w-full mb-4" />
-              <Skeleton className="h-16 w-3/4 mb-2" />
-              <Skeleton className="h-16 w-3/4 ml-auto mb-2" />
-              <Skeleton className="h-16 w-3/4 mb-2" />
-              <Skeleton className="h-12 w-full mt-auto" />
-            </Card>
-          </div>
-        </div>
-      ) : contacts.length === 0 ? (
-        <Card className="p-6 text-center">
-          <p className="text-lg mb-4">Vous n'avez pas encore de messages.</p>
-          <p>Vous verrez ici vos conversations une fois que vous commencerez à échanger avec des propriétaires ou des acheteurs.</p>
-        </Card>
+      {contacts.length === 0 && !loading ? (
+        <ContactList 
+          contacts={[]}
+          selectedContact={null}
+          onSelectContact={() => {}}
+          loading={loading}
+        />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="md:col-span-1">
-            <Card className="p-2">
-              <div className="font-medium px-2 py-3">Conversations</div>
-              <div className="divide-y">
-                {contacts.map((contact) => (
-                  <div 
-                    key={contact.id}
-                    onClick={() => setSelectedContact(contact.id)}
-                    className={`p-2 hover:bg-gray-100 cursor-pointer rounded-md flex items-start gap-3 ${selectedContact === contact.id ? 'bg-gray-100' : ''}`}
-                  >
-                    <Avatar>
-                      <div className="bg-cmr-green text-white flex items-center justify-center w-full h-full">
-                        {contact.full_name.charAt(0)}
-                      </div>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between">
-                        <p className="font-medium truncate">{contact.full_name}</p>
-                        <p className="text-xs text-gray-500">
-                          {new Date(contact.last_message_date).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <p className="text-sm text-gray-500 truncate">{contact.last_message}</p>
-                      {contact.unread_count > 0 && (
-                        <span className="inline-block bg-cmr-red text-white text-xs rounded-full px-2 py-1 mt-1">
-                          {contact.unread_count}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card>
+            <ContactList 
+              contacts={contacts}
+              selectedContact={selectedContact}
+              onSelectContact={setSelectedContact}
+              loading={loading}
+            />
           </div>
           
           <div className="md:col-span-2">
             {selectedContact && (
-              <Card className="p-4 flex flex-col h-[70vh]">
-                <div className="font-medium mb-4">
-                  {contacts.find(c => c.id === selectedContact)?.full_name || 'Conversation'}
-                </div>
-                
-                <div className="flex-1 overflow-y-auto space-y-4 mb-4">
-                  {messages
-                    .filter(msg => 
-                      (msg.sender_id === selectedContact && msg.receiver_id === user.id) || 
-                      (msg.sender_id === user.id && msg.receiver_id === selectedContact)
-                    )
-                    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-                    .map(message => (
-                      <div
-                        key={message.id}
-                        className={`flex ${message.sender_id === user.id ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div 
-                          className={`rounded-lg px-4 py-2 max-w-[80%] break-words ${
-                            message.sender_id === user.id 
-                              ? 'bg-cmr-green text-white' 
-                              : 'bg-gray-100'
-                          }`}
-                        >
-                          {message.content}
-                          <div className="text-xs opacity-70 text-right mt-1">
-                            {new Date(message.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  }
-                </div>
-                
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder="Tapez votre message..."
-                    className="flex-1 border rounded-md px-3 py-2"
-                  />
-                  <Button 
-                    onClick={async () => {
-                      if (!newMessage.trim() || !selectedContact) return;
-                      
-                      try {
-                        await supabase.from('messages').insert({
-                          sender_id: user.id,
-                          receiver_id: selectedContact,
-                          content: newMessage,
-                          read: false,
-                        });
-                        
-                        setNewMessage('');
-                      } catch (error) {
-                        console.error("Erreur lors de l'envoi du message:", error);
-                      }
-                    }}
-                  >
-                    Envoyer
-                  </Button>
-                </div>
-              </Card>
+              <>
+                <MessageThread 
+                  messages={messages}
+                  selectedContact={selectedContact}
+                  contacts={contacts}
+                  currentUserId={user.id}
+                  loading={loading}
+                />
+                <MessageInput 
+                  selectedContact={selectedContact}
+                  onSendMessage={handleSendMessage}
+                />
+              </>
             )}
           </div>
         </div>
