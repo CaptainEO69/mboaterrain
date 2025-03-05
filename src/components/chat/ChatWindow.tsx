@@ -6,7 +6,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { ChatMessage } from "./ChatMessage";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Types pour les messages
 export interface Message {
@@ -38,6 +37,18 @@ const PREDEFINED_RESPONSES: Record<string, string[]> = {
   "contact": [
     "Vous pouvez nous contacter via le formulaire dans la section 'Contact' ou directement avec le propriétaire d'une annonce via notre messagerie sécurisée.",
     "Notre équipe est disponible pour répondre à vos questions via le formulaire de contact."
+  ],
+  "agent": [
+    "Nos agents immobiliers sont disponibles pour vous accompagner dans votre recherche. Ils connaissent parfaitement le marché local.",
+    "Vous pouvez contacter directement un agent immobilier depuis la page d'une propriété qui vous intéresse."
+  ],
+  "notaire": [
+    "Nous collaborons avec des notaires qualifiés qui peuvent vous assister pour toutes les formalités légales liées à votre transaction immobilière.",
+    "Les services d'un notaire sont essentiels pour sécuriser votre achat ou vente immobilière."
+  ],
+  "offre": [
+    "Vous pouvez envoyer une offre directement au propriétaire depuis la page de la propriété qui vous intéresse.",
+    "Pour faire une offre, il vous suffit de cliquer sur le bouton 'Contacter le propriétaire' et de préciser votre proposition."
   ]
 };
 
@@ -52,12 +63,18 @@ export function ChatWindow() {
   ]);
   const [input, setInput] = useState("");
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const { user } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+    
+    // Si le chat est ouvert, réinitialiser le compteur de messages non lus
+    if (isChatOpen) {
+      setUnreadCount(0);
+    }
+  }, [messages, isChatOpen]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -86,6 +103,11 @@ export function ChatWindow() {
         timestamp: new Date()
       };
       setMessages(prev => [...prev, botMessage]);
+      
+      // Si le chat n'est pas ouvert, incrémenter le compteur
+      if (!isChatOpen) {
+        setUnreadCount(prev => prev + 1);
+      }
     }, 1000);
   };
 
@@ -106,17 +128,26 @@ export function ChatWindow() {
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
+    if (!isChatOpen) {
+      setUnreadCount(0); // Réinitialiser le compteur lors de l'ouverture
+    }
   };
 
   if (!isChatOpen) {
     return (
       <Button 
         onClick={toggleChat}
-        className="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-50 rounded-full w-12 h-12 p-0 shadow-lg bg-cmr-green hover:bg-cmr-green/90"
+        className="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-50 rounded-full w-12 h-12 p-0 shadow-lg bg-cmr-green hover:bg-cmr-green/90 relative"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
         </svg>
+        
+        {unreadCount > 0 && (
+          <span className="absolute -top-1 -right-1 bg-cmr-red text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+            {unreadCount}
+          </span>
+        )}
       </Button>
     );
   }

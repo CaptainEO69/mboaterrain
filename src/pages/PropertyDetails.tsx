@@ -1,9 +1,10 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { Heart, Edit, Trash2, ArrowLeft } from "lucide-react";
+import { Heart, Edit, Trash2, ArrowLeft, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 
 type Property = {
@@ -86,6 +87,51 @@ export default function PropertyDetails() {
       navigate("/");
     } catch (error: any) {
       toast.error("Erreur lors de la suppression");
+    }
+  };
+
+  const handleContactOwner = async () => {
+    if (!user) {
+      toast.error("Veuillez vous connecter pour contacter le propriétaire");
+      navigate("/login");
+      return;
+    }
+
+    if (!property) return;
+
+    try {
+      // Vérifier si une conversation existe déjà
+      const { data: existingMessages } = await supabase
+        .from("messages")
+        .select()
+        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+        .or(`sender_id.eq.${property.owner_id},receiver_id.eq.${property.owner_id}`)
+        .limit(1);
+
+      if (existingMessages && existingMessages.length > 0) {
+        // Une conversation existe déjà, rediriger vers la messagerie
+        navigate("/messaging");
+        return;
+      }
+
+      // Créer un premier message
+      const { error } = await supabase
+        .from("messages")
+        .insert({
+          sender_id: user.id,
+          receiver_id: property.owner_id,
+          content: `Bonjour, je suis intéressé(e) par votre propriété "${property.title}"`,
+          property_id: property.id,
+          read: false,
+        });
+
+      if (error) throw error;
+
+      toast.success("Message envoyé au propriétaire");
+      navigate("/messaging");
+    } catch (error: any) {
+      console.error("Erreur lors de l'envoi du message:", error);
+      toast.error("Erreur lors de l'envoi du message");
     }
   };
 
@@ -222,6 +268,16 @@ export default function PropertyDetails() {
             <h2 className="font-semibold mb-2">Contact</h2>
             <p>{property.profiles.full_name || "Nom non renseigné"}</p>
             <p>{property.profiles.phone_number || "Téléphone non renseigné"}</p>
+            
+            {!isOwner && (
+              <Button 
+                onClick={handleContactOwner}
+                className="mt-3 w-full bg-cmr-green hover:bg-cmr-green/90"
+              >
+                <MessageSquare className="mr-2 h-4 w-4" />
+                Contacter le propriétaire
+              </Button>
+            )}
           </div>
         </div>
       </div>
