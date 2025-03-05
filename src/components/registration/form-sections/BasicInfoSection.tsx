@@ -12,6 +12,8 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { PasswordStrength } from "@/components/ui/password-strength";
+import { PhoneInput } from "@/components/ui/phone-input";
+import { useState } from "react";
 
 interface BasicInfoSectionProps {
   formData: {
@@ -33,6 +35,8 @@ interface BasicInfoSectionProps {
 }
 
 export function BasicInfoSection({ formData, setters }: BasicInfoSectionProps) {
+  const [countryCode, setCountryCode] = useState("CM"); // CM pour Cameroun par défaut
+
   return (
     <div className="flex flex-col space-y-4">
       <div className="space-y-4">
@@ -64,15 +68,14 @@ export function BasicInfoSection({ formData, setters }: BasicInfoSectionProps) {
           />
         </div>
 
-        <div className="space-y-2">
-          <Label>Téléphone</Label>
-          <Input
-            type="tel"
-            value={formData.phoneNumber}
-            onChange={(e) => setters.setPhoneNumber(e.target.value)}
-            required
-          />
-        </div>
+        <PhoneInput
+          label="Téléphone"
+          countryCode={countryCode}
+          onCountryChange={setCountryCode}
+          value={formData.phoneNumber}
+          onChange={(e) => setters.setPhoneNumber(e.target.value)}
+          required
+        />
 
         <div className="space-y-2">
           <Label>Date de naissance</Label>

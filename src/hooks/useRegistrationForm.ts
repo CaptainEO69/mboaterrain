@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useNavigate } from "react-router-dom";
@@ -70,6 +69,9 @@ export function useRegistrationForm(type: string | null) {
       
       // Convertir la date de naissance en année de naissance pour la BD
       const birthYear = birthDate ? birthDate.getFullYear() : null;
+      
+      // Format phone number if necessary
+      // Le numéro est déjà formaté avec l'indicatif grâce au composant PhoneInput
       
       // Create a profile record with additional information
       const { data: profile, error: profileError } = await supabase

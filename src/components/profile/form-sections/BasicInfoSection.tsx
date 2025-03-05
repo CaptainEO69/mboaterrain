@@ -1,6 +1,8 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PhoneInput } from "@/components/ui/phone-input";
+import { useState, useEffect } from "react";
 
 interface BasicInfoSectionProps {
   userEmail: string;
@@ -19,6 +21,22 @@ export function BasicInfoSection({
   isEditing,
   onInputChange,
 }: BasicInfoSectionProps) {
+  const [countryCode, setCountryCode] = useState("CM"); // Cameroun par défaut
+  
+  // Détecter le code pays si un numéro existe déjà
+  useEffect(() => {
+    if (phoneNumber) {
+      // Si le numéro commence par +, essayons de détecter le pays
+      if (phoneNumber.startsWith('+')) {
+        // Logique simple: +237 -> CM (Cameroun), +33 -> FR (France), etc.
+        // Pour une implémentation plus complète, utiliser une bibliothèque comme libphonenumber-js
+        if (phoneNumber.startsWith('+237')) setCountryCode('CM');
+        else if (phoneNumber.startsWith('+33')) setCountryCode('FR');
+        // Ajouter d'autres cas selon les besoins
+      }
+    }
+  }, [phoneNumber]);
+
   return (
     <>
       <div className="space-y-2">
@@ -53,16 +71,28 @@ export function BasicInfoSection({
         />
       </div>
 
-      <div className="space-y-2">
-        <Label className="text-cmr-green font-medium">Téléphone</Label>
-        <Input
-          name="phone_number"
+      {isEditing ? (
+        <PhoneInput
+          label="Téléphone"
+          countryCode={countryCode}
+          onCountryChange={setCountryCode}
           value={phoneNumber}
+          name="phone_number"
           onChange={onInputChange}
           disabled={!isEditing}
-          className={!isEditing ? "bg-gray-50" : ""}
         />
-      </div>
+      ) : (
+        <div className="space-y-2">
+          <Label className="text-cmr-green font-medium">Téléphone</Label>
+          <Input
+            name="phone_number"
+            value={phoneNumber}
+            onChange={onInputChange}
+            disabled={!isEditing}
+            className="bg-gray-50"
+          />
+        </div>
+      )}
     </>
   );
 }
