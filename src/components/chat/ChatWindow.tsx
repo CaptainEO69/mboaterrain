@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -142,7 +141,7 @@ export function ChatWindow() {
       <div 
         className="absolute inset-0 -z-10"
         style={{
-          backgroundImage: "url('/lovable-uploads/ff74bfca-be9a-4f99-9ec1-a7e93bc5c72f.png')",
+          backgroundImage: "url('/Lion.jpeg')",
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
           backgroundPosition: "center",
