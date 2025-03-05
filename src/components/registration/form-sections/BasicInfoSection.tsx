@@ -1,7 +1,6 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ImageUpload } from "@/components/sell/ImageUpload";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -22,7 +21,6 @@ interface BasicInfoSectionProps {
     phoneNumber: string;
     password: string;
     birthDate: Date | null;
-    profileImage: File | null;
   };
   setters: {
     setFirstName: (value: string) => void;
@@ -31,19 +29,10 @@ interface BasicInfoSectionProps {
     setPhoneNumber: (value: string) => void;
     setPassword: (value: string) => void;
     setBirthDate: (value: Date | null) => void;
-    setProfileImage: (value: File | null) => void;
   };
 }
 
 export function BasicInfoSection({ formData, setters }: BasicInfoSectionProps) {
-  const handleImageChange = (files: FileList | null) => {
-    if (files && files.length > 0) {
-      setters.setProfileImage(files[0]);
-    } else {
-      setters.setProfileImage(null);
-    }
-  };
-
   return (
     <div className="flex flex-col space-y-4">
       <div className="space-y-4">
@@ -125,11 +114,6 @@ export function BasicInfoSection({ formData, setters }: BasicInfoSectionProps) {
             minLength={6}
           />
           <PasswordStrength password={formData.password} />
-        </div>
-
-        <div className="space-y-2">
-          <Label>Photo de profil</Label>
-          <ImageUpload onChange={handleImageChange} isProfilePhoto={true} />
         </div>
       </div>
     </div>

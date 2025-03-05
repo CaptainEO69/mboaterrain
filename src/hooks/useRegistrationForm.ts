@@ -24,7 +24,6 @@ export function useRegistrationForm(type: string | null) {
   const [isCertified, setIsCertified] = useState(false);
   const [notaryOffice, setNotaryOffice] = useState("");
   const [servicePrices, setServicePrices] = useState<Record<string, number>>({});
-  const [profileImage, setProfileImage] = useState<File | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     if (e.preventDefault) {
@@ -72,32 +71,6 @@ export function useRegistrationForm(type: string | null) {
 
       if (profileError) throw profileError;
       
-      // Upload profile image if available
-      if (profileImage && profile && profile.length > 0) {
-        const fileExt = profileImage.name.split('.').pop();
-        const fileName = `${Date.now()}.${fileExt}`;
-        const filePath = `profile-images/${fileName}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('profiles')
-          .upload(filePath, profileImage);
-          
-        if (uploadError) {
-          console.error("Error uploading profile image:", uploadError);
-          // Continue with signup even if image upload fails
-        } else {
-          // Update profile with image URL
-          const { error: updateError } = await supabase
-            .from("profiles")
-            .update({ sale_proof_url: filePath }) // Utiliser sale_proof_url au lieu de avatar_url
-            .eq("id", profile[0].id);
-            
-          if (updateError) {
-            console.error("Error updating profile with image URL:", updateError);
-          }
-        }
-      }
-      
       toast.success("Inscription réussie! Veuillez vous connecter.");
       navigate("/login");
     } catch (error: any) {
@@ -122,7 +95,6 @@ export function useRegistrationForm(type: string | null) {
       isCertified,
       notaryOffice,
       servicePrices,
-      profileImage,
     },
     setters: {
       setEmail,
@@ -139,7 +111,6 @@ export function useRegistrationForm(type: string | null) {
       setIsCertified,
       setNotaryOffice,
       setServicePrices,
-      setProfileImage,
     },
     handleSubmit,
   };
