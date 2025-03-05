@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -121,7 +122,14 @@ export function ChatWindow() {
   }
 
   return (
-    <Card className="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-50 w-[90vw] md:w-80 shadow-xl h-[60vh] md:h-96 flex flex-col overflow-hidden">
+    <Card className="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-50 w-[90vw] md:w-80 shadow-xl h-[60vh] md:h-96 flex flex-col overflow-hidden" 
+          style={{
+            backgroundImage: "url('/lovable-uploads/90f5860e-3aad-4988-9908-d85922d3f3d3.png')",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundBlendMode: "overlay",
+          }}>
       <CardHeader className="py-3 px-4 border-b flex flex-row items-center justify-between bg-white/90 backdrop-blur-sm">
         <CardTitle className="text-lg font-medium">Mon Assistant</CardTitle>
         <Button 
@@ -137,19 +145,7 @@ export function ChatWindow() {
         </Button>
       </CardHeader>
       
-      {/* Utilisation directe de l'image de fond */}
-      <div 
-        className="absolute inset-0 -z-10 opacity-30"
-        style={{
-          backgroundImage: "url('/lovable-uploads/90f5860e-3aad-4988-9908-d85922d3f3d3.png')",
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          filter: "brightness(1.1) contrast(0.9)"
-        }}
-      />
-      
-      <CardContent className="flex-1 p-4 overflow-hidden bg-transparent backdrop-blur-[2px]">
+      <CardContent className="flex-1 p-4 overflow-hidden bg-white/30 backdrop-blur-[1px]">
         <ScrollArea className="h-full pr-4">
           {messages.map((message) => (
             <ChatMessage key={message.id} message={message} />
