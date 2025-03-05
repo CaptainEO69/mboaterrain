@@ -140,7 +140,7 @@ export function ChatWindow() {
       <div 
         className="absolute inset-0 -z-10 opacity-25"
         style={{
-          backgroundImage: "url('/lovable-uploads/6c9ac32e-40f4-4083-ba7c-91d01bbe8eea.png')",
+          backgroundImage: "url('/lovable-uploads/d43f6569-f04e-4043-bbf1-6cb25d99b290.png')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           filter: "brightness(1.3) contrast(0.85) blur(1px)",
