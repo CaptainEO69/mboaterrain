@@ -8,7 +8,7 @@ import { PersonalInfoSection } from "./form-sections/PersonalInfoSection";
 interface ProfileFormProps {
   formData: ProfileFormData;
   isEditing: boolean;
-  onInputChange: (e: React.ChangeEvent<HTMLInputElement> | { target: { name: string; value: any } }) => void;
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name: string; value: any } }) => void;
   onSubmit: (e: React.FormEvent) => void;
   onEdit: () => void;
   onCancel: () => void;
@@ -78,6 +78,23 @@ export function ProfileForm({
           residencePlace={formData.residence_place}
           userType={formData.user_type}
           isEditing={isEditing}
+          propertyType={formData.property_type}
+          agencyName={formData.agency_name}
+          commercialRegister={formData.commercial_register}
+          operationZone={formData.operation_zone}
+          estimatedBudget={formData.estimated_budget}
+          desiredLocation={formData.desired_location}
+          approvalNumber={formData.approval_number}
+          interventionZone={formData.intervention_zone}
+          notaryOffice={formData.notary_office}
+          experienceQualifications={formData.experience_qualifications}
+          companyName={formData.company_name}
+          legalStatus={formData.legal_status}
+          investmentType={formData.investment_type}
+          estimatedFundingCapacity={formData.estimated_funding_capacity}
+          serviceType={formData.service_type}
+          transportCapacity={formData.transport_capacity}
+          insuranceIncluded={formData.insurance_included}
           onInputChange={onInputChange}
         />
       </div>

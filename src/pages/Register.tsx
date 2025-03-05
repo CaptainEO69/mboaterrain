@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { House, User, UserSquare2, Users, Scale, FileText } from "lucide-react";
+import { House, User, UserSquare2, Users, Scale, FileText, Briefcase, Truck } from "lucide-react";
 import { UserTypeCard } from "@/components/registration/UserTypeCard";
 
 const userTypes = [
@@ -46,6 +46,20 @@ const userTypes = [
     description: "Assistez les transactions",
     icon: FileText,
     color: "yellow" as const,
+  },
+  {
+    type: "financier",
+    title: "Financier Lotisseur",
+    description: "Investissez dans l'immobilier",
+    icon: Briefcase,
+    color: "green" as const,
+  },
+  {
+    type: "mover",
+    title: "Déménageur",
+    description: "Proposez vos services de déménagement",
+    icon: Truck,
+    color: "red" as const,
   },
 ];
 

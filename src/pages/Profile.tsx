@@ -20,6 +20,24 @@ export default function Profile() {
     residence_place: "",
     birth_date: null,
     user_type: "",
+    // Ajout des nouveaux champs
+    agency_name: "",
+    commercial_register: "",
+    operation_zone: "",
+    property_type: "",
+    estimated_budget: 0,
+    desired_location: "",
+    approval_number: "",
+    intervention_zone: "",
+    experience_qualifications: "",
+    company_name: "",
+    legal_status: "",
+    investment_type: "",
+    estimated_funding_capacity: "",
+    service_type: "",
+    transport_capacity: "",
+    insurance_included: false,
+    notary_office: "",
   });
 
   useEffect(() => {
@@ -34,11 +52,29 @@ export default function Profile() {
         residence_place: user.user_metadata?.residence_place || "",
         birth_date: user.user_metadata?.birth_date ? new Date(user.user_metadata.birth_date) : null,
         user_type: user.user_metadata?.user_type || "",
+        // Nouveaux champs
+        agency_name: user.user_metadata?.agency_name || "",
+        commercial_register: user.user_metadata?.commercial_register || "",
+        operation_zone: user.user_metadata?.operation_zone || "",
+        property_type: user.user_metadata?.property_type || "",
+        estimated_budget: user.user_metadata?.estimated_budget || 0,
+        desired_location: user.user_metadata?.desired_location || "",
+        approval_number: user.user_metadata?.approval_number || "",
+        intervention_zone: user.user_metadata?.intervention_zone || "",
+        experience_qualifications: user.user_metadata?.experience_qualifications || "",
+        company_name: user.user_metadata?.company_name || "",
+        legal_status: user.user_metadata?.legal_status || "",
+        investment_type: user.user_metadata?.investment_type || "",
+        estimated_funding_capacity: user.user_metadata?.estimated_funding_capacity || "",
+        service_type: user.user_metadata?.service_type || "",
+        transport_capacity: user.user_metadata?.transport_capacity || "",
+        insurance_included: user.user_metadata?.insurance_included || false,
+        notary_office: user.user_metadata?.notary_office || "",
       });
     }
   }, [user]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement> | { target: { name: string; value: any } }) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name: string; value: any } }) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -61,6 +97,24 @@ export default function Profile() {
           residence_place: formData.residence_place,
           birth_date: formData.birth_date?.toISOString(),
           user_type: formData.user_type,
+          // Nouveaux champs
+          agency_name: formData.agency_name,
+          commercial_register: formData.commercial_register,
+          operation_zone: formData.operation_zone,
+          property_type: formData.property_type,
+          estimated_budget: formData.estimated_budget,
+          desired_location: formData.desired_location,
+          approval_number: formData.approval_number,
+          intervention_zone: formData.intervention_zone,
+          experience_qualifications: formData.experience_qualifications,
+          company_name: formData.company_name,
+          legal_status: formData.legal_status,
+          investment_type: formData.investment_type,
+          estimated_funding_capacity: formData.estimated_funding_capacity,
+          service_type: formData.service_type,
+          transport_capacity: formData.transport_capacity,
+          insurance_included: formData.insurance_included,
+          notary_office: formData.notary_office,
         },
       });
 
@@ -78,6 +132,24 @@ export default function Profile() {
           residence_place: formData.residence_place,
           birth_date: formData.birth_date,
           user_type: formData.user_type,
+          // Nouveaux champs
+          agency_name: formData.agency_name,
+          commercial_register: formData.commercial_register,
+          operation_zone: formData.operation_zone,
+          property_type: formData.property_type,
+          estimated_budget: formData.estimated_budget,
+          desired_location: formData.desired_location,
+          approval_number: formData.approval_number,
+          intervention_zone: formData.intervention_zone,
+          experience_qualifications: formData.experience_qualifications,
+          company_name: formData.company_name,
+          legal_status: formData.legal_status,
+          investment_type: formData.investment_type,
+          estimated_funding_capacity: formData.estimated_funding_capacity,
+          service_type: formData.service_type,
+          transport_capacity: formData.transport_capacity,
+          insurance_included: formData.insurance_included,
+          notary_office: formData.notary_office,
           updated_at: new Date().toISOString(),
         })
         .eq("user_id", user?.id);
@@ -119,6 +191,24 @@ export default function Profile() {
                 residence_place: user.user_metadata?.residence_place || "",
                 birth_date: user.user_metadata?.birth_date ? new Date(user.user_metadata.birth_date) : null,
                 user_type: user.user_metadata?.user_type || "",
+                // Nouveaux champs
+                agency_name: user.user_metadata?.agency_name || "",
+                commercial_register: user.user_metadata?.commercial_register || "",
+                operation_zone: user.user_metadata?.operation_zone || "",
+                property_type: user.user_metadata?.property_type || "",
+                estimated_budget: user.user_metadata?.estimated_budget || 0,
+                desired_location: user.user_metadata?.desired_location || "",
+                approval_number: user.user_metadata?.approval_number || "",
+                intervention_zone: user.user_metadata?.intervention_zone || "",
+                experience_qualifications: user.user_metadata?.experience_qualifications || "",
+                company_name: user.user_metadata?.company_name || "",
+                legal_status: user.user_metadata?.legal_status || "",
+                investment_type: user.user_metadata?.investment_type || "",
+                estimated_funding_capacity: user.user_metadata?.estimated_funding_capacity || "",
+                service_type: user.user_metadata?.service_type || "",
+                transport_capacity: user.user_metadata?.transport_capacity || "",
+                insurance_included: user.user_metadata?.insurance_included || false,
+                notary_office: user.user_metadata?.notary_office || "",
               });
             }}
             onSignOut={signOut}

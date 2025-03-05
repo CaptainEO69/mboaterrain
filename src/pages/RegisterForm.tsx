@@ -19,6 +19,8 @@ const userTypes = [
   { value: "surveyor", label: "Géomètre" },
   { value: "notary", label: "Notaire" },
   { value: "notary_clerk", label: "Clerc de notaire" },
+  { value: "financier", label: "Financier Lotisseur" },
+  { value: "mover", label: "Déménageur" },
 ];
 
 const getCurrentUserType = () => {
@@ -120,7 +122,9 @@ export default function RegisterForm() {
                       getCurrentUserType() === "seller" || 
                       getCurrentUserType() === "surveyor" || 
                       getCurrentUserType() === "notary" || 
-                      getCurrentUserType() === "notary_clerk") && (
+                      getCurrentUserType() === "notary_clerk" ||
+                      getCurrentUserType() === "financier" ||
+                      getCurrentUserType() === "mover") && (
                       <PersonalInfoSection formData={formData} setters={setters} />
                     )}
 

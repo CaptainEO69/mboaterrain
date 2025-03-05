@@ -24,6 +24,24 @@ export function useRegistrationForm(type: string | null) {
   const [isCertified, setIsCertified] = useState(false);
   const [notaryOffice, setNotaryOffice] = useState("");
   const [servicePrices, setServicePrices] = useState<Record<string, number>>({});
+  
+  // Nouveaux champs
+  const [propertyType, setPropertyType] = useState("");
+  const [agencyName, setAgencyName] = useState("");
+  const [commercialRegister, setCommercialRegister] = useState("");
+  const [operationZone, setOperationZone] = useState("");
+  const [estimatedBudget, setEstimatedBudget] = useState<number>(0);
+  const [desiredLocation, setDesiredLocation] = useState("");
+  const [approvalNumber, setApprovalNumber] = useState("");
+  const [interventionZone, setInterventionZone] = useState("");
+  const [experienceQualifications, setExperienceQualifications] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [legalStatus, setLegalStatus] = useState("");
+  const [investmentType, setInvestmentType] = useState("");
+  const [estimatedFundingCapacity, setEstimatedFundingCapacity] = useState("");
+  const [serviceType, setServiceType] = useState("");
+  const [transportCapacity, setTransportCapacity] = useState("");
+  const [insuranceIncluded, setInsuranceIncluded] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     if (e.preventDefault) {
@@ -59,6 +77,8 @@ export function useRegistrationForm(type: string | null) {
         .insert({
           user_id: userId,
           full_name: `${firstName} ${lastName}`,
+          first_name: firstName,
+          last_name: lastName,
           phone_number: phoneNumber,
           birth_place: birthPlace,
           birth_year: birthYear,
@@ -66,6 +86,27 @@ export function useRegistrationForm(type: string | null) {
           profession: profession,
           residence_place: residencePlace,
           user_type: type || "buyer", // Valeur par défaut si type est null
+          is_certified: isCertified,
+          notary_office: notaryOffice,
+          service_prices: servicePrices,
+          
+          // Nouveaux champs
+          property_type: propertyType,
+          agency_name: agencyName,
+          commercial_register: commercialRegister,
+          operation_zone: operationZone,
+          estimated_budget: estimatedBudget,
+          desired_location: desiredLocation,
+          approval_number: approvalNumber,
+          intervention_zone: interventionZone,
+          experience_qualifications: experienceQualifications,
+          company_name: companyName,
+          legal_status: legalStatus,
+          investment_type: investmentType,
+          estimated_funding_capacity: estimatedFundingCapacity,
+          service_type: serviceType,
+          transport_capacity: transportCapacity,
+          insurance_included: insuranceIncluded,
         })
         .select();
 
@@ -95,6 +136,24 @@ export function useRegistrationForm(type: string | null) {
       isCertified,
       notaryOffice,
       servicePrices,
+      
+      // Nouveaux champs
+      propertyType,
+      agencyName,
+      commercialRegister,
+      operationZone,
+      estimatedBudget,
+      desiredLocation,
+      approvalNumber,
+      interventionZone,
+      experienceQualifications,
+      companyName,
+      legalStatus,
+      investmentType,
+      estimatedFundingCapacity,
+      serviceType,
+      transportCapacity,
+      insuranceIncluded,
     },
     setters: {
       setEmail,
@@ -111,6 +170,24 @@ export function useRegistrationForm(type: string | null) {
       setIsCertified,
       setNotaryOffice,
       setServicePrices,
+      
+      // Nouveaux setters
+      setPropertyType,
+      setAgencyName,
+      setCommercialRegister,
+      setOperationZone,
+      setEstimatedBudget,
+      setDesiredLocation,
+      setApprovalNumber,
+      setInterventionZone,
+      setExperienceQualifications,
+      setCompanyName,
+      setLegalStatus,
+      setInvestmentType,
+      setEstimatedFundingCapacity,
+      setServiceType,
+      setTransportCapacity,
+      setInsuranceIncluded,
     },
     handleSubmit,
   };
