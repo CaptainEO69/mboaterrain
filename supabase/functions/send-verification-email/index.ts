@@ -16,6 +16,9 @@ serve(async (req) => {
   }
 
   try {
+    // Loguer les en-têtes pour le débogage
+    console.log("Request headers:", Object.fromEntries([...req.headers.entries()]));
+    
     const { email, code } = await req.json();
 
     if (!email || !code) {

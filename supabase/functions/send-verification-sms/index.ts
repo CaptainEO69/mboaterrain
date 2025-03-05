@@ -20,6 +20,9 @@ serve(async (req) => {
   }
 
   try {
+    // Loguer les en-têtes pour le débogage
+    console.log("Request headers:", Object.fromEntries([...req.headers.entries()]));
+    
     const { phoneNumber, code } = await req.json();
 
     if (!phoneNumber || !code) {
@@ -34,6 +37,9 @@ serve(async (req) => {
 
     console.log("Attempting to send verification SMS to:", phoneNumber);
     console.log("Verification code:", code);
+    console.log("Twilio phone number:", twilioPhoneNumber);
+    console.log("Twilio SID available:", !!accountSid);
+    console.log("Twilio Auth Token available:", !!authToken);
 
     // Format the phone number (ensure it has country code)
     let formattedPhone = phoneNumber;
