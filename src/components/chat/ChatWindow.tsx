@@ -127,7 +127,7 @@ export function ChatWindow() {
     return (
       <Button 
         onClick={toggleChat}
-        className="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-50 rounded-full w-12 h-12 p-0 shadow-lg bg-cmr-green hover:bg-cmr-green/90 relative"
+        className="fixed bottom-0 right-0 z-50 rounded-full w-12 h-12 p-0 shadow-lg bg-green-500 hover:bg-green-600 m-4"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -143,7 +143,7 @@ export function ChatWindow() {
   }
 
   return (
-    <div className="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-50 w-[90vw] md:w-80 h-[60vh] md:h-96">
+    <div className="fixed bottom-0 right-0 z-50 w-[90vw] md:w-80 h-[60vh] md:h-96 m-4">
       <div 
         className="absolute inset-0 rounded-lg shadow-xl overflow-hidden"
         style={{
