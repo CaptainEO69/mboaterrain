@@ -138,15 +138,18 @@ export function ChatWindow() {
         </Button>
       </CardHeader>
       
-      {/* Fond avec image de lion */}
+      {/* Fond avec image de lion - updated approach */}
       <div 
-        className="absolute inset-0 -z-10 bg-no-repeat bg-cover bg-center opacity-15"
+        className="absolute inset-0 -z-10 opacity-30" 
         style={{
-          backgroundImage: `url('/lovable-uploads/61bf705f-6a7f-4f57-aa11-ac8121c57d73.png')`,
+          backgroundImage: "url('/lovable-uploads/61bf705f-6a7f-4f57-aa11-ac8121c57d73.png')",
+          backgroundPosition: 'center',
+          backgroundSize: 'cover',
+          backgroundRepeat: 'no-repeat',
         }}
       />
       
-      <CardContent className="flex-1 p-4 overflow-hidden backdrop-blur-[2px]">
+      <CardContent className="flex-1 p-4 overflow-hidden">
         <ScrollArea className="h-full pr-4">
           {messages.map((message) => (
             <ChatMessage key={message.id} message={message} />
