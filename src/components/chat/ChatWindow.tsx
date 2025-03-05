@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,9 @@ const PREDEFINED_RESPONSES: Record<string, string[]> = {
     "Notre équipe est disponible pour répondre à vos questions via le formulaire de contact."
   ]
 };
+
+// Importation directe de l'image de fond
+import lionBackground from '/Lion.jpeg';
 
 export function ChatWindow() {
   const [messages, setMessages] = useState<Message[]>([
@@ -137,15 +141,11 @@ export function ChatWindow() {
         </Button>
       </CardHeader>
       
-      {/* Fond avec image de lion */}
+      {/* Fond avec image de lion - alternative avec CSS */}
       <div 
-        className="absolute inset-0 -z-10"
+        className="absolute inset-0 -z-10 bg-no-repeat bg-cover bg-center opacity-15"
         style={{
-          backgroundImage: "url('/Lion.jpeg')",
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          opacity: 0.15
+          backgroundImage: `url(${lionBackground})`,
         }}
       />
       
