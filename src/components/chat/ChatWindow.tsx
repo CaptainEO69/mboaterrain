@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -122,7 +121,16 @@ export function ChatWindow() {
   }
 
   return (
-    <Card className="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-50 w-[90vw] md:w-80 shadow-xl h-[60vh] md:h-96 flex flex-col overflow-hidden">
+    <Card 
+      className="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-50 w-[90vw] md:w-80 shadow-xl h-[60vh] md:h-96 flex flex-col overflow-hidden"
+      style={{
+        backgroundImage: `url('/lovable-uploads/61bf705f-6a7f-4f57-aa11-ac8121c57d73.png')`,
+        backgroundPosition: 'center',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundBlendMode: 'overlay',
+      }}
+    >
       <CardHeader className="py-3 px-4 border-b flex flex-row items-center justify-between bg-white/90 backdrop-blur-sm">
         <CardTitle className="text-lg font-medium">Mon Assistant</CardTitle>
         <Button 
@@ -138,18 +146,7 @@ export function ChatWindow() {
         </Button>
       </CardHeader>
       
-      {/* Fond avec image de lion - updated approach */}
-      <div 
-        className="absolute inset-0 -z-10 opacity-30" 
-        style={{
-          backgroundImage: "url('/lovable-uploads/61bf705f-6a7f-4f57-aa11-ac8121c57d73.png')",
-          backgroundPosition: 'center',
-          backgroundSize: 'cover',
-          backgroundRepeat: 'no-repeat',
-        }}
-      />
-      
-      <CardContent className="flex-1 p-4 overflow-hidden">
+      <CardContent className="flex-1 p-4 overflow-hidden bg-white/50">
         <ScrollArea className="h-full pr-4">
           {messages.map((message) => (
             <ChatMessage key={message.id} message={message} />
