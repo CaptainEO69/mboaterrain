@@ -14,6 +14,7 @@ import { fr } from "date-fns/locale";
 import { PasswordStrength } from "@/components/ui/password-strength";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { useState } from "react";
+import { CountryCode } from "libphonenumber-js";
 
 interface BasicInfoSectionProps {
   formData: {
@@ -35,7 +36,11 @@ interface BasicInfoSectionProps {
 }
 
 export function BasicInfoSection({ formData, setters }: BasicInfoSectionProps) {
-  const [countryCode, setCountryCode] = useState("CM"); // CM pour Cameroun par défaut
+  const [countryCode, setCountryCode] = useState<CountryCode>("CM"); // CM pour Cameroun par défaut
+
+  const handleCountryChange = (code: CountryCode) => {
+    setCountryCode(code);
+  };
 
   return (
     <div className="flex flex-col space-y-4">
@@ -71,7 +76,7 @@ export function BasicInfoSection({ formData, setters }: BasicInfoSectionProps) {
         <PhoneInput
           label="Téléphone"
           countryCode={countryCode}
-          onCountryChange={setCountryCode}
+          onCountryChange={handleCountryChange}
           value={formData.phoneNumber}
           onChange={(e) => setters.setPhoneNumber(e.target.value)}
           required

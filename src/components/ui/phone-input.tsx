@@ -4,11 +4,11 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { getCountries, getCountryCallingCode } from "libphonenumber-js";
+import { getCountries, getCountryCallingCode, CountryCode } from "libphonenumber-js";
 
 interface PhoneInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  countryCode: string;
-  onCountryChange: (value: string) => void;
+  countryCode: CountryCode;
+  onCountryChange: (value: CountryCode) => void;
   label?: string;
 }
 
@@ -38,7 +38,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
       <div className="space-y-2">
         {label && <Label>{label}</Label>}
         <div className="flex gap-2">
-          <Select value={countryCode} onValueChange={onCountryChange}>
+          <Select value={countryCode} onValueChange={(value) => onCountryChange(value as CountryCode)}>
             <SelectTrigger className="w-[120px] flex-shrink-0">
               <SelectValue placeholder="Pays" />
             </SelectTrigger>

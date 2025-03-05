@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { useState, useEffect } from "react";
+import { CountryCode } from "libphonenumber-js";
 
 interface BasicInfoSectionProps {
   userEmail: string;
@@ -21,7 +22,7 @@ export function BasicInfoSection({
   isEditing,
   onInputChange,
 }: BasicInfoSectionProps) {
-  const [countryCode, setCountryCode] = useState("CM"); // Cameroun par défaut
+  const [countryCode, setCountryCode] = useState<CountryCode>("CM"); // Cameroun par défaut
   
   // Détecter le code pays si un numéro existe déjà
   useEffect(() => {
@@ -36,6 +37,10 @@ export function BasicInfoSection({
       }
     }
   }, [phoneNumber]);
+
+  const handleCountryChange = (code: CountryCode) => {
+    setCountryCode(code);
+  };
 
   return (
     <>
@@ -75,7 +80,7 @@ export function BasicInfoSection({
         <PhoneInput
           label="Téléphone"
           countryCode={countryCode}
-          onCountryChange={setCountryCode}
+          onCountryChange={handleCountryChange}
           value={phoneNumber}
           name="phone_number"
           onChange={onInputChange}
