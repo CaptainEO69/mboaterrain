@@ -41,9 +41,6 @@ const PREDEFINED_RESPONSES: Record<string, string[]> = {
   ]
 };
 
-// Importation directe de l'image de fond
-import lionBackground from '/Lion.jpeg';
-
 export function ChatWindow() {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -141,11 +138,11 @@ export function ChatWindow() {
         </Button>
       </CardHeader>
       
-      {/* Fond avec image de lion - alternative avec CSS */}
+      {/* Fond avec image de lion */}
       <div 
         className="absolute inset-0 -z-10 bg-no-repeat bg-cover bg-center opacity-15"
         style={{
-          backgroundImage: `url(${lionBackground})`,
+          backgroundImage: `url('/Lion.jpeg')`,
         }}
       />
       
