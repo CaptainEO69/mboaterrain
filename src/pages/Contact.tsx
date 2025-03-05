@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Mail, Phone, MapPin } from "lucide-react";
+import { Loader2, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { BottomNav } from "@/components/BottomNav";
 import { useAuth } from "@/lib/auth";
@@ -63,22 +63,6 @@ export default function Contact() {
                 <a href="mailto:contactmboater@yahoo.com" className="text-cmr-green hover:underline">
                   contactmboater@yahoo.com
                 </a>
-              </div>
-            </div>
-            
-            <div className="flex items-start">
-              <Phone className="w-5 h-5 text-cmr-green mt-1 mr-3" />
-              <div>
-                <p className="font-medium">Téléphone</p>
-                <p>+237 XXX XXX XXX</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start">
-              <MapPin className="w-5 h-5 text-cmr-green mt-1 mr-3" />
-              <div>
-                <p className="font-medium">Adresse</p>
-                <p>Yaoundé, Cameroun</p>
               </div>
             </div>
           </div>
