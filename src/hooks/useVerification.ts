@@ -26,9 +26,10 @@ export function useVerification() {
       
       console.log("Sending SMS verification with code:", code, "to phone:", phoneNumber);
       
-      // Appel à la fonction Edge Function avec les headers d'authentification
+      // Appel à la fonction Edge Function avec les headers corrects
       const { data, error } = await supabase.functions.invoke("send-verification-sms", {
         body: { phoneNumber, code },
+        // S'assurer que les headers d'authentification sont envoyés automatiquement par le SDK
       });
 
       if (error) {
@@ -64,9 +65,10 @@ export function useVerification() {
       
       console.log("Sending email verification with code:", code);
       
-      // Appel à la fonction Edge Function avec les headers d'authentification
+      // Appel à la fonction Edge Function avec les headers corrects
       const { data, error } = await supabase.functions.invoke("send-verification-email", {
         body: { email, code },
+        // S'assurer que les headers d'authentification sont envoyés automatiquement par le SDK
       });
 
       if (error) throw error;

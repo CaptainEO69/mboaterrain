@@ -20,8 +20,25 @@ serve(async (req) => {
   }
 
   try {
+    // Vérifier que l'API key est présente
+    const apiKey = req.headers.get('apikey') || new URL(req.url).searchParams.get('apikey');
+    
+    if (!apiKey) {
+      return new Response(
+        JSON.stringify({ 
+          error: "No API key found in request", 
+          hint: "No 'apikey' request header or url param was found." 
+        }),
+        { 
+          status: 401, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        }
+      );
+    }
+    
     // Loguer les en-têtes pour le débogage
     console.log("Request headers:", Object.fromEntries([...req.headers.entries()]));
+    console.log("API Key found:", !!apiKey);
     
     const { phoneNumber, code } = await req.json();
 
