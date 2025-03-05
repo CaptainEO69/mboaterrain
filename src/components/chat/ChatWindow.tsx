@@ -147,7 +147,7 @@ export function ChatWindow() {
       <div 
         className="absolute inset-0 rounded-lg shadow-xl overflow-hidden"
         style={{
-          backgroundImage: `url('/lovable-uploads/61bf705f-6a7f-4f57-aa11-ac8121c57d73.png')`,
+          backgroundImage: `url('/lovable-uploads/lion.jpeg')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
