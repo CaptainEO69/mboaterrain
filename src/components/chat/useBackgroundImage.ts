@@ -95,54 +95,31 @@ export function useBackgroundImage(imagePath: string) {
         }
       }
       
-      // Essayer les images existantes dans lovable-uploads
-      console.log("🔍 Recherche d'images dans lovable-uploads...");
-      const lovableImages = [
+      // Vérifier spécifiquement dans les chemins existants connus
+      const knownPaths = [
         '/lovable-uploads/83fc2739-1a70-4b50-b7a3-127bda76b51d.png',
         '/lovable-uploads/b0d64b27-cdd5-43a9-b0dd-fba53da4a96d.png',
         '/lovable-uploads/ff74bfca-be9a-4f99-9ec1-a7e93bc5c72f.png'
       ];
       
-      for (const img of lovableImages) {
-        console.log("🔄 Essai avec l'image uploadée:", img);
-        const exists = await checkImage(img);
+      console.log("🔍 Vérification des chemins connus...");
+      for (const path of knownPaths) {
+        console.log("🔄 Essai avec le chemin connu:", path);
+        const exists = await checkImage(path);
         if (exists) {
-          console.log("✅ Image uploadée trouvée et chargée:", img);
-          setImageSrc(img);
+          console.log("✅ Image trouvée et chargée depuis un chemin connu:", path);
+          setImageSrc(path);
           setImageLoaded(true);
-          setError("Image d'origine non trouvée, utilisation d'une image uploadée");
+          setError(`Image originale '${imagePath}' non trouvée, utilisation d'une image alternative`);
           allAttemptsFailed = false;
           return;
         }
       }
       
-      // Essayer une image de secours de placeholder depuis Unsplash
-      const placeholderImage = 'https://images.unsplash.com/photo-1582562124811-c09040d0a901';
-      console.log("🔄 Essai avec l'image de secours Unsplash:", placeholderImage);
-      const placeholderExists = await checkImage(placeholderImage);
-      
-      if (placeholderExists) {
-        console.log("✅ Utilisation de l'image de secours");
-        setImageSrc(placeholderImage);
-        setImageLoaded(true);
-        setError("Image d'origine non trouvée, utilisation d'une image de secours");
-        allAttemptsFailed = false;
-        return;
-      }
-      
       // Si aucune image n'est trouvée, définir imageLoaded à false
       if (allAttemptsFailed) {
-        const errorMsg = `❌ Aucune image trouvée pour le chemin: ${basePath}. Vérifiez que l'image existe dans le dossier public.`;
+        const errorMsg = `❌ Aucune image trouvée pour '${imagePath}'. Vérifiez que l'image existe dans le dossier public ou utilisez un chemin valide.`;
         console.error(errorMsg);
-        console.log("🔍 Chemins essayés:", [
-          normalizedPath.includes('.') ? normalizedPath : null,
-          ...extensions.map(ext => `${basePath}${ext}`),
-          ...locations.flatMap(loc => 
-            extensions.map(ext => `${loc}${basePath.split('/').pop()}${ext}`)
-          ),
-          ...lovableImages,
-          placeholderImage
-        ].filter(Boolean));
         setError(errorMsg);
         setImageLoaded(false);
       }

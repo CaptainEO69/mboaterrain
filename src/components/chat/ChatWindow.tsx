@@ -20,8 +20,8 @@ export function ChatWindow() {
     toggleChat
   } = useChatMessages();
   
-  // On vérifie plusieurs chemins possibles pour l'image
-  const imageUrl = '/lion.png';
+  // Recherche de l'image dans différents emplacements
+  const imageUrl = '/lovable-uploads/83fc2739-1a70-4b50-b7a3-127bda76b51d.png'; // Utiliser directement une image connue
   const { imageLoaded, imageSrc, error } = useBackgroundImage(imageUrl);
 
   if (!isChatOpen) {
