@@ -20,8 +20,8 @@ export function ChatWindow() {
     toggleChat
   } = useChatMessages();
   
-  // Utiliser l'image du lion téléversée par l'utilisateur
-  const imageUrl = '/lovable-uploads/38adb80d-13a9-45e2-8442-7f2f5485b8db.png';
+  // Utiliser la nouvelle image téléversée
+  const imageUrl = '/lovable-uploads/b64335e0-8752-4337-bb1a-fc40d9577d29.png';
   const { imageLoaded, imageSrc, error } = useBackgroundImage(imageUrl);
 
   if (!isChatOpen) {
