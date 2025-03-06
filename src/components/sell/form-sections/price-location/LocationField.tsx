@@ -10,6 +10,30 @@ export function LocationField() {
     lng: null
   });
   
+  const handleCityChange = (city: string) => {
+    const form = document.querySelector('form');
+    if (form) {
+      const formData = new FormData(form);
+      formData.set('city', city);
+    }
+  };
+  
+  const handleNeighborhoodChange = (neighborhood: string) => {
+    const form = document.querySelector('form');
+    if (form) {
+      const formData = new FormData(form);
+      formData.set('neighborhood', neighborhood);
+    }
+  };
+  
+  const handleDistrictChange = (district: string) => {
+    const form = document.querySelector('form');
+    if (form) {
+      const formData = new FormData(form);
+      formData.set('district', district);
+    }
+  };
+  
   return (
     <div>
       <div className="flex items-center gap-2 mb-2">
@@ -18,27 +42,9 @@ export function LocationField() {
       </div>
       
       <LocationSelect
-        onCityChange={(city) => {
-          const form = document.querySelector('form');
-          if (form) {
-            const formData = new FormData(form);
-            formData.set('city', city);
-          }
-        }}
-        onNeighborhoodChange={(neighborhood) => {
-          const form = document.querySelector('form');
-          if (form) {
-            const formData = new FormData(form);
-            formData.set('neighborhood', neighborhood);
-          }
-        }}
-        onDistrictChange={(district) => {
-          const form = document.querySelector('form');
-          if (form) {
-            const formData = new FormData(form);
-            formData.set('district', district);
-          }
-        }}
+        onCityChange={handleCityChange}
+        onNeighborhoodChange={handleNeighborhoodChange}
+        onDistrictChange={handleDistrictChange}
       />
     </div>
   );

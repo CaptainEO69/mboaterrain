@@ -28,54 +28,67 @@ export function LocationSelect({
   const [cities, setCities] = useState<{ id: string; name: string }[]>([]);
   const [selectedRegion, setSelectedRegion] = useState<string>("");
   const [selectedCity, setSelectedCity] = useState<string>("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [locationInfo, setLocationInfo] = useState<{
     latitude: number | null;
     longitude: number | null;
   }>({ latitude: null, longitude: null });
 
+  // Chargement des villes lorsqu'une région est sélectionnée
   useEffect(() => {
     async function fetchCities() {
-      if (selectedRegion) {
-        try {
-          setLoading(true);
-          const { data: regionData, error: regionError } = await supabase
-            .from('regions')
-            .select('id')
-            .eq('name', selectedRegion)
-            .single();
-          
-          if (regionError) {
-            console.error('Erreur lors de la récupération de la région:', regionError);
-            setCities([]);
-            setLoading(false);
-            return;
-          }
-          
-          if (regionData) {
-            console.log("Région sélectionnée:", regionData);
-            const { data, error } = await supabase
-              .from('cities')
-              .select('*')
-              .eq('region_id', regionData.id)
-              .order('name');
-            
-            if (error) {
-              console.error('Erreur lors du chargement des villes:', error);
-              setCities([]);
-            } else {
-              console.log("Villes récupérées:", data);
-              setCities(data || []);
-            }
-          }
-        } catch (error) {
-          console.error('Erreur lors du chargement des villes:', error);
-          setCities([]);
-        } finally {
-          setLoading(false);
-        }
-      } else {
+      if (!selectedRegion) {
         setCities([]);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        
+        // Récupérer l'ID de la région
+        const { data: regionData, error: regionError } = await supabase
+          .from('regions')
+          .select('id')
+          .eq('name', selectedRegion)
+          .maybeSingle();
+        
+        if (regionError) {
+          console.error('Erreur lors de la récupération de la région:', regionError);
+          toast.error("Impossible de récupérer les informations de la région");
+          setCities([]);
+          setLoading(false);
+          return;
+        }
+        
+        if (!regionData) {
+          console.error('Région non trouvée');
+          setCities([]);
+          setLoading(false);
+          return;
+        }
+        
+        console.log("Région sélectionnée:", regionData);
+        
+        // Récupérer les villes de la région
+        const { data: citiesData, error: citiesError } = await supabase
+          .from('cities')
+          .select('id, name')
+          .eq('region_id', regionData.id)
+          .order('name');
+        
+        if (citiesError) {
+          console.error('Erreur lors du chargement des villes:', citiesError);
+          toast.error("Impossible de charger les villes");
+          setCities([]);
+        } else {
+          console.log("Villes récupérées:", citiesData);
+          setCities(citiesData || []);
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des villes:', error);
+        toast.error("Une erreur est survenue lors du chargement des villes");
+        setCities([]);
+      } finally {
         setLoading(false);
       }
     }
@@ -83,6 +96,7 @@ export function LocationSelect({
     fetchCities();
   }, [selectedRegion]);
   
+  // Fonction appelée lorsque la géolocalisation est réussie
   const handleLocationFound = async (latitude: number, longitude: number) => {
     try {
       setLocationInfo({ latitude, longitude });
@@ -91,15 +105,13 @@ export function LocationSelect({
       localStorage.setItem('userLatitude', latitude.toString());
       localStorage.setItem('userLongitude', longitude.toString());
       
-      // Dans une future version, on pourrait implémenter une recherche des lieux à proximité
-      // avec une API comme Google Geocoding ou Mapbox
-      toast.success("Coordonnées enregistrées avec succès. Fonctionnalité de recherche par proximité en développement.");
+      toast.success("Position enregistrée avec succès");
       
-      // Implémentation simple : afficher les coordonnées
+      // Afficher les coordonnées
       console.log("Coordonnées géographiques:", { latitude, longitude });
     } catch (error) {
       console.error('Erreur lors du traitement de la géolocalisation:', error);
-      toast.error("Erreur lors du traitement de votre localisation.");
+      toast.error("Erreur lors du traitement de votre localisation");
     }
   };
 

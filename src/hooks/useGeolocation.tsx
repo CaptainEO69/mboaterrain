@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface GeolocationState {
   latitude: number | null;
@@ -10,31 +10,38 @@ interface GeolocationState {
   success: boolean;
 }
 
+const initialState: GeolocationState = {
+  latitude: null,
+  longitude: null,
+  accuracy: null,
+  error: null,
+  loading: false,
+  success: false
+};
+
 export function useGeolocation() {
-  const [state, setState] = useState<GeolocationState>({
-    latitude: null,
-    longitude: null,
-    accuracy: null,
-    error: null,
-    loading: false,
-    success: false
-  });
+  const [state, setState] = useState<GeolocationState>(initialState);
 
   const getPosition = () => {
+    // Vérifier si la géolocalisation est supportée
     if (!navigator.geolocation) {
-      setState(prev => ({
-        ...prev,
+      setState({
+        ...initialState,
         error: "La géolocalisation n'est pas supportée par votre navigateur",
-        loading: false,
-        success: false
-      }));
+      });
       return;
     }
 
-    setState(prev => ({ ...prev, loading: true, error: null, success: false }));
+    // Mettre à jour l'état pour indiquer que la géolocalisation est en cours
+    setState({
+      ...initialState,
+      loading: true
+    });
 
+    // Demander la position actuelle
     navigator.geolocation.getCurrentPosition(
-      position => {
+      // Succès
+      (position) => {
         console.log("Géolocalisation réussie:", position.coords);
         setState({
           latitude: position.coords.latitude,
@@ -45,7 +52,8 @@ export function useGeolocation() {
           success: true
         });
       },
-      error => {
+      // Erreur
+      (error) => {
         console.error("Erreur de géolocalisation:", error);
         let errorMessage = "Erreur de géolocalisation inconnue";
         
@@ -62,13 +70,12 @@ export function useGeolocation() {
             break;
         }
         
-        setState(prev => ({
-          ...prev,
-          error: errorMessage,
-          loading: false,
-          success: false
-        }));
+        setState({
+          ...initialState,
+          error: errorMessage
+        });
       },
+      // Options
       { 
         enableHighAccuracy: true, 
         timeout: 10000, 
@@ -77,19 +84,10 @@ export function useGeolocation() {
     );
   };
 
-  // Nettoyer le state lors du démontage du composant
-  useEffect(() => {
-    return () => {
-      setState({
-        latitude: null,
-        longitude: null,
-        accuracy: null,
-        error: null,
-        loading: false,
-        success: false
-      });
-    };
-  }, []);
+  // Réinitialiser l'état
+  const resetGeolocation = () => {
+    setState(initialState);
+  };
 
-  return { ...state, getPosition };
+  return { ...state, getPosition, resetGeolocation };
 }

@@ -12,20 +12,20 @@ interface GeolocationButtonProps {
 export function GeolocationButton({ onLocationFound }: GeolocationButtonProps) {
   const { latitude, longitude, error, loading, success, getPosition } = useGeolocation();
 
+  // Appeler le callback onLocationFound lorsque les coordonnées sont trouvées
   useEffect(() => {
-    // Si les coordonnées sont trouvées
-    if (success && latitude && longitude) {
+    if (success && latitude !== null && longitude !== null) {
       console.log("Coordonnées trouvées:", { latitude, longitude });
       onLocationFound(latitude, longitude);
-      toast.success(`Position trouvée: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+      toast.success("Position trouvée avec succès");
     }
   }, [success, latitude, longitude, onLocationFound]);
 
+  // Afficher une notification d'erreur si nécessaire
   useEffect(() => {
-    // Gestion des erreurs
     if (error) {
       console.error("Erreur de géolocalisation:", error);
-      toast.error(`Erreur: ${error}`);
+      toast.error(`Erreur de géolocalisation: ${error}`);
     }
   }, [error]);
 
