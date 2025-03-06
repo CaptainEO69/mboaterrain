@@ -23,13 +23,14 @@ export function useProfileForm(user: User | null) {
     handleSubmit: baseHandleSubmit
   } = useProfileSubmit(user, formData, setLoading);
   
-  // If editing is enabled, ensure we have fresh data
+  // Si l'édition est activée, assurons-nous d'avoir des données fraîches
   useEffect(() => {
     if (isEditing && user) {
       console.log("Edit mode enabled, ensuring fresh user data");
     }
   }, [isEditing, user]);
   
+  // Notification des erreurs
   useEffect(() => {
     if (dataError || submitError) {
       toast.error(`Erreur: ${dataError || submitError}`);
@@ -38,14 +39,13 @@ export function useProfileForm(user: User | null) {
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name: string; value: any } }) => {
     const { name, value } = e.target;
-    console.log(`Setting form data for field ${name} to:`, value);
     
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
     
-    // Also call the base handler for any additional logic
+    // Appeler aussi le gestionnaire de base pour toute logique supplémentaire
     baseHandleInputChange(e);
   };
   

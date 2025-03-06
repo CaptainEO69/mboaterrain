@@ -10,10 +10,10 @@ export function ProfileLoading({ message = "Chargement de votre profil..." }: Pr
   const [extendedLoading, setExtendedLoading] = useState(false);
   
   useEffect(() => {
-    // If loading takes more than 5 seconds, show extended loading message
+    // Si le chargement prend plus de 3 secondes (au lieu de 5), afficher un message de chargement prolongé
     const timer = setTimeout(() => {
       setExtendedLoading(true);
-    }, 5000);
+    }, 3000);
     
     return () => clearTimeout(timer);
   }, []);

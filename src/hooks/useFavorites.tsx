@@ -35,12 +35,31 @@ export function useFavorites() {
       }
     },
     enabled: !!user?.id,
-    retry: 2,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: 1, // Réduit de 2 à 1
+    staleTime: 1000 * 60 * 10, // Augmenté à 10 minutes
     refetchOnWindowFocus: false,
     refetchOnMount: true,
+    initialData: [], // Définit une valeur initiale vide
   });
 
+  // Préchargement du cache
+  useEffect(() => {
+    if (user?.id) {
+      // Précharger les favoris dès que l'utilisateur est authentifié
+      queryClient.prefetchQuery({
+        queryKey: ["favorites", user.id],
+        queryFn: async () => {
+          const { data } = await supabase
+            .from("favorites")
+            .select("property_id")
+            .eq("user_id", user.id);
+          return data?.map(fav => fav.property_id) || [];
+        },
+      });
+    }
+  }, [user?.id, queryClient]);
+
+  // Le reste du code reste identique
   const addToFavorites = useMutation({
     mutationFn: async (propertyId: string) => {
       if (!user?.id) throw new Error("Utilisateur non connecté");

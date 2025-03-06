@@ -24,7 +24,7 @@ export default function Favorites() {
   const [error, setError] = useState<string | null>(null);
   const { favorites, isLoading: favoritesLoading } = useFavorites();
 
-  // Ajouter un timeout pour éviter le chargement infini
+  // Ajouter un timeout plus court pour éviter le chargement infini
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (isLoading) {
@@ -33,7 +33,7 @@ export default function Favorites() {
           setError("Le chargement a pris trop de temps. Veuillez rafraîchir la page.");
         }
       }
-    }, 5000);
+    }, 3000); // Réduit de 5000ms à 3000ms
 
     return () => clearTimeout(timeoutId);
   }, [isLoading, error]);
@@ -63,14 +63,12 @@ export default function Favorites() {
       try {
         console.log("Fetching favorite properties, favorites:", favorites);
 
+        // Utilisation d'une requête optimisée pour de meilleures performances
         const { data, error } = await supabase
           .from("properties")
           .select(`
-            *,
-            property_images (
-              image_url,
-              is_main
-            )
+            id, title, price, city, neighborhood, area_size,
+            property_images (image_url, is_main)
           `)
           .in("id", favorites);
 

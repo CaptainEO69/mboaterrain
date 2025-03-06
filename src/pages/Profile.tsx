@@ -22,13 +22,13 @@ export default function Profile() {
       localLoading 
     });
     
-    // Set a short timeout to prevent long loading screens
+    // Définir un court délai pour éviter les écrans de chargement longs
     const timer = setTimeout(() => {
       setLocalLoading(false);
       setAuthChecked(true);
-    }, 1000); // Keep reduced timeout
+    }, 500); // Garde un délai réduit
     
-    // If user is already loaded, no need to wait
+    // Si l'utilisateur est déjà chargé, pas besoin d'attendre
     if (user) {
       setLocalLoading(false);
       setAuthChecked(true);
@@ -55,12 +55,12 @@ export default function Profile() {
     }
   }, [formError]);
 
-  // If we're still in initial loading state, show loading screen
+  // Si nous sommes toujours dans l'état initial de chargement, afficher l'écran de chargement
   if (localLoading) {
     return <ProfileLoading message="Initialisation de votre profil..." />;
   }
 
-  // After loading completed, if no user is found, redirect to login
+  // Une fois le chargement terminé, si aucun utilisateur n'est trouvé, rediriger vers la connexion
   if (!user && authChecked) {
     return (
       <div className="container mx-auto px-4 py-8 pb-24 max-w-2xl">
@@ -84,7 +84,7 @@ export default function Profile() {
     );
   }
 
-  // Show loading screen while form data is being loaded, with max 3 seconds wait time
+  // Afficher l'écran de chargement pendant le chargement des données du formulaire
   if (formLoading) {
     return <ProfileLoading message="Chargement des données de votre profil..." />;
   }

@@ -45,13 +45,13 @@ export function useProfileData(user: User | null) {
       return;
     }
     
-    // Set a timeout to prevent infinite loading
+    // Définir un délai d'attente plus court pour éviter un chargement infini
     const loadingTimeout = setTimeout(() => {
       if (loading) {
         console.log("ProfileForm - Loading timeout exceeded, forcing load complete");
         setLoading(false);
       }
-    }, 3000); // Reduced timeout to 3 seconds
+    }, 1500); // Réduit à 1.5 secondes
     
     if (user && user.user_metadata) {
       try {
@@ -65,7 +65,7 @@ export function useProfileData(user: User | null) {
         setLoading(false);
       }
     } else {
-      // Reset the form if no user is found, and stop loading
+      // Réinitialiser le formulaire si aucun utilisateur n'est trouvé et arrêter le chargement
       resetForm();
       setLoading(false);
     }
@@ -73,6 +73,7 @@ export function useProfileData(user: User | null) {
     return () => clearTimeout(loadingTimeout);
   }, [user, loading]);
 
+  // Le reste du code reste le même
   const extractUserMetadata = (user: User): ProfileFormData => {
     return {
       first_name: user.user_metadata?.first_name || "",
@@ -108,7 +109,7 @@ export function useProfileData(user: User | null) {
     if (user && user.user_metadata) {
       setFormData(extractUserMetadata(user));
     } else {
-      // Reset with default values if no user is found
+      // Réinitialiser avec des valeurs par défaut si aucun utilisateur n'est trouvé
       setFormData({
         first_name: "",
         last_name: "",
@@ -140,7 +141,7 @@ export function useProfileData(user: User | null) {
     }
   };
 
-  // Load user data on initial mount or when user changes
+  // Charger les données utilisateur au montage initial ou lorsque l'utilisateur change
   useEffect(() => {
     loadUserData();
   }, [loadUserData]);
