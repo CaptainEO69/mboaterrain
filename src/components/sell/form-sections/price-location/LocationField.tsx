@@ -2,14 +2,11 @@
 import { Label } from "@/components/ui/label";
 import { MapPin } from "lucide-react";
 import { LocationSelect } from "@/components/property-search/LocationSelect";
-import { useState } from "react";
 import { GeolocationButton } from "@/components/property-search/GeolocationButton";
+import { useLocationStorage } from "@/hooks/useLocationStorage";
 
 export function LocationField() {
-  const [locationInfo, setLocationInfo] = useState<{lat: number | null, lng: number | null}>({
-    lat: null,
-    lng: null
-  });
+  const { location, saveLocation, hasLocation } = useLocationStorage();
   
   const handleCityChange = (city: string) => {
     const form = document.querySelector('form');
@@ -39,7 +36,8 @@ export function LocationField() {
   };
   
   const handleLocationFound = (latitude: number, longitude: number) => {
-    setLocationInfo({ lat: latitude, lng: longitude });
+    // Utiliser notre nouveau hook pour sauvegarder les coordonnées
+    saveLocation(latitude, longitude);
     
     // Ajouter les coordonnées au formulaire
     const form = document.querySelector('form');
@@ -70,9 +68,9 @@ export function LocationField() {
         <GeolocationButton onLocationFound={handleLocationFound} />
       </div>
 
-      {locationInfo.lat && locationInfo.lng && (
+      {hasLocation && location.latitude && location.longitude && (
         <div className="mt-2 text-xs text-muted-foreground">
-          Coordonnées: {locationInfo.lat.toFixed(6)}, {locationInfo.lng.toFixed(6)}
+          Coordonnées: {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)}
         </div>
       )}
     </div>

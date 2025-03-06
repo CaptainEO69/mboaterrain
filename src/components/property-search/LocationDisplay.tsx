@@ -2,19 +2,21 @@
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { GeolocationButton } from "./GeolocationButton";
+import { useLocationStorage } from "@/hooks/useLocationStorage";
 
 interface LocationDisplayProps {
   onLocationFound: (latitude: number, longitude: number) => void;
 }
 
 export function LocationDisplay({ onLocationFound }: LocationDisplayProps) {
-  const [locationInfo, setLocationInfo] = useState<{
-    latitude: number | null;
-    longitude: number | null;
-  }>({ latitude: null, longitude: null });
+  const { location, saveLocation, hasLocation } = useLocationStorage();
+  const [showCoordinates, setShowCoordinates] = useState(false);
 
   const handleLocationFound = (latitude: number, longitude: number) => {
-    setLocationInfo({ latitude, longitude });
+    // Sauvegarder les coordonnées avec notre hook
+    saveLocation(latitude, longitude);
+    setShowCoordinates(true);
+    // Remonter l'information au parent
     onLocationFound(latitude, longitude);
   };
 
@@ -25,9 +27,9 @@ export function LocationDisplay({ onLocationFound }: LocationDisplayProps) {
         <GeolocationButton onLocationFound={handleLocationFound} />
       </div>
       
-      {locationInfo.latitude && locationInfo.longitude && (
+      {(hasLocation || showCoordinates) && location.latitude && location.longitude && (
         <div className="text-xs text-muted-foreground">
-          Position: {locationInfo.latitude.toFixed(4)}, {locationInfo.longitude.toFixed(4)}
+          Position: {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}
         </div>
       )}
     </>

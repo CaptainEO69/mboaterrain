@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { RegionSelect } from "./RegionSelect";
 import { CitySelect } from "./CitySelect";
@@ -5,6 +6,7 @@ import { LocationTextFields } from "./LocationTextFields";
 import { LocationDisplay } from "./LocationDisplay";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
+import { useLocationStorage } from "@/hooks/useLocationStorage";
 
 interface LocationSelectProps {
   onCityChange: (city: string) => void;
@@ -18,13 +20,13 @@ export function LocationSelect({
   onDistrictChange
 }: LocationSelectProps) {
   const [selectedRegion, setSelectedRegion] = useState<string>("");
+  const { saveLocation } = useLocationStorage();
 
   // Fonction appelée lorsque la géolocalisation réussit
   const handleLocationFound = async (latitude: number, longitude: number) => {
     try {
-      // Stocker les coordonnées temporairement
-      localStorage.setItem('userLatitude', latitude.toString());
-      localStorage.setItem('userLongitude', longitude.toString());
+      // Utiliser notre nouveau hook pour stocker les coordonnées
+      saveLocation(latitude, longitude);
       
       toast.success("Position enregistrée avec succès");
       console.log("Coordonnées géographiques:", { latitude, longitude });
