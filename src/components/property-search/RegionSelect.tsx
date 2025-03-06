@@ -6,36 +6,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
+import { useRegionSelector } from "@/hooks/useRegionSelector";
 
 interface RegionSelectProps {
   onRegionChange: (region: string) => void;
 }
 
 export function RegionSelect({ onRegionChange }: RegionSelectProps) {
-  const [regions, setRegions] = useState<{ id: string; name: string }[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchRegions() {
-      try {
-        const { data, error } = await supabase
-          .from('regions')
-          .select('*')
-          .order('name');
-        
-        if (error) throw error;
-        setRegions(data || []);
-      } catch (error) {
-        console.error('Erreur lors du chargement des régions:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchRegions();
-  }, []);
+  const { regions, loading } = useRegionSelector();
 
   return (
     <Select
@@ -43,14 +22,27 @@ export function RegionSelect({ onRegionChange }: RegionSelectProps) {
       disabled={loading}
     >
       <SelectTrigger>
-        <SelectValue placeholder="Région" />
+        {loading ? (
+          <div className="flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span>Chargement des régions...</span>
+          </div>
+        ) : (
+          <SelectValue placeholder="Région" />
+        )}
       </SelectTrigger>
       <SelectContent>
-        {regions.map((region) => (
-          <SelectItem key={region.id} value={region.name}>
-            {region.name}
+        {regions.length > 0 ? (
+          regions.map((region) => (
+            <SelectItem key={region.id} value={region.name}>
+              {region.name}
+            </SelectItem>
+          ))
+        ) : (
+          <SelectItem value="no-regions" disabled>
+            {loading ? "Chargement..." : "Aucune région disponible"}
           </SelectItem>
-        ))}
+        )}
       </SelectContent>
     </Select>
   );
