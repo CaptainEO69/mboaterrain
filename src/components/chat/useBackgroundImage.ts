@@ -1,54 +1,59 @@
 
 import { useState, useEffect } from "react";
 
-export function useBackgroundImage(imageUrl: string) {
+export function useBackgroundImage(imagePath: string) {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageSrc, setImageSrc] = useState("");
 
   useEffect(() => {
-    // Précharger l'image pour vérifier si elle existe
-    const img = new Image();
-    img.src = imageUrl;
-    img.onload = () => {
-      console.log("Image chargée avec succès:", imageUrl);
-      setImageLoaded(true);
+    // Fonction pour vérifier si une image existe
+    const checkImage = async (src: string): Promise<boolean> => {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = src;
+      });
     };
-    img.onerror = (e) => {
-      console.error("Erreur de chargement de l'image:", e);
-      console.log(`L'image ${imageUrl} n'a pas été trouvée dans le dossier public`);
+
+    // Essayer avec différentes extensions
+    const tryLoadImage = async () => {
+      // Récupérer le chemin de base sans extension
+      const basePath = imagePath.includes('.')
+        ? imagePath.substring(0, imagePath.lastIndexOf('.'))
+        : imagePath;
       
-      // Essayer avec d'autres extensions au cas où
-      const extensions = ['.jpg', '.jpeg', '.svg', '.webp'];
-      let extensionIndex = 0;
+      // Extensions à essayer
+      const extensions = ['.png', '.jpg', '.jpeg', '.webp', '.svg'];
       
-      const tryNextExtension = () => {
-        if (extensionIndex >= extensions.length) {
-          console.log("Toutes les extensions ont été essayées sans succès");
-          setImageLoaded(false);
+      // Si le chemin original inclut déjà une extension, l'essayer en premier
+      if (imagePath.includes('.')) {
+        const exists = await checkImage(imagePath);
+        if (exists) {
+          setImageSrc(imagePath);
+          setImageLoaded(true);
           return;
         }
-        
-        const baseImageName = '/lion'; // Utiliser "lion" en minuscule
-        const nextExtension = extensions[extensionIndex];
-        const imgWithExt = new Image();
-        imgWithExt.src = baseImageName + nextExtension;
-        
-        console.log(`Essai avec l'extension ${nextExtension}:`, imgWithExt.src);
-        
-        imgWithExt.onload = () => {
-          console.log(`Image chargée avec succès avec l'extension ${nextExtension}`);
-          setImageLoaded(true);
-        };
-        
-        imgWithExt.onerror = () => {
-          console.log(`Échec avec l'extension ${nextExtension}`);
-          extensionIndex++;
-          tryNextExtension();
-        };
-      };
+      }
       
-      tryNextExtension();
+      // Sinon, essayer avec différentes extensions
+      for (const ext of extensions) {
+        const fullPath = `${basePath}${ext}`;
+        const exists = await checkImage(fullPath);
+        if (exists) {
+          setImageSrc(fullPath);
+          setImageLoaded(true);
+          return;
+        }
+      }
+      
+      // Si aucune image n'est trouvée, définir imageLoaded à false
+      console.log("Aucune image trouvée pour le chemin:", basePath);
+      setImageLoaded(false);
     };
-  }, [imageUrl]);
 
-  return { imageLoaded };
+    tryLoadImage();
+  }, [imagePath]);
+
+  return { imageLoaded, imageSrc };
 }
