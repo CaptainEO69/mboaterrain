@@ -11,34 +11,44 @@ export function useBackgroundImage(imagePath: string) {
     const checkImage = async (src: string): Promise<boolean> => {
       return new Promise((resolve) => {
         const img = new Image();
-        img.onload = () => resolve(true);
-        img.onerror = () => resolve(false);
+        img.onload = () => {
+          console.log(`✅ Image chargée avec succès: ${src}`);
+          resolve(true);
+        };
+        img.onerror = () => {
+          console.log(`❌ Échec du chargement de l'image: ${src}`);
+          resolve(false);
+        };
         img.src = src;
       });
     };
 
     // Essayer avec différentes extensions et emplacements
     const tryLoadImage = async () => {
+      console.log(`🔍 Tentative de chargement de l'image: ${imagePath}`);
+      
       // S'assurer que le chemin commence par "/"
       const normalizedPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+      console.log(`🔄 Chemin normalisé: ${normalizedPath}`);
       
       // Récupérer le chemin de base sans extension
       const basePath = normalizedPath.includes('.')
         ? normalizedPath.substring(0, normalizedPath.lastIndexOf('.'))
         : normalizedPath;
+      console.log(`📂 Chemin de base: ${basePath}`);
       
       // Extensions à essayer
       const extensions = ['.png', '.jpg', '.jpeg', '.webp', '.svg'];
       
       // Emplacements à essayer (racine et sous-dossiers communs)
-      const locations = ['', '/images/', '/assets/', '/img/'];
+      const locations = ['', '/images/', '/assets/', '/img/', '/lovable-uploads/'];
       
       // Si le chemin original inclut déjà une extension, l'essayer en premier
       if (normalizedPath.includes('.')) {
-        console.log("Trying with original path:", normalizedPath);
+        console.log("🥇 Essai avec le chemin original:", normalizedPath);
         const exists = await checkImage(normalizedPath);
         if (exists) {
-          console.log("✅ Image loaded successfully:", normalizedPath);
+          console.log("✅ Image chargée avec succès:", normalizedPath);
           setImageSrc(normalizedPath);
           setImageLoaded(true);
           setError(null);
@@ -52,10 +62,10 @@ export function useBackgroundImage(imagePath: string) {
       // D'abord essayer les extensions à la racine
       for (const ext of extensions) {
         const fullPath = `${basePath}${ext}`;
-        console.log("Trying path:", fullPath);
+        console.log("🔄 Essai avec le chemin:", fullPath);
         const exists = await checkImage(fullPath);
         if (exists) {
-          console.log("✅ Image loaded successfully:", fullPath);
+          console.log("✅ Image chargée avec succès:", fullPath);
           setImageSrc(fullPath);
           setImageLoaded(true);
           setError(null);
@@ -72,10 +82,10 @@ export function useBackgroundImage(imagePath: string) {
         
         for (const ext of extensions) {
           const fullPath = `${location}${fileName}${ext}`;
-          console.log("Trying path in subfolder:", fullPath);
+          console.log("🔄 Essai dans le sous-dossier:", fullPath);
           const exists = await checkImage(fullPath);
           if (exists) {
-            console.log("✅ Image loaded successfully in subfolder:", fullPath);
+            console.log("✅ Image chargée avec succès dans le sous-dossier:", fullPath);
             setImageSrc(fullPath);
             setImageLoaded(true);
             setError(null);
@@ -85,13 +95,34 @@ export function useBackgroundImage(imagePath: string) {
         }
       }
       
+      // Essayer les images existantes dans lovable-uploads
+      console.log("🔍 Recherche d'images dans lovable-uploads...");
+      const lovableImages = [
+        '/lovable-uploads/83fc2739-1a70-4b50-b7a3-127bda76b51d.png',
+        '/lovable-uploads/b0d64b27-cdd5-43a9-b0dd-fba53da4a96d.png',
+        '/lovable-uploads/ff74bfca-be9a-4f99-9ec1-a7e93bc5c72f.png'
+      ];
+      
+      for (const img of lovableImages) {
+        console.log("🔄 Essai avec l'image uploadée:", img);
+        const exists = await checkImage(img);
+        if (exists) {
+          console.log("✅ Image uploadée trouvée et chargée:", img);
+          setImageSrc(img);
+          setImageLoaded(true);
+          setError("Image d'origine non trouvée, utilisation d'une image uploadée");
+          allAttemptsFailed = false;
+          return;
+        }
+      }
+      
       // Essayer une image de secours de placeholder depuis Unsplash
       const placeholderImage = 'https://images.unsplash.com/photo-1582562124811-c09040d0a901';
-      console.log("Trying placeholder image:", placeholderImage);
+      console.log("🔄 Essai avec l'image de secours Unsplash:", placeholderImage);
       const placeholderExists = await checkImage(placeholderImage);
       
       if (placeholderExists) {
-        console.log("✅ Using placeholder image as fallback");
+        console.log("✅ Utilisation de l'image de secours");
         setImageSrc(placeholderImage);
         setImageLoaded(true);
         setError("Image d'origine non trouvée, utilisation d'une image de secours");
@@ -101,14 +132,16 @@ export function useBackgroundImage(imagePath: string) {
       
       // Si aucune image n'est trouvée, définir imageLoaded à false
       if (allAttemptsFailed) {
-        const errorMsg = `Aucune image trouvée pour le chemin: ${basePath}. Vérifiez que l'image existe dans le dossier public.`;
+        const errorMsg = `❌ Aucune image trouvée pour le chemin: ${basePath}. Vérifiez que l'image existe dans le dossier public.`;
         console.error(errorMsg);
-        console.log("Chemins essayés:", [
+        console.log("🔍 Chemins essayés:", [
           normalizedPath.includes('.') ? normalizedPath : null,
           ...extensions.map(ext => `${basePath}${ext}`),
           ...locations.flatMap(loc => 
             extensions.map(ext => `${loc}${basePath.split('/').pop()}${ext}`)
-          )
+          ),
+          ...lovableImages,
+          placeholderImage
         ].filter(Boolean));
         setError(errorMsg);
         setImageLoaded(false);

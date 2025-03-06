@@ -20,7 +20,7 @@ export function ChatWindow() {
     toggleChat
   } = useChatMessages();
   
-  // Chemin vérifié vers l'image du lion
+  // On vérifie plusieurs chemins possibles pour l'image
   const imageUrl = '/lion.png';
   const { imageLoaded, imageSrc, error } = useBackgroundImage(imageUrl);
 
@@ -57,9 +57,9 @@ export function ChatWindow() {
       </div>
       
       {/* Affichage des informations de débogage en mode développement */}
-      {process.env.NODE_ENV === 'development' && !imageLoaded && (
+      {process.env.NODE_ENV === 'development' && (
         <div className="absolute bottom-0 left-0 bg-orange-500 text-white p-1 text-xs max-w-full overflow-hidden">
-          {error || "Image de fond non chargée. Vérifiez que l'image existe dans le dossier public."}
+          {error || (imageLoaded ? `Image chargée: ${imageSrc}` : "Image de fond non chargée. Vérifiez la console.")}
         </div>
       )}
     </div>
