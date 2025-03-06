@@ -24,7 +24,7 @@ export function ChatWindow() {
   useEffect(() => {
     console.log("Chat window rendered, chat open:", isChatOpen);
     
-    // Vérifie si l'image existe avec le bon nom de fichier
+    // Vérifie si l'image existe avec le chemin correct
     const img = new Image();
     img.onload = () => {
       console.log("Image de fond chargée avec succès:", img.src);
@@ -34,7 +34,7 @@ export function ChatWindow() {
       console.error("Erreur lors du chargement de l'image de fond:", error);
       console.log("Chemin de l'image tentée:", img.src);
     };
-    img.src = "/thelion.jpg"; // Utilisation du bon nom de fichier avec extension .jpg
+    img.src = "/lovable-uploads/1f09cbc4-45e2-4b8c-8e32-75019e404759.png"; // Utilisation de la nouvelle image téléchargée
   }, [isChatOpen]);
 
   if (!isChatOpen) {
@@ -48,7 +48,7 @@ export function ChatWindow() {
         {backgroundImageLoaded ? (
           <div 
             className="absolute inset-0 z-0 bg-cover bg-center opacity-30" 
-            style={{ backgroundImage: 'url(/thelion.jpg)' }}
+            style={{ backgroundImage: 'url(/lovable-uploads/1f09cbc4-45e2-4b8c-8e32-75019e404759.png)' }}
           ></div>
         ) : (
           <div className="absolute inset-0 z-0 bg-gradient-to-br from-cmr-green/20 to-cmr-yellow/20"></div>
