@@ -7,6 +7,7 @@ import { ChatButton } from "./ChatButton";
 import { useChatMessages } from "./useChatMessages";
 import { useBackgroundImage } from "./useBackgroundImage";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useEffect } from "react";
 
 export * from "./types";
 
@@ -24,6 +25,11 @@ export function ChatWindow() {
   const imageUrl = '/lovable-uploads/83fc2739-1a70-4b50-b7a3-127bda76b51d.png';
   const { imageLoaded, imageSrc, error } = useBackgroundImage(imageUrl);
 
+  // Afficher des informations de débogage dans la console
+  useEffect(() => {
+    console.log("État de l'image:", { imageLoaded, imageSrc, error });
+  }, [imageLoaded, imageSrc, error]);
+
   if (!isChatOpen) {
     return <ChatButton toggleChat={toggleChat} unreadCount={unreadCount} />;
   }
@@ -34,19 +40,19 @@ export function ChatWindow() {
         {/* Dégradé de couleur comme fond de secours */}
         <div className="absolute inset-0 z-0 bg-gradient-to-br from-cmr-green/10 to-cmr-yellow/10"></div>
         
-        {/* Image de fond - affichage uniquement si chargée avec succès */}
-        {imageLoaded && imageSrc ? (
+        {/* Image de fond avec style direct et forced display */}
+        {imageLoaded && (
           <div 
-            className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
+            className="absolute inset-0 z-0"
             style={{
               backgroundImage: `url('${imageSrc}')`,
-              opacity: 0.7, // Augmenter l'opacité pour rendre l'image plus visible
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+              opacity: 1,
+              display: 'block',
             }}
           ></div>
-        ) : (
-          <div className="absolute inset-0 z-0 flex items-center justify-center">
-            <Skeleton className="h-full w-full opacity-10" />
-          </div>
         )}
       </div>
       
