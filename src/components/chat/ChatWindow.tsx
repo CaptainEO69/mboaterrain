@@ -20,10 +20,10 @@ export function ChatWindow() {
     toggleChat
   } = useChatMessages();
   
-  // Utiliser l'image lion.png comme fond par défaut
+  // Utiliser l'image lion.png.png comme fond par défaut
   const [useImageBackground, setUseImageBackground] = useState(true);
   const { imageLoaded, imageSrc, error } = useBackgroundImage(
-    useImageBackground ? 'lion.png' : '' // Removed leading slash to test if that's the issue
+    useImageBackground ? 'lion.png.png' : '' // Modifié pour utiliser l'extension correcte
   );
 
   // Afficher des informations de débogage dans la console

@@ -27,7 +27,9 @@ export function useBackgroundImage(imagePath: string) {
         `/${imagePath}`,
         `/public/${imagePath}`,
         `./public/${imagePath}`,
-        `./src/assets/${imagePath}`
+        `./src/assets/${imagePath}`,
+        `./assets/${imagePath}`,
+        `../public/${imagePath}` // Ajout d'un chemin supplémentaire
       ];
       
       console.log(`🔍 Tentative de chargement de l'image avec plusieurs chemins pour: ${imagePath}`);
