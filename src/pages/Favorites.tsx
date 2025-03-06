@@ -21,13 +21,29 @@ type Property = {
 export default function Favorites() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { favorites, isLoading: favoritesLoading } = useFavorites();
+
+  useEffect(() => {
+    // Set a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      if (isLoading) {
+        setIsLoading(false);
+        if (!error) {
+          setError("Le chargement a pris trop de temps. Veuillez rafraîchir la page.");
+        }
+      }
+    }, 5000);
+
+    return () => clearTimeout(timeoutId);
+  }, [isLoading, error]);
 
   useEffect(() => {
     if (favoritesLoading) return;
 
     const fetchFavoriteProperties = async () => {
       setIsLoading(true);
+      setError(null);
       
       try {
         console.log("Fetching favorite properties, favorites:", favorites);
@@ -52,6 +68,7 @@ export default function Favorites() {
 
         if (error) {
           console.error("Erreur lors du chargement des propriétés:", error);
+          setError("Impossible de charger vos favoris. Veuillez réessayer.");
           throw error;
         }
 
@@ -59,6 +76,7 @@ export default function Favorites() {
         setProperties(data || []);
       } catch (error: any) {
         console.error("Erreur lors du chargement des propriétés:", error.message);
+        setError("Une erreur est survenue. Veuillez réessayer.");
       } finally {
         setIsLoading(false);
       }
@@ -75,6 +93,11 @@ export default function Favorites() {
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cmr-green"></div>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-16 text-red-500 bg-white rounded-lg shadow-sm">
+            <p className="text-lg font-medium">Erreur</p>
+            <p className="text-sm mt-2 text-center max-w-md">{error}</p>
           </div>
         ) : properties.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-gray-500 bg-white rounded-lg shadow-sm">

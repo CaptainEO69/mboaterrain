@@ -22,6 +22,7 @@ export function useFavorites() {
 
         if (error) {
           console.error("Error fetching favorites:", error);
+          toast.error("Erreur lors du chargement des favoris");
           return [];
         }
 
@@ -29,12 +30,15 @@ export function useFavorites() {
         return data?.map(fav => fav.property_id) || [];
       } catch (error) {
         console.error("Unexpected error fetching favorites:", error);
+        toast.error("Erreur inattendue lors du chargement des favoris");
         return [];
       }
     },
     enabled: !!user?.id,
-    retry: 1,
+    retry: 2,
     staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
   });
 
   const addToFavorites = useMutation({
