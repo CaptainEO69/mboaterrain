@@ -45,25 +45,13 @@ export function useBackgroundImage(imagePath: string) {
           return;
         }
         
-        // Si l'image n'est pas trouvée, utiliser une image de secours
+        // Si l'image n'est pas trouvée, afficher un message d'erreur
         throw new Error(`Image '${imagePath}' non trouvée`);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
         console.error(`❌ Erreur lors du chargement de l'image: ${errorMessage}`);
         setError(`Image '${imagePath}' non trouvée`);
         setImageLoaded(false);
-        
-        // Essayer une image de secours connue comme fonctionnelle
-        const fallbackPath = '/lovable-uploads/83fc2739-1a70-4b50-b7a3-127bda76b51d.png';
-        console.log(`🔄 Tentative avec l'image de secours: ${fallbackPath}`);
-        
-        const fallbackExists = await checkImage(fallbackPath);
-        if (fallbackExists) {
-          console.log(`✅ Image de secours chargée: ${fallbackPath}`);
-          setImageSrc(fallbackPath);
-          setImageLoaded(true);
-          setError(null);
-        }
       }
     };
 
