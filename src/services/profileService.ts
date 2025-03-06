@@ -7,8 +7,8 @@ export async function updateUserProfile(userId: string, formData: ProfileFormDat
   try {
     console.log("Updating user profile for user ID:", userId);
     
-    // Mise à jour des métadonnées de l'utilisateur
-    const { error: updateError } = await supabase.auth.updateUser({
+    // Update user metadata
+    const { error: updateError, data } = await supabase.auth.updateUser({
       data: {
         first_name: formData.first_name,
         last_name: formData.last_name,
@@ -44,7 +44,9 @@ export async function updateUserProfile(userId: string, formData: ProfileFormDat
       throw updateError;
     }
 
-    // Mise à jour du profil dans la table des profils
+    console.log("Auth metadata update succeeded:", !!data.user);
+
+    // Update profile in the profiles table
     const { error: profileError } = await supabase
       .from("profiles")
       .update({
@@ -87,7 +89,6 @@ export async function updateUserProfile(userId: string, formData: ProfileFormDat
     return true;
   } catch (error: any) {
     console.error("Error updating profile:", error);
-    toast.error("Erreur lors de la mise à jour du profil: " + (error.message || "Erreur inconnue"));
     return false;
   }
 }

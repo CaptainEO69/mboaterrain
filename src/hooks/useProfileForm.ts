@@ -8,6 +8,7 @@ import { toast } from "sonner";
 export function useProfileForm(user: User | null) {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<ProfileFormData>({
     first_name: "",
     last_name: "",
@@ -38,7 +39,8 @@ export function useProfileForm(user: User | null) {
   });
 
   useEffect(() => {
-    console.log("ProfileForm - User metadata:", user?.user_metadata ? "Present" : "Not present");
+    console.log("ProfileForm - Loading user data, user present:", !!user);
+    setError(null);
     
     if (user && user.user_metadata) {
       try {
@@ -70,16 +72,16 @@ export function useProfileForm(user: User | null) {
           insurance_included: user.user_metadata?.insurance_included || false,
           notary_office: user.user_metadata?.notary_office || "",
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error setting form data:", error);
-        toast.error("Erreur lors du chargement des données du profil");
+        setError("Erreur lors du chargement des données du profil: " + (error.message || "Erreur inconnue"));
       }
     } else {
-      // Réinitialiser le formulaire si aucun utilisateur n'est trouvé
+      // Reset the form if no user is found
       resetForm();
     }
     
-    // Toujours terminer le chargement, même en cas d'erreur
+    // Always finish loading, even if there's an error
     setLoading(false);
   }, [user]);
 
@@ -94,20 +96,24 @@ export function useProfileForm(user: User | null) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      toast.error("Vous devez être connecté pour mettre à jour votre profil");
+      setError("Vous devez être connecté pour mettre à jour votre profil");
       return;
     }
     
     setLoading(true);
+    setError(null);
+    
     try {
       const success = await updateUserProfile(user.id, formData);
       if (success) {
         setIsEditing(false);
         toast.success("Profil mis à jour avec succès");
+      } else {
+        throw new Error("La mise à jour du profil a échoué");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in handleSubmit:", error);
-      toast.error("Erreur lors de la mise à jour du profil");
+      setError("Erreur lors de la mise à jour du profil: " + (error.message || "Erreur inconnue"));
     } finally {
       setLoading(false);
     }
@@ -144,7 +150,7 @@ export function useProfileForm(user: User | null) {
         notary_office: user.user_metadata?.notary_office || "",
       });
     } else {
-      // Réinitialiser avec des valeurs par défaut si aucun utilisateur n'est trouvé
+      // Reset with default values if no user is found
       setFormData({
         first_name: "",
         last_name: "",
@@ -180,6 +186,7 @@ export function useProfileForm(user: User | null) {
     isEditing,
     setIsEditing,
     loading,
+    error,
     formData,
     handleInputChange,
     handleSubmit,

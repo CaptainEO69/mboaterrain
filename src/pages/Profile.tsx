@@ -7,23 +7,29 @@ import { useProfileForm } from "@/hooks/useProfileForm";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function Profile() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [authChecked, setAuthChecked] = useState(false);
   const [localLoading, setLocalLoading] = useState(true);
 
-  // Mettre en place un timeout pour éviter un chargement infini
   useEffect(() => {
+    // Log authentication state for debugging
+    console.log("Profile component - Auth state:", { 
+      user: user ? "Authenticated" : "Not authenticated", 
+      authChecked,
+      localLoading 
+    });
+    
+    // Set a timeout to prevent infinite loading
     const timer = setTimeout(() => {
       setLocalLoading(false);
-    }, 3000); // 3 secondes de chargement maximum
+      setAuthChecked(true);
+    }, 2000);
     
     return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    console.log("Profile component - User status:", user ? "Authenticated" : "Not authenticated");
   }, [user]);
 
   const {
@@ -33,11 +39,23 @@ export default function Profile() {
     formData,
     handleInputChange,
     handleSubmit,
-    resetForm
+    resetForm,
+    error: formError
   } = useProfileForm(user);
 
-  // Si aucune donnée utilisateur n'est disponible après le timeout, afficher un message d'erreur
-  if (!user && !localLoading) {
+  useEffect(() => {
+    if (formError) {
+      toast.error(`Erreur: ${formError}`);
+    }
+  }, [formError]);
+
+  // If we're still in initial loading state, show loading screen
+  if (localLoading) {
+    return <ProfileLoading message="Chargement de votre profil en cours..." />;
+  }
+
+  // After loading completed, if no user is found, redirect to login
+  if (!user && authChecked) {
     return (
       <div className="container mx-auto px-4 py-8 pb-24 max-w-2xl">
         <Card className="border-cmr-green">
@@ -60,9 +78,9 @@ export default function Profile() {
     );
   }
 
-  // Afficher l'écran de chargement pendant le chargement des données du formulaire
-  if (formLoading || localLoading) {
-    return <ProfileLoading />;
+  // Show loading screen while form data is being loaded
+  if (formLoading) {
+    return <ProfileLoading message="Chargement des données de votre profil..." />;
   }
 
   return (
