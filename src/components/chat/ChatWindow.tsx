@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
@@ -63,11 +64,23 @@ export function ChatWindow() {
   const [unreadCount, setUnreadCount] = useState(0);
   const { user } = useAuth();
 
+  // Vérifier si l'image est chargée
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   useEffect(() => {
     // Si le chat est ouvert, réinitialiser le compteur de messages non lus
     if (isChatOpen) {
       setUnreadCount(0);
     }
+
+    // Précharger l'image pour vérifier si elle existe
+    const img = new Image();
+    img.src = '/lovable-uploads/34d61d7a-8ad7-4c42-b801-3b79bf3450fc.png';
+    img.onload = () => setImageLoaded(true);
+    img.onerror = () => {
+      console.error("Erreur de chargement de l'image du lion");
+      setImageLoaded(false);
+    };
   }, [isChatOpen]);
 
   const handleSendMessage = (input: string) => {
@@ -144,14 +157,12 @@ export function ChatWindow() {
   return (
     <div className="fixed bottom-16 right-4 z-50 w-[90vw] md:w-80 h-[60vh] md:h-96">
       <div className="absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white">
+        {/* Image de fond */}
         <div 
-          className="absolute inset-0 z-0"
+          className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
           style={{
             backgroundImage: `url('/lovable-uploads/34d61d7a-8ad7-4c42-b801-3b79bf3450fc.png')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            opacity: 0.15,
+            opacity: 0.2,  // Augmenté l'opacité pour une meilleure visibilité
           }}
         ></div>
       </div>
@@ -161,6 +172,13 @@ export function ChatWindow() {
         <ChatMessages messages={messages} />
         <ChatInput onSendMessage={handleSendMessage} />
       </div>
+      
+      {/* Message de débogage pour vérifier le chargement de l'image */}
+      {process.env.NODE_ENV === 'development' && !imageLoaded && (
+        <div className="absolute bottom-0 left-0 bg-red-500 text-white p-1 text-xs">
+          Image non chargée
+        </div>
+      )}
     </div>
   );
 }
