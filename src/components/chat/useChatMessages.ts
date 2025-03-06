@@ -73,8 +73,7 @@ export function useChatMessages() {
           
           // Afficher une notification toast pour indiquer une réponse d'expert
           setTimeout(() => {
-            toast({
-              title: "Conseil d'expert",
+            toast("Conseil d'expert", {
               description: "Notre assistant vous a fourni une information spécialisée",
               duration: 3000,
             });
