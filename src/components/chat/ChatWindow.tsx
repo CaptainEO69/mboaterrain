@@ -47,7 +47,7 @@ export function ChatWindow() {
         {/* Image d'arrière-plan ou dégradé de secours */}
         {backgroundImageLoaded ? (
           <div 
-            className="absolute inset-0 z-0 bg-cover bg-center opacity-30" 
+            className="absolute inset-0 z-0 bg-cover bg-center opacity-60" 
             style={{ backgroundImage: 'url(/lovable-uploads/1f09cbc4-45e2-4b8c-8e32-75019e404759.png)' }}
           ></div>
         ) : (
