@@ -16,6 +16,7 @@ export function LocationField() {
       const formData = new FormData(form);
       formData.set('city', city);
     }
+    console.log("City selected:", city);
   };
   
   const handleNeighborhoodChange = (neighborhood: string) => {
@@ -24,6 +25,7 @@ export function LocationField() {
       const formData = new FormData(form);
       formData.set('neighborhood', neighborhood);
     }
+    console.log("Neighborhood entered:", neighborhood);
   };
   
   const handleDistrictChange = (district: string) => {
@@ -32,6 +34,7 @@ export function LocationField() {
       const formData = new FormData(form);
       formData.set('district', district);
     }
+    console.log("District entered:", district);
   };
   
   return (

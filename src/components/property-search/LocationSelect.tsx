@@ -34,7 +34,7 @@ export function LocationSelect({
     longitude: number | null;
   }>({ latitude: null, longitude: null });
 
-  // Chargement des villes lorsqu'une région est sélectionnée
+  // Fetch cities when a region is selected
   useEffect(() => {
     async function fetchCities() {
       if (!selectedRegion) {
@@ -44,32 +44,26 @@ export function LocationSelect({
 
       try {
         setLoading(true);
+        console.log("Fetching cities for region:", selectedRegion);
         
-        // Récupérer l'ID de la région
+        // First get the region ID
         const { data: regionData, error: regionError } = await supabase
           .from('regions')
           .select('id')
           .eq('name', selectedRegion)
-          .maybeSingle();
+          .single();
         
         if (regionError) {
-          console.error('Erreur lors de la récupération de la région:', regionError);
+          console.error('Error fetching region:', regionError);
           toast.error("Impossible de récupérer les informations de la région");
           setCities([]);
           setLoading(false);
           return;
         }
         
-        if (!regionData) {
-          console.error('Région non trouvée');
-          setCities([]);
-          setLoading(false);
-          return;
-        }
+        console.log("Found region data:", regionData);
         
-        console.log("Région sélectionnée:", regionData);
-        
-        // Récupérer les villes de la région
+        // Then get cities for that region
         const { data: citiesData, error: citiesError } = await supabase
           .from('cities')
           .select('id, name')
@@ -77,15 +71,15 @@ export function LocationSelect({
           .order('name');
         
         if (citiesError) {
-          console.error('Erreur lors du chargement des villes:', citiesError);
+          console.error('Error loading cities:', citiesError);
           toast.error("Impossible de charger les villes");
           setCities([]);
         } else {
-          console.log("Villes récupérées:", citiesData);
+          console.log("Cities loaded:", citiesData);
           setCities(citiesData || []);
         }
       } catch (error) {
-        console.error('Erreur lors du chargement des villes:', error);
+        console.error('Error loading cities:', error);
         toast.error("Une erreur est survenue lors du chargement des villes");
         setCities([]);
       } finally {
@@ -96,21 +90,19 @@ export function LocationSelect({
     fetchCities();
   }, [selectedRegion]);
   
-  // Fonction appelée lorsque la géolocalisation est réussie
+  // Function called when geolocation is successful
   const handleLocationFound = async (latitude: number, longitude: number) => {
     try {
       setLocationInfo({ latitude, longitude });
       
-      // Stockage temporaire des coordonnées
+      // Store coordinates temporarily
       localStorage.setItem('userLatitude', latitude.toString());
       localStorage.setItem('userLongitude', longitude.toString());
       
       toast.success("Position enregistrée avec succès");
-      
-      // Afficher les coordonnées
-      console.log("Coordonnées géographiques:", { latitude, longitude });
+      console.log("Geographic coordinates:", { latitude, longitude });
     } catch (error) {
-      console.error('Erreur lors du traitement de la géolocalisation:', error);
+      console.error('Error processing geolocation:', error);
       toast.error("Erreur lors du traitement de votre localisation");
     }
   };

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 interface GeolocationState {
   latitude: number | null;
@@ -22,8 +22,8 @@ const initialState: GeolocationState = {
 export function useGeolocation() {
   const [state, setState] = useState<GeolocationState>(initialState);
 
-  const getPosition = () => {
-    // Vérifier si la géolocalisation est supportée
+  const getPosition = useCallback(() => {
+    // Check if geolocation is supported
     if (!navigator.geolocation) {
       setState({
         ...initialState,
@@ -32,17 +32,25 @@ export function useGeolocation() {
       return;
     }
 
-    // Mettre à jour l'état pour indiquer que la géolocalisation est en cours
+    // Update state to indicate geolocation is in progress
     setState({
       ...initialState,
       loading: true
     });
 
-    // Demander la position actuelle
+    // Request current position with a timeout
+    const geolocationTimeout = setTimeout(() => {
+      setState({
+        ...initialState,
+        error: "La demande de géolocalisation a pris trop de temps. Veuillez réessayer.",
+      });
+    }, 15000); // 15 seconds timeout
+
     navigator.geolocation.getCurrentPosition(
-      // Succès
+      // Success
       (position) => {
-        console.log("Géolocalisation réussie:", position.coords);
+        clearTimeout(geolocationTimeout);
+        console.log("Geolocation successful:", position.coords);
         setState({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
@@ -52,12 +60,13 @@ export function useGeolocation() {
           success: true
         });
       },
-      // Erreur
+      // Error
       (error) => {
-        console.error("Erreur de géolocalisation:", error);
+        clearTimeout(geolocationTimeout);
+        console.error("Geolocation error:", error);
         let errorMessage = "Erreur de géolocalisation inconnue";
         
-        // Traduire les messages d'erreur courants
+        // Translate common error messages
         switch(error.code) {
           case error.PERMISSION_DENIED:
             errorMessage = "Vous avez refusé l'accès à la géolocalisation";
@@ -82,12 +91,12 @@ export function useGeolocation() {
         maximumAge: 0 
       }
     );
-  };
+  }, []);
 
-  // Réinitialiser l'état
-  const resetGeolocation = () => {
+  // Reset state
+  const resetGeolocation = useCallback(() => {
     setState(initialState);
-  };
+  }, []);
 
   return { ...state, getPosition, resetGeolocation };
 }

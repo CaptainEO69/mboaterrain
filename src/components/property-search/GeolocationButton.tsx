@@ -1,8 +1,8 @@
 
-import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { MapPin } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { useEffect } from "react";
 import { toast } from "sonner";
 
 interface GeolocationButtonProps {
@@ -10,41 +10,40 @@ interface GeolocationButtonProps {
 }
 
 export function GeolocationButton({ onLocationFound }: GeolocationButtonProps) {
-  const { latitude, longitude, error, loading, success, getPosition } = useGeolocation();
+  const { 
+    latitude, 
+    longitude, 
+    error, 
+    loading, 
+    success,
+    getPosition 
+  } = useGeolocation();
 
-  // Appeler le callback onLocationFound lorsque les coordonnées sont trouvées
+  // When geolocation is successful, call the callback
   useEffect(() => {
-    if (success && latitude !== null && longitude !== null) {
-      console.log("Coordonnées trouvées:", { latitude, longitude });
+    if (success && latitude && longitude) {
       onLocationFound(latitude, longitude);
-      toast.success("Position trouvée avec succès");
     }
   }, [success, latitude, longitude, onLocationFound]);
 
-  // Afficher une notification d'erreur si nécessaire
+  // Show error toast when geolocation fails
   useEffect(() => {
     if (error) {
-      console.error("Erreur de géolocalisation:", error);
-      toast.error(`Erreur de géolocalisation: ${error}`);
+      toast.error(error);
     }
   }, [error]);
 
-  const handleClick = () => {
-    toast.info("Recherche de votre position...");
-    getPosition();
-  };
-
   return (
     <Button 
-      type="button" 
       variant="outline" 
       size="sm" 
-      onClick={handleClick}
+      type="button"
+      onClick={getPosition}
       disabled={loading}
-      className="flex items-center gap-2"
+      className="text-xs flex items-center gap-1"
     >
-      <MapPin className="h-4 w-4" />
-      {loading ? "Localisation..." : "Me localiser"}
+      <MapPin className="h-3 w-3" />
+      {loading ? "Localisation..." : "Ma position"}
     </Button>
   );
 }
