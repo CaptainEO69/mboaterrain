@@ -24,8 +24,8 @@ export default function Favorites() {
   const [error, setError] = useState<string | null>(null);
   const { favorites, isLoading: favoritesLoading } = useFavorites();
 
+  // Ajouter un timeout pour éviter le chargement infini
   useEffect(() => {
-    // Set a timeout to prevent infinite loading
     const timeoutId = setTimeout(() => {
       if (isLoading) {
         setIsLoading(false);
@@ -38,22 +38,30 @@ export default function Favorites() {
     return () => clearTimeout(timeoutId);
   }, [isLoading, error]);
 
+  // Charge les propriétés uniquement quand les favoris sont chargés
   useEffect(() => {
+    console.log("Favorites status:", { 
+      favoritesLoading, 
+      favoritesCount: favorites?.length,
+      favorites
+    });
+    
     if (favoritesLoading) return;
 
     const fetchFavoriteProperties = async () => {
+      // Si aucun favori, on ne charge rien
+      if (!favorites || favorites.length === 0) {
+        console.log("No favorites found, setting empty properties array");
+        setProperties([]);
+        setIsLoading(false);
+        return;
+      }
+      
       setIsLoading(true);
       setError(null);
       
       try {
         console.log("Fetching favorite properties, favorites:", favorites);
-        
-        if (!favorites || favorites.length === 0) {
-          console.log("No favorites found, setting empty properties array");
-          setProperties([]);
-          setIsLoading(false);
-          return;
-        }
 
         const { data, error } = await supabase
           .from("properties")
