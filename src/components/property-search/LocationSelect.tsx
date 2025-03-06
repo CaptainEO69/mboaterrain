@@ -112,14 +112,15 @@ export function LocationSelect({
       <div>
         <Label>Ville</Label>
         <Select
+          value={selectedCity}
           onValueChange={(value) => {
             setSelectedCity(value);
             onCityChange(value);
           }}
           disabled={loading || !selectedRegion}
         >
-          <SelectTrigger>
-            <SelectValue placeholder="Ville" />
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Sélectionnez une ville" />
           </SelectTrigger>
           <SelectContent>
             {cities.map((city) => (

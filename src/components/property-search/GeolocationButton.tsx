@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { MapPin } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
