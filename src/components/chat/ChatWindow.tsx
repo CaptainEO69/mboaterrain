@@ -20,8 +20,8 @@ export function ChatWindow() {
     toggleChat
   } = useChatMessages();
   
-  // Utiliser l'image du lion avec le chemin correct
-  const imageUrl = '/lovable-uploads/83fc2739-1a70-4b50-b7a3-127bda76b51d.png';
+  // Utiliser spécifiquement l'image du lion
+  const imageUrl = '/lovable-uploads/a3ffe062-c7f9-4c48-9958-60db36d00526.png';
   const { imageLoaded, imageSrc, error } = useBackgroundImage(imageUrl);
 
   // Afficher des informations de débogage dans la console
@@ -39,7 +39,7 @@ export function ChatWindow() {
         {/* Dégradé de couleur comme fond de secours */}
         <div className="absolute inset-0 z-0 bg-gradient-to-br from-cmr-green/10 to-cmr-yellow/10"></div>
         
-        {/* Image de fond */}
+        {/* Image de fond - forcée à s'afficher avec !important */}
         {imageLoaded && imageSrc && (
           <div 
             className="absolute inset-0 z-0"
@@ -48,7 +48,7 @@ export function ChatWindow() {
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
-              opacity: 0.8,
+              opacity: 0.7,
               display: 'block !important'
             }}
           ></div>
@@ -66,7 +66,7 @@ export function ChatWindow() {
         <div className="absolute bottom-0 left-0 bg-orange-500 text-white p-1 text-xs max-w-full overflow-hidden">
           {error ? 
             `Erreur: ${error}` : 
-            (imageLoaded ? `Image chargée: ${imageSrc.substring(0, 30)}...` : "Chargement de l'image...")
+            (imageLoaded ? `Image chargée: ${imageSrc?.substring(0, 30)}...` : "Chargement de l'image...")
           }
         </div>
       )}

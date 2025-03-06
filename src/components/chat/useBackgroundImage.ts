@@ -8,6 +8,11 @@ export function useBackgroundImage(imagePath: string) {
 
   useEffect(() => {
     const loadImage = async () => {
+      // Réinitialiser l'état à chaque changement de chemin d'image
+      setImageLoaded(false);
+      setImageSrc("");
+      setError(null);
+      
       console.log(`🔍 Tentative de chargement de l'image: ${imagePath}`);
       
       try {
@@ -33,10 +38,16 @@ export function useBackgroundImage(imagePath: string) {
         });
         
         // Définir le src après avoir défini les gestionnaires d'événements
-        // Ajout d'un paramètre aléatoire pour contourner le cache du navigateur
-        const cacheBuster = `?nocache=${Date.now()}`;
-        const fullPath = imagePath.startsWith('http') ? imagePath : `${imagePath}${cacheBuster}`;
-        img.src = fullPath;
+        // Ajout d'un paramètre aléatoire pour forcer le contournement du cache
+        const timestamp = Date.now();
+        const cacheBuster = `?v=${timestamp}`;
+        
+        // S'assurer que l'URL est correctement formée selon qu'elle est absolue ou relative
+        const fullImagePath = imagePath.startsWith('http') 
+          ? `${imagePath}${imagePath.includes('?') ? '&' : '?'}nocache=${timestamp}`
+          : `${imagePath}${cacheBuster}`;
+          
+        img.src = fullImagePath;
         
         // Attendre que l'image soit chargée
         await imageLoadPromise;
@@ -49,13 +60,21 @@ export function useBackgroundImage(imagePath: string) {
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
         console.error(`❌ Erreur lors du chargement de l'image: ${errorMessage}`);
-        setError(`Image '${imagePath}' non trouvée`);
+        setError(`Erreur: ${errorMessage}`);
         setImageLoaded(false);
         setImageSrc("");
       }
     };
 
+    // Lancer le chargement immédiatement
     loadImage();
+    
+    // Nettoyage au démontage du composant
+    return () => {
+      setImageLoaded(false);
+      setImageSrc("");
+      setError(null);
+    };
   }, [imagePath]);
 
   return { imageLoaded, imageSrc, error };
