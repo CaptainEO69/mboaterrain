@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { User } from "@supabase/supabase-js";
 import { toast } from "sonner";
@@ -7,6 +8,7 @@ import { useProfileSubmit } from "./profile/useProfileSubmit";
 export function useProfileForm(user: User | null) {
   const {
     loading,
+    setLoading,
     error: dataError,
     formData,
     setFormData,
@@ -19,12 +21,7 @@ export function useProfileForm(user: User | null) {
     error: submitError,
     handleInputChange: baseHandleInputChange,
     handleSubmit
-  } = useProfileSubmit(user, formData, (isLoading) => setLoading(isLoading));
-  
-  const setLoading = (isLoading: boolean) => {
-    // This function exists to avoid circular dependencies
-    // It's a wrapper for the setLoading function from useProfileData
-  };
+  } = useProfileSubmit(user, formData, setLoading);
   
   // If editing is enabled, ensure we have fresh data
   useEffect(() => {

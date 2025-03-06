@@ -147,6 +147,7 @@ export function useProfileData(user: User | null) {
 
   return {
     loading,
+    setLoading,
     error,
     formData,
     setFormData,

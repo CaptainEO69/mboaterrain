@@ -29,16 +29,18 @@ export function useProfileSubmit(
       return;
     }
     
+    console.log("ProfileForm - Submitting form, setting loading state");
     setLoading(true);
     setError(null);
     
     try {
-      console.log("ProfileForm - Submitting profile update");
+      console.log("ProfileForm - Calling updateUserProfile");
       const success = await updateUserProfile(user.id, formData);
       
       if (success) {
         setIsEditing(false);
         toast.success("Profil mis à jour avec succès");
+        console.log("ProfileForm - Profile updated successfully");
       } else {
         throw new Error("La mise à jour du profil a échoué");
       }
@@ -47,6 +49,7 @@ export function useProfileSubmit(
       setError("Erreur lors de la mise à jour du profil: " + (error.message || "Erreur inconnue"));
       toast.error("Erreur lors de la mise à jour du profil. Veuillez réessayer.");
     } finally {
+      console.log("ProfileForm - Form submission complete, resetting loading state");
       setLoading(false);
     }
   };

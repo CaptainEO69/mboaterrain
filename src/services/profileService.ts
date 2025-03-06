@@ -6,6 +6,7 @@ import { toast } from "sonner";
 export async function updateUserProfile(userId: string, formData: ProfileFormData) {
   try {
     console.log("Updating user profile for user ID:", userId);
+    console.log("Form data being submitted:", formData);
     
     // Update user metadata
     const { error: updateError, data } = await supabase.auth.updateUser({
