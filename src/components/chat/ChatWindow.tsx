@@ -151,12 +151,12 @@ export function ChatWindow() {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
+          opacity: 0.15, // Ajout d'une faible opacité pour un effet subtil
         }}
       >
-        <div className="absolute inset-0 bg-black/20"></div>
       </div>
       
-      <div className="relative h-full flex flex-col rounded-lg overflow-hidden">
+      <div className="relative h-full flex flex-col rounded-lg overflow-hidden bg-white/80">
         <ChatHeader toggleChat={toggleChat} unreadCount={unreadCount} />
         <ChatMessages messages={messages} />
         <ChatInput onSendMessage={handleSendMessage} />
