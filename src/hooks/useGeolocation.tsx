@@ -31,7 +31,7 @@ export function useGeolocation() {
       return;
     }
 
-    setState(prev => ({ ...prev, loading: true, error: null }));
+    setState(prev => ({ ...prev, loading: true, error: null, success: false }));
 
     navigator.geolocation.getCurrentPosition(
       position => {

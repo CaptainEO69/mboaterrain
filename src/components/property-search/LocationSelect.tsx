@@ -39,21 +39,34 @@ export function LocationSelect({
       if (selectedRegion) {
         try {
           setLoading(true);
-          const { data: regionData } = await supabase
+          const { data: regionData, error: regionError } = await supabase
             .from('regions')
             .select('id')
             .eq('name', selectedRegion)
             .single();
           
+          if (regionError) {
+            console.error('Erreur lors de la récupération de la région:', regionError);
+            setCities([]);
+            setLoading(false);
+            return;
+          }
+          
           if (regionData) {
+            console.log("Région sélectionnée:", regionData);
             const { data, error } = await supabase
               .from('cities')
               .select('*')
               .eq('region_id', regionData.id)
               .order('name');
             
-            if (error) throw error;
-            setCities(data || []);
+            if (error) {
+              console.error('Erreur lors du chargement des villes:', error);
+              setCities([]);
+            } else {
+              console.log("Villes récupérées:", data);
+              setCities(data || []);
+            }
           }
         } catch (error) {
           console.error('Erreur lors du chargement des villes:', error);
@@ -63,6 +76,7 @@ export function LocationSelect({
         }
       } else {
         setCities([]);
+        setLoading(false);
       }
     }
 
@@ -123,11 +137,17 @@ export function LocationSelect({
             <SelectValue placeholder="Sélectionnez une ville" />
           </SelectTrigger>
           <SelectContent>
-            {cities.map((city) => (
-              <SelectItem key={city.id} value={city.name}>
-                {city.name}
+            {cities.length > 0 ? (
+              cities.map((city) => (
+                <SelectItem key={city.id} value={city.name}>
+                  {city.name}
+                </SelectItem>
+              ))
+            ) : (
+              <SelectItem value="no-cities" disabled>
+                {loading ? "Chargement..." : "Aucune ville disponible"}
               </SelectItem>
-            ))}
+            )}
           </SelectContent>
         </Select>
       </div>
