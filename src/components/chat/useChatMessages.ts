@@ -1,7 +1,6 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Message, PREDEFINED_RESPONSES } from "./types";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export function useChatMessages() {
   const [messages, setMessages] = useState<Message[]>([
@@ -15,7 +14,6 @@ export function useChatMessages() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
-  const { toast } = useToast();
 
   useEffect(() => {
     // Si le chat est ouvert, réinitialiser le compteur de messages non lus
@@ -24,7 +22,7 @@ export function useChatMessages() {
     }
   }, [isChatOpen]);
 
-  const handleSendMessage = (input: string) => {
+  const handleSendMessage = useCallback((input: string) => {
     if (!input.trim()) return;
 
     // Ajoute le message de l'utilisateur
@@ -93,7 +91,7 @@ export function useChatMessages() {
     }, delay);
     
     setTypingTimeout(newTimeout);
-  };
+  }, [isChatOpen, typingTimeout]);
 
   const generateResponse = (question: string): string => {
     // Convertir en minuscules pour la recherche de mots-clés
@@ -168,12 +166,12 @@ export function useChatMessages() {
     return responses[Math.floor(Math.random() * responses.length)];
   };
 
-  const toggleChat = () => {
+  const toggleChat = useCallback(() => {
     setIsChatOpen(!isChatOpen);
     if (!isChatOpen) {
       setUnreadCount(0); // Réinitialiser le compteur lors de l'ouverture
     }
-  };
+  }, [isChatOpen]);
 
   // Nettoyer les timeouts lors du démontage du composant
   useEffect(() => {

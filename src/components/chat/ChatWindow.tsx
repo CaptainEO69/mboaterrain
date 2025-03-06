@@ -8,6 +8,7 @@ import { useChatMessages } from "./useChatMessages";
 import { useEffect } from "react";
 import { useBackgroundImage } from "./useBackgroundImage";
 import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export * from "./types";
 
@@ -31,11 +32,15 @@ export function ChatWindow() {
   }, [isChatOpen, imageLoaded, imageSrc, error]);
 
   if (!isChatOpen) {
-    return <ChatButton toggleChat={toggleChat} unreadCount={unreadCount} />;
+    return (
+      <TooltipProvider>
+        <ChatButton toggleChat={toggleChat} unreadCount={unreadCount} />
+      </TooltipProvider>
+    );
   }
 
   return (
-    <>
+    <TooltipProvider>
       <div className="fixed bottom-16 right-4 z-50 w-[90vw] md:w-80 h-[60vh] md:h-96">
         <div className="absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white">
           {/* Préchargement de l'image en arrière-plan avec transition douce */}
@@ -57,7 +62,6 @@ export function ChatWindow() {
           <ChatInput onSendMessage={handleSendMessage} messages={messages} />
         </div>
       </div>
-      <Toaster />
-    </>
+    </TooltipProvider>
   );
 }
