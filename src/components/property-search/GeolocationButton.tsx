@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MapPin } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
@@ -10,25 +10,29 @@ interface GeolocationButtonProps {
 }
 
 export function GeolocationButton({ onLocationFound }: GeolocationButtonProps) {
-  const [isLocating, setIsLocating] = useState(false);
-  const { latitude, longitude, error, loading, getPosition } = useGeolocation();
+  const { latitude, longitude, error, loading, success, getPosition } = useGeolocation();
+
+  useEffect(() => {
+    // Si les coordonnées sont trouvées
+    if (success && latitude && longitude) {
+      console.log("Coordonnées trouvées:", { latitude, longitude });
+      onLocationFound(latitude, longitude);
+      toast.success(`Position trouvée: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+    }
+  }, [success, latitude, longitude, onLocationFound]);
+
+  useEffect(() => {
+    // Gestion des erreurs
+    if (error) {
+      console.error("Erreur de géolocalisation:", error);
+      toast.error(`Erreur: ${error}`);
+    }
+  }, [error]);
 
   const handleClick = () => {
-    setIsLocating(true);
+    toast.info("Recherche de votre position...");
     getPosition();
   };
-
-  // Effet lorsque les coordonnées sont trouvées ou une erreur survient
-  if (latitude && longitude && isLocating) {
-    onLocationFound(latitude, longitude);
-    setIsLocating(false);
-    toast.success("Position trouvée !");
-  }
-
-  if (error && isLocating) {
-    toast.error(`Erreur de géolocalisation: ${error}`);
-    setIsLocating(false);
-  }
 
   return (
     <Button 

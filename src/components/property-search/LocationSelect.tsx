@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import {
   Select,
@@ -11,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { RegionSelect } from "./RegionSelect";
 import { GeolocationButton } from "./GeolocationButton";
+import { toast } from "sonner";
 
 interface LocationSelectProps {
   onCityChange: (city: string) => void;
@@ -28,6 +30,10 @@ export function LocationSelect({
   const [selectedRegion, setSelectedRegion] = useState<string>("");
   const [selectedCity, setSelectedCity] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [locationInfo, setLocationInfo] = useState<{
+    latitude: number | null;
+    longitude: number | null;
+  }>({ latitude: null, longitude: null });
 
   useEffect(() => {
     async function fetchCities() {
@@ -93,15 +99,21 @@ export function LocationSelect({
   
   const handleLocationFound = async (latitude: number, longitude: number) => {
     try {
-      // Pour une première version, nous utilisons simplement les coordonnées 
-      // pour les stocker dans le localStorage pour un usage ultérieur
+      setLocationInfo({ latitude, longitude });
+      
+      // Stockage temporaire des coordonnées
       localStorage.setItem('userLatitude', latitude.toString());
       localStorage.setItem('userLongitude', longitude.toString());
       
-      // Dans une version future, on pourrait faire un appel à une API de géocodage inversé
-      // pour convertir ces coordonnées en adresse et remplir automatiquement les champs
+      // Dans une future version, on pourrait implémenter une recherche des lieux à proximité
+      // avec une API comme Google Geocoding ou Mapbox
+      toast.success("Coordonnées enregistrées avec succès. Fonctionnalité de recherche par proximité en développement.");
+      
+      // Implémentation simple : afficher les coordonnées
+      console.log("Coordonnées géographiques:", { latitude, longitude });
     } catch (error) {
-      console.error('Erreur lors de la géolocalisation:', error);
+      console.error('Erreur lors du traitement de la géolocalisation:', error);
+      toast.error("Erreur lors du traitement de votre localisation.");
     }
   };
 
@@ -111,6 +123,12 @@ export function LocationSelect({
         <Label>Région</Label>
         <GeolocationButton onLocationFound={handleLocationFound} />
       </div>
+      
+      {locationInfo.latitude && locationInfo.longitude && (
+        <div className="text-xs text-muted-foreground">
+          Position: {locationInfo.latitude.toFixed(4)}, {locationInfo.longitude.toFixed(4)}
+        </div>
+      )}
       
       <RegionSelect
         onRegionChange={(region) => {
