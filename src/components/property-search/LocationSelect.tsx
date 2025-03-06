@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { RegionSelect } from "./RegionSelect";
 import { GeolocationButton } from "./GeolocationButton";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 interface LocationSelectProps {
   onCityChange: (city: string) => void;
@@ -28,7 +29,7 @@ export function LocationSelect({
   const [cities, setCities] = useState<{ id: string; name: string }[]>([]);
   const [selectedRegion, setSelectedRegion] = useState<string>("");
   const [selectedCity, setSelectedCity] = useState<string>("");
-  const [loading, setLoading] = useState(false);
+  const [loadingCities, setLoadingCities] = useState(false);
   const [locationInfo, setLocationInfo] = useState<{
     latitude: number | null;
     longitude: number | null;
@@ -43,7 +44,7 @@ export function LocationSelect({
       }
 
       try {
-        setLoading(true);
+        setLoadingCities(true);
         console.log("Fetching cities for region:", selectedRegion);
         
         // First get the region ID
@@ -57,7 +58,13 @@ export function LocationSelect({
           console.error('Error fetching region:', regionError);
           toast.error("Impossible de récupérer les informations de la région");
           setCities([]);
-          setLoading(false);
+          return;
+        }
+        
+        if (!regionData || !regionData.id) {
+          console.error('No region data found');
+          toast.error("Région non trouvée");
+          setCities([]);
           return;
         }
         
@@ -74,16 +81,20 @@ export function LocationSelect({
           console.error('Error loading cities:', citiesError);
           toast.error("Impossible de charger les villes");
           setCities([]);
+        } else if (!citiesData || citiesData.length === 0) {
+          console.log("No cities found for this region");
+          toast.info("Aucune ville trouvée pour cette région");
+          setCities([]);
         } else {
           console.log("Cities loaded:", citiesData);
-          setCities(citiesData || []);
+          setCities(citiesData);
         }
       } catch (error) {
         console.error('Error loading cities:', error);
         toast.error("Une erreur est survenue lors du chargement des villes");
         setCities([]);
       } finally {
-        setLoading(false);
+        setLoadingCities(false);
       }
     }
 
@@ -135,10 +146,17 @@ export function LocationSelect({
             setSelectedCity(value);
             onCityChange(value);
           }}
-          disabled={loading || !selectedRegion}
+          disabled={loadingCities || !selectedRegion}
         >
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="Sélectionnez une ville" />
+            {loadingCities ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Chargement des villes...</span>
+              </div>
+            ) : (
+              <SelectValue placeholder={cities.length === 0 ? "Sélectionnez d'abord une région" : "Sélectionnez une ville"} />
+            )}
           </SelectTrigger>
           <SelectContent>
             {cities.length > 0 ? (
@@ -149,7 +167,7 @@ export function LocationSelect({
               ))
             ) : (
               <SelectItem value="no-cities" disabled>
-                {loading ? "Chargement..." : "Aucune ville disponible"}
+                {loadingCities ? "Chargement..." : "Aucune ville disponible"}
               </SelectItem>
             )}
           </SelectContent>

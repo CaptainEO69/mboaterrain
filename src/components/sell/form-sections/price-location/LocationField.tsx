@@ -5,7 +5,7 @@ import { LocationSelect } from "@/components/property-search/LocationSelect";
 import { useState } from "react";
 
 export function LocationField() {
-  const [geoLocation, setGeoLocation] = useState<{lat: number | null, lng: number | null}>({
+  const [locationInfo, setLocationInfo] = useState<{lat: number | null, lng: number | null}>({
     lat: null,
     lng: null
   });
@@ -37,6 +37,11 @@ export function LocationField() {
     console.log("District entered:", district);
   };
   
+  const handleLocationFound = (latitude: number, longitude: number) => {
+    setLocationInfo({ lat: latitude, lng: longitude });
+    console.log("Geolocation in LocationField:", { latitude, longitude });
+  };
+  
   return (
     <div>
       <div className="flex items-center gap-2 mb-2">
@@ -49,6 +54,12 @@ export function LocationField() {
         onNeighborhoodChange={handleNeighborhoodChange}
         onDistrictChange={handleDistrictChange}
       />
+
+      {locationInfo.lat && locationInfo.lng && (
+        <div className="mt-2 text-xs text-muted-foreground">
+          Coordonnées: {locationInfo.lat.toFixed(6)}, {locationInfo.lng.toFixed(6)}
+        </div>
+      )}
     </div>
   );
 }

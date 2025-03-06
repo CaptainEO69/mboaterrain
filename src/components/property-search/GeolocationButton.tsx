@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { MapPin } from "lucide-react";
+import { MapPin, Loader2 } from "lucide-react";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useEffect } from "react";
 import { toast } from "sonner";
@@ -16,7 +16,8 @@ export function GeolocationButton({ onLocationFound }: GeolocationButtonProps) {
     error, 
     loading, 
     success,
-    getPosition 
+    getPosition,
+    resetGeolocation 
   } = useGeolocation();
 
   // When geolocation is successful, call the callback
@@ -29,21 +30,42 @@ export function GeolocationButton({ onLocationFound }: GeolocationButtonProps) {
   // Show error toast when geolocation fails
   useEffect(() => {
     if (error) {
-      toast.error(error);
+      toast.error(`Erreur de géolocalisation: ${error}`);
+      resetGeolocation();
     }
-  }, [error]);
+  }, [error, resetGeolocation]);
+
+  // Handle button click
+  const handleGeolocationClick = () => {
+    if (loading) return;
+    
+    // Clear any previous errors
+    resetGeolocation();
+    
+    // Request position
+    getPosition();
+  };
 
   return (
     <Button 
       variant="outline" 
       size="sm" 
       type="button"
-      onClick={getPosition}
+      onClick={handleGeolocationClick}
       disabled={loading}
       className="text-xs flex items-center gap-1"
     >
-      <MapPin className="h-3 w-3" />
-      {loading ? "Localisation..." : "Ma position"}
+      {loading ? (
+        <>
+          <Loader2 className="h-3 w-3 animate-spin" />
+          <span>Localisation...</span>
+        </>
+      ) : (
+        <>
+          <MapPin className="h-3 w-3" />
+          <span>Ma position</span>
+        </>
+      )}
     </Button>
   );
 }
