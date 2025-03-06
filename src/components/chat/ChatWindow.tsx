@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
@@ -144,19 +143,20 @@ export function ChatWindow() {
 
   return (
     <div className="fixed bottom-16 right-4 z-50 w-[90vw] md:w-80 h-[60vh] md:h-96">
-      <div 
-        className="absolute inset-0 rounded-lg shadow-xl overflow-hidden"
-        style={{
-          backgroundImage: `url('/lovable-uploads/Lion.png')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          opacity: 0.15, // Ajout d'une faible opacité pour un effet subtil
-        }}
-      >
+      <div className="absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white">
+        <div 
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: `url('/lovable-uploads/Lion.png')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            opacity: 0.15,
+          }}
+        ></div>
       </div>
       
-      <div className="relative h-full flex flex-col rounded-lg overflow-hidden bg-white/80">
+      <div className="relative h-full flex flex-col rounded-lg overflow-hidden">
         <ChatHeader toggleChat={toggleChat} unreadCount={unreadCount} />
         <ChatMessages messages={messages} />
         <ChatInput onSendMessage={handleSendMessage} />
