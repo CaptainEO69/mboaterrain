@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from "react";
-import { useAuth } from "@/lib/auth";
+import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +9,7 @@ import type { ProfileFormData } from "@/types/profile";
 export default function Profile() {
   const { user, signOut } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState<ProfileFormData>({
     first_name: "",
     last_name: "",
@@ -41,6 +41,8 @@ export default function Profile() {
   });
 
   useEffect(() => {
+    console.log("Profile - Current auth state:", { user: user ? "User authenticated" : "No user" });
+    
     if (user) {
       setFormData({
         first_name: user.user_metadata?.first_name || "",
@@ -72,6 +74,7 @@ export default function Profile() {
         notary_office: user.user_metadata?.notary_office || "",
       });
     }
+    setLoading(false);
   }, [user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name: string; value: any } }) => {
@@ -164,7 +167,28 @@ export default function Profile() {
     }
   };
 
-  if (!user) return null;
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8 pb-24 max-w-2xl">
+        <Card className="border-cmr-green">
+          <CardHeader className="bg-cmr-green text-white">
+            <CardTitle className="text-2xl font-playfair">Mon Profil</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cmr-green"></div>
+              <p className="ml-4">Chargement du profil...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!user) {
+    console.log("Profile - No user found, should be redirected by ProtectedRoute");
+    return null;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 pb-24 max-w-2xl">

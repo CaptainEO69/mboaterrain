@@ -13,7 +13,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowLoader(false);
-    }, 2000); // Timeout réduit pour une meilleure expérience
+    }, 3000); // 3 seconds max loading time
     
     return () => clearTimeout(timer);
   }, []);
@@ -38,7 +38,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cmr-green mx-auto"></div>
-          <p className="mt-4 text-gray-600">Chargement...</p>
+          <p className="mt-4 text-gray-600">Chargement de votre profil...</p>
         </div>
       </div>
     );
