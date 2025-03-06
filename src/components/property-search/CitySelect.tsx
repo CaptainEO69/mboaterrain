@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -18,6 +18,11 @@ interface CitySelectProps {
 export function CitySelect({ selectedRegion, onCityChange }: CitySelectProps) {
   const [selectedCity, setSelectedCity] = useState<string>("");
   const { cities, loadingCities } = useCitySelector(selectedRegion);
+
+  // Réinitialiser la ville sélectionnée quand la région change
+  useEffect(() => {
+    setSelectedCity("");
+  }, [selectedRegion]);
 
   return (
     <Select
@@ -39,12 +44,12 @@ export function CitySelect({ selectedRegion, onCityChange }: CitySelectProps) {
           <SelectValue placeholder={
             !selectedRegion 
               ? "Sélectionnez d'abord une région" 
-              : (cities.length === 0 ? "Aucune ville disponible pour cette région" : "Sélectionnez une ville")
+              : "Sélectionnez une ville"
           } />
         )}
       </SelectTrigger>
       <SelectContent>
-        {cities.length > 0 ? (
+        {cities && cities.length > 0 ? (
           cities.map((city) => (
             <SelectItem key={city.id} value={city.name}>
               {city.name}

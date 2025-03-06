@@ -18,51 +18,30 @@ export function useCitySelector(selectedRegion: string) {
         setLoadingCities(true);
         console.log("Chargement des villes pour la région:", selectedRegion);
         
-        // D'abord récupérer l'ID de la région
-        const { data: regionData, error: regionError } = await supabase
-          .from('regions')
-          .select('id')
-          .eq('name', selectedRegion)
-          .maybeSingle();
-        
-        if (regionError) {
-          console.error('Erreur lors de la récupération de la région:', regionError);
-          toast.error("Impossible de récupérer les informations de la région");
-          setCities([]);
-          setLoadingCities(false);
-          return;
-        }
-        
-        if (!regionData) {
-          console.error('Aucune donnée de région trouvée');
-          toast.error("Région non trouvée");
-          setCities([]);
-          setLoadingCities(false);
-          return;
-        }
-        
-        console.log("ID de région trouvé:", regionData.id);
-        
-        // Puis récupérer les villes pour cette région
-        const { data: citiesData, error: citiesError } = await supabase
+        // Récupération directe des villes par région
+        const { data, error } = await supabase
           .from('cities')
-          .select('id, name')
-          .eq('region_id', regionData.id)
+          .select('id, name, region_id')
+          .eq('region_id', (await supabase
+            .from('regions')
+            .select('id')
+            .eq('name', selectedRegion)
+            .single()).data.id)
           .order('name');
         
-        console.log("Réponse du serveur pour les villes:", { data: citiesData, error: citiesError });
+        console.log("Données de villes récupérées:", data);
         
-        if (citiesError) {
-          console.error('Erreur lors du chargement des villes:', citiesError);
+        if (error) {
+          console.error('Erreur lors du chargement des villes:', error);
           toast.error("Impossible de charger les villes");
           setCities([]);
-        } else if (!citiesData || citiesData.length === 0) {
+        } else if (!data || data.length === 0) {
           console.log("Aucune ville trouvée pour cette région");
           toast.info("Aucune ville trouvée pour cette région");
           setCities([]);
         } else {
-          console.log(`${citiesData.length} villes chargées pour la région ${selectedRegion}:`, citiesData);
-          setCities(citiesData);
+          console.log(`${data.length} villes chargées pour la région ${selectedRegion}:`, data);
+          setCities(data);
         }
       } catch (error) {
         console.error('Erreur lors du chargement des villes:', error);

@@ -15,23 +15,16 @@ export function useRegionSelector() {
         
         const { data, error } = await supabase
           .from('regions')
-          .select('*')
+          .select('id, name')
           .order('name');
         
         if (error) {
           console.error('Erreur lors du chargement des régions:', error);
           toast.error("Impossible de charger les régions");
-          throw error;
-        }
-        
-        if (!data || data.length === 0) {
-          console.log("Aucune région trouvée");
-          toast.info("Aucune région disponible");
         } else {
-          console.log(`${data.length} régions chargées:`, data);
+          console.log(`${data?.length || 0} régions chargées:`, data);
+          setRegions(data || []);
         }
-        
-        setRegions(data || []);
       } catch (error) {
         console.error('Erreur lors du chargement des régions:', error);
         toast.error("Une erreur est survenue lors du chargement des régions");

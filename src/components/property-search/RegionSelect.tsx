@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 import { useRegionSelector } from "@/hooks/useRegionSelector";
+import { useState } from "react";
 
 interface RegionSelectProps {
   onRegionChange: (region: string) => void;
@@ -15,13 +16,19 @@ interface RegionSelectProps {
 
 export function RegionSelect({ onRegionChange }: RegionSelectProps) {
   const { regions, loading } = useRegionSelector();
+  const [selectedRegion, setSelectedRegion] = useState<string>("");
 
   return (
     <Select
-      onValueChange={onRegionChange}
+      value={selectedRegion}
+      onValueChange={(value) => {
+        console.log("Région sélectionnée:", value);
+        setSelectedRegion(value);
+        onRegionChange(value);
+      }}
       disabled={loading}
     >
-      <SelectTrigger>
+      <SelectTrigger className="w-full">
         {loading ? (
           <div className="flex items-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -32,7 +39,7 @@ export function RegionSelect({ onRegionChange }: RegionSelectProps) {
         )}
       </SelectTrigger>
       <SelectContent>
-        {regions.length > 0 ? (
+        {regions && regions.length > 0 ? (
           regions.map((region) => (
             <SelectItem key={region.id} value={region.name}>
               {region.name}
