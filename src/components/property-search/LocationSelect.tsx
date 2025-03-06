@@ -62,7 +62,7 @@ export function LocationSelect({
           return;
         }
         
-        if (!regionData || !regionData.id) {
+        if (!regionData) {
           console.error('Aucune donnée de région trouvée');
           toast.error("Région non trouvée");
           setCities([]);
@@ -70,7 +70,7 @@ export function LocationSelect({
           return;
         }
         
-        console.log("Données de région trouvées:", regionData);
+        console.log("ID de région trouvé:", regionData.id);
         
         // Puis récupérer les villes pour cette région
         const { data: citiesData, error: citiesError } = await supabase
@@ -78,6 +78,8 @@ export function LocationSelect({
           .select('id, name')
           .eq('region_id', regionData.id)
           .order('name');
+        
+        console.log("Réponse du serveur pour les villes:", { citiesData, citiesError });
         
         if (citiesError) {
           console.error('Erreur lors du chargement des villes:', citiesError);
@@ -88,7 +90,7 @@ export function LocationSelect({
           toast.info("Aucune ville trouvée pour cette région");
           setCities([]);
         } else {
-          console.log("Villes chargées:", citiesData);
+          console.log(`${citiesData.length} villes chargées pour la région ${selectedRegion}:`, citiesData);
           setCities(citiesData);
         }
       } catch (error) {
@@ -150,7 +152,7 @@ export function LocationSelect({
             setSelectedCity(value);
             onCityChange(value);
           }}
-          disabled={loadingCities || cities.length === 0}
+          disabled={loadingCities}
         >
           <SelectTrigger className="w-full">
             {loadingCities ? (
@@ -159,7 +161,11 @@ export function LocationSelect({
                 <span>Chargement des villes...</span>
               </div>
             ) : (
-              <SelectValue placeholder={cities.length === 0 && selectedRegion ? "Aucune ville disponible" : "Sélectionnez une ville"} />
+              <SelectValue placeholder={
+                selectedRegion 
+                  ? (cities.length === 0 ? "Aucune ville disponible pour cette région" : "Sélectionnez une ville") 
+                  : "Sélectionnez d'abord une région"
+              } />
             )}
           </SelectTrigger>
           <SelectContent>
@@ -171,8 +177,13 @@ export function LocationSelect({
               ))
             ) : (
               <SelectItem value="no-cities" disabled>
-                {loadingCities ? "Chargement..." : 
-                  selectedRegion ? "Aucune ville disponible pour cette région" : "Sélectionnez d'abord une région"}
+                {loadingCities 
+                  ? "Chargement..." 
+                  : (selectedRegion 
+                      ? "Aucune ville disponible pour cette région" 
+                      : "Sélectionnez d'abord une région"
+                    )
+                }
               </SelectItem>
             )}
           </SelectContent>
