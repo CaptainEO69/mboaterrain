@@ -23,7 +23,7 @@ export function ChatWindow() {
   // Utiliser l'image lion.png comme fond par défaut
   const [useImageBackground, setUseImageBackground] = useState(true);
   const { imageLoaded, imageSrc, error } = useBackgroundImage(
-    useImageBackground ? '/lion.png' : ''
+    useImageBackground ? 'lion.png' : '' // Removed leading slash to test if that's the issue
   );
 
   // Afficher des informations de débogage dans la console
