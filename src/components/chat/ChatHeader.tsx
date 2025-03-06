@@ -18,7 +18,7 @@ export function ChatHeader({ toggleChat, unreadCount }: ChatHeaderProps) {
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
           </svg>
         </div>
-        <h3 className="text-lg font-medium">Assistant CamerImmo</h3>
+        <h3 className="text-lg font-medium">Mon Assistant</h3>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
