@@ -66,6 +66,9 @@ export function ChatWindow() {
 
   // Vérifier si l'image est chargée
   const [imageLoaded, setImageLoaded] = useState(false);
+  
+  // Url de l'image - utiliser celle que l'utilisateur vient de téléverser
+  const imageUrl = '/lovable-uploads/88b68d0c-94d9-4cc8-8f5f-c27a5942663c.png';
 
   useEffect(() => {
     // Si le chat est ouvert, réinitialiser le compteur de messages non lus
@@ -75,13 +78,16 @@ export function ChatWindow() {
 
     // Précharger l'image pour vérifier si elle existe
     const img = new Image();
-    img.src = '/lovable-uploads/34d61d7a-8ad7-4c42-b801-3b79bf3450fc.png';
-    img.onload = () => setImageLoaded(true);
-    img.onerror = () => {
-      console.error("Erreur de chargement de l'image du lion");
+    img.src = imageUrl;
+    img.onload = () => {
+      console.log("Image chargée avec succès");
+      setImageLoaded(true);
+    };
+    img.onerror = (e) => {
+      console.error("Erreur de chargement de l'image:", e);
       setImageLoaded(false);
     };
-  }, [isChatOpen]);
+  }, [isChatOpen, imageUrl]);
 
   const handleSendMessage = (input: string) => {
     if (!input.trim()) return;
@@ -157,14 +163,18 @@ export function ChatWindow() {
   return (
     <div className="fixed bottom-16 right-4 z-50 w-[90vw] md:w-80 h-[60vh] md:h-96">
       <div className="absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white">
-        {/* Image de fond */}
-        <div 
-          className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
-          style={{
-            backgroundImage: `url('/lovable-uploads/34d61d7a-8ad7-4c42-b801-3b79bf3450fc.png')`,
-            opacity: 0.2,  // Augmenté l'opacité pour une meilleure visibilité
-          }}
-        ></div>
+        {/* Image de fond - affichage conditionnel basé sur le chargement */}
+        {imageLoaded ? (
+          <div 
+            className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
+            style={{
+              backgroundImage: `url('${imageUrl}')`,
+              opacity: 0.3,  // Augmenté l'opacité pour une meilleure visibilité
+            }}
+          ></div>
+        ) : (
+          <div className="absolute inset-0 z-0 bg-gradient-to-br from-cmr-green/10 to-cmr-yellow/10"></div>
+        )}
       </div>
       
       <div className="relative h-full flex flex-col rounded-lg overflow-hidden">
@@ -173,9 +183,9 @@ export function ChatWindow() {
         <ChatInput onSendMessage={handleSendMessage} />
       </div>
       
-      {/* Message de débogage pour vérifier le chargement de l'image */}
+      {/* Message de débogage pour vérifier le chargement de l'image - visible en développement */}
       {process.env.NODE_ENV === 'development' && !imageLoaded && (
-        <div className="absolute bottom-0 left-0 bg-red-500 text-white p-1 text-xs">
+        <div className="absolute bottom-0 left-0 bg-cmr-red text-white p-1 text-xs">
           Image non chargée
         </div>
       )}
