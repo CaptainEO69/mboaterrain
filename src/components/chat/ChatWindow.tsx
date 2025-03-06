@@ -6,7 +6,7 @@ import { ChatInput } from "./ChatInput";
 import { ChatButton } from "./ChatButton";
 import { useChatMessages } from "./useChatMessages";
 import { useBackgroundImage } from "./useBackgroundImage";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export * from "./types";
 
@@ -20,14 +20,16 @@ export function ChatWindow() {
     toggleChat
   } = useChatMessages();
   
-  // Utiliser une des images disponibles dans le projet
-  const imageUrl = '/lovable-uploads/83fc2739-1a70-4b50-b7a3-127bda76b51d.png';
-  const { imageLoaded, imageSrc, error } = useBackgroundImage(imageUrl);
+  // Utiliser uniquement un dégradé de couleur comme fond (sans image)
+  const [useImageBackground, setUseImageBackground] = useState(false);
+  const { imageLoaded, imageSrc, error } = useBackgroundImage(
+    useImageBackground ? '/lovable-uploads/83fc2739-1a70-4b50-b7a3-127bda76b51d.png' : ''
+  );
 
   // Afficher des informations de débogage dans la console
   useEffect(() => {
-    console.log("État de l'image:", { imageLoaded, imageSrc, error });
-  }, [imageLoaded, imageSrc, error]);
+    console.log("État de l'image:", { imageLoaded, imageSrc, error, useImageBackground });
+  }, [imageLoaded, imageSrc, error, useImageBackground]);
 
   if (!isChatOpen) {
     return <ChatButton toggleChat={toggleChat} unreadCount={unreadCount} />;
@@ -36,11 +38,11 @@ export function ChatWindow() {
   return (
     <div className="fixed bottom-16 right-4 z-50 w-[90vw] md:w-80 h-[60vh] md:h-96">
       <div className="absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white">
-        {/* Dégradé de couleur comme fond de secours */}
-        <div className="absolute inset-0 z-0 bg-gradient-to-br from-cmr-green/10 to-cmr-yellow/10"></div>
+        {/* Dégradé de couleur comme fond principal */}
+        <div className="absolute inset-0 z-0 bg-gradient-to-br from-cmr-green/20 to-cmr-yellow/20"></div>
         
-        {/* Image de fond - forcée à s'afficher avec !important */}
-        {imageLoaded && imageSrc && (
+        {/* Image de fond - uniquement si chargée avec succès */}
+        {useImageBackground && imageLoaded && imageSrc && (
           <div 
             className="absolute inset-0 z-0"
             style={{
@@ -66,7 +68,9 @@ export function ChatWindow() {
         <div className="absolute bottom-0 left-0 bg-orange-500 text-white p-1 text-xs max-w-full overflow-hidden">
           {error ? 
             `Erreur: ${error}` : 
-            (imageLoaded ? `Image chargée: ${imageSrc?.substring(0, 30)}...` : "Chargement de l'image...")
+            (useImageBackground ? 
+              (imageLoaded ? `Image chargée: ${imageSrc?.substring(0, 30)}...` : "Chargement de l'image...") :
+              "Utilisation du dégradé uniquement (pas d'image)")
           }
         </div>
       )}

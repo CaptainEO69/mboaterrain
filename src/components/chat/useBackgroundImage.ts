@@ -7,6 +7,14 @@ export function useBackgroundImage(imagePath: string) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Si aucun chemin d'image n'est fourni, ne rien faire
+    if (!imagePath) {
+      setImageLoaded(false);
+      setImageSrc("");
+      setError(null);
+      return;
+    }
+
     const loadImage = async () => {
       // Réinitialiser l'état à chaque changement de chemin d'image
       setImageLoaded(false);
@@ -31,26 +39,29 @@ export function useBackgroundImage(imagePath: string) {
             resolve();
           };
           
-          img.onerror = (e) => {
-            console.error(`❌ Échec du chargement de l'image: ${imagePath}`, e);
-            reject(new Error(`Impossible de charger l'image`));
+          img.onerror = () => {
+            console.error(`❌ Échec du chargement de l'image: ${imagePath}`);
+            reject(new Error("Image non trouvée"));
           };
         });
         
         // Définir le src après avoir défini les gestionnaires d'événements
         // Ajout d'un paramètre aléatoire pour forcer le contournement du cache
         const timestamp = Date.now();
-        const cacheBuster = `?v=${timestamp}`;
         
         // S'assurer que l'URL est correctement formée selon qu'elle est absolue ou relative
         const fullImagePath = imagePath.startsWith('http') 
-          ? `${imagePath}${imagePath.includes('?') ? '&' : '?'}nocache=${timestamp}`
-          : `${imagePath}${cacheBuster}`;
+          ? `${imagePath}${imagePath.includes('?') ? '&' : '?'}v=${timestamp}`
+          : `${imagePath}?v=${timestamp}`;
           
         img.src = fullImagePath;
         
-        // Attendre que l'image soit chargée
-        await imageLoadPromise;
+        // Attendre que l'image soit chargée avec un timeout
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error("Délai d'attente dépassé")), 5000);
+        });
+        
+        await Promise.race([imageLoadPromise, timeoutPromise]);
         
         // Si on arrive ici, l'image est chargée avec succès
         setImageSrc(img.src);
