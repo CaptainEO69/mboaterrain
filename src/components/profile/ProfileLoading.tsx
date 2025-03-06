@@ -9,9 +9,9 @@ export function ProfileLoading() {
           <CardTitle className="text-2xl font-playfair">Mon Profil</CardTitle>
         </CardHeader>
         <CardContent className="p-6">
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cmr-green"></div>
-            <p className="ml-4">Chargement du profil...</p>
+          <div className="flex flex-col items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cmr-green mb-4"></div>
+            <p>Chargement de votre profil...</p>
           </div>
         </CardContent>
       </Card>

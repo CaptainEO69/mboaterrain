@@ -5,6 +5,9 @@ import { toast } from "sonner";
 
 export async function updateUserProfile(userId: string, formData: ProfileFormData) {
   try {
+    console.log("Updating user profile for user ID:", userId);
+    
+    // Mise à jour des métadonnées de l'utilisateur
     const { error: updateError } = await supabase.auth.updateUser({
       data: {
         first_name: formData.first_name,
@@ -36,8 +39,12 @@ export async function updateUserProfile(userId: string, formData: ProfileFormDat
       },
     });
 
-    if (updateError) throw updateError;
+    if (updateError) {
+      console.error("Error updating user metadata:", updateError);
+      throw updateError;
+    }
 
+    // Mise à jour du profil dans la table des profils
     const { error: profileError } = await supabase
       .from("profiles")
       .update({
@@ -71,13 +78,16 @@ export async function updateUserProfile(userId: string, formData: ProfileFormDat
       })
       .eq("user_id", userId);
 
-    if (profileError) throw profileError;
+    if (profileError) {
+      console.error("Error updating profile in database:", profileError);
+      throw profileError;
+    }
 
-    toast.success("Profil mis à jour avec succès");
+    console.log("Profile successfully updated");
     return true;
   } catch (error: any) {
     console.error("Error updating profile:", error);
-    toast.error("Erreur lors de la mise à jour du profil");
+    toast.error("Erreur lors de la mise à jour du profil: " + (error.message || "Erreur inconnue"));
     return false;
   }
 }
