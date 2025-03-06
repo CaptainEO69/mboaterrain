@@ -67,8 +67,8 @@ export function ChatWindow() {
   // Vérifier si l'image est chargée
   const [imageLoaded, setImageLoaded] = useState(false);
   
-  // Utiliser l'image Lion avec l'extension .png explicite
-  const imageUrl = '/Lion.png';
+  // Utiliser l'image lion.png avec la minuscule
+  const imageUrl = '/lion.png';
 
   useEffect(() => {
     // Si le chat est ouvert, réinitialiser le compteur de messages non lus
@@ -98,7 +98,7 @@ export function ChatWindow() {
           return;
         }
         
-        const baseImageName = '/Lion';
+        const baseImageName = '/lion'; // Utiliser "lion" en minuscule
         const nextExtension = extensions[extensionIndex];
         const imgWithExt = new Image();
         imgWithExt.src = baseImageName + nextExtension;
