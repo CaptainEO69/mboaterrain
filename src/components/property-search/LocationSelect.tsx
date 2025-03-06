@@ -52,12 +52,13 @@ export function LocationSelect({
           .from('regions')
           .select('id')
           .eq('name', selectedRegion)
-          .single();
+          .maybeSingle();
         
         if (regionError) {
           console.error('Erreur lors de la récupération de la région:', regionError);
           toast.error("Impossible de récupérer les informations de la région");
           setCities([]);
+          setLoadingCities(false);
           return;
         }
         
@@ -65,6 +66,7 @@ export function LocationSelect({
           console.error('Aucune donnée de région trouvée');
           toast.error("Région non trouvée");
           setCities([]);
+          setLoadingCities(false);
           return;
         }
         
@@ -148,7 +150,7 @@ export function LocationSelect({
             setSelectedCity(value);
             onCityChange(value);
           }}
-          disabled={loadingCities || !selectedRegion}
+          disabled={loadingCities || cities.length === 0}
         >
           <SelectTrigger className="w-full">
             {loadingCities ? (
@@ -157,7 +159,7 @@ export function LocationSelect({
                 <span>Chargement des villes...</span>
               </div>
             ) : (
-              <SelectValue placeholder={cities.length === 0 ? "Sélectionnez d'abord une région" : "Sélectionnez une ville"} />
+              <SelectValue placeholder={cities.length === 0 && selectedRegion ? "Aucune ville disponible" : "Sélectionnez une ville"} />
             )}
           </SelectTrigger>
           <SelectContent>
@@ -169,7 +171,8 @@ export function LocationSelect({
               ))
             ) : (
               <SelectItem value="no-cities" disabled>
-                {loadingCities ? "Chargement..." : "Aucune ville disponible"}
+                {loadingCities ? "Chargement..." : 
+                  selectedRegion ? "Aucune ville disponible pour cette région" : "Sélectionnez d'abord une région"}
               </SelectItem>
             )}
           </SelectContent>
