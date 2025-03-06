@@ -1,10 +1,9 @@
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
-import { AuthProvider } from "@/lib/auth";
+import { AuthProvider } from "@/providers/AuthProvider";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { Header } from "@/components/Header";
-import { BottomNav } from "@/components/BottomNav";
 import Index from "@/pages/Index";
 import Buy from "@/pages/Buy";
 import Rent from "@/pages/Rent";
@@ -23,6 +22,7 @@ import Terms from "@/pages/Terms";
 import Contact from "@/pages/Contact";
 import Messaging from "@/pages/Messaging";
 import { ChatWindow } from "@/components/chat/ChatWindow";
+import { BottomNav } from "@/components/BottomNav";
 
 function App() {
   return (

@@ -2,11 +2,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PropertyList } from "@/components/PropertyList";
-import { BottomNav } from "@/components/BottomNav";
 import { useFavorites } from "@/hooks/useFavorites";
 import { Heart } from "lucide-react";
-import { useAuth } from "@/lib/auth";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 type Property = {
   id: string;
@@ -24,17 +22,10 @@ type Property = {
 export default function Favorites() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { favorites, isLoading: favoritesLoading, error: favoritesError } = useFavorites();
+  const { favorites, isLoading: favoritesLoading } = useFavorites();
   const { user } = useAuth();
-  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user) {
-      // Si l'utilisateur n'est pas connecté, on redirige vers la page de connexion
-      navigate("/login");
-      return;
-    }
-
     if (favoritesLoading) return;
 
     const fetchFavoriteProperties = async () => {
@@ -72,12 +63,7 @@ export default function Favorites() {
     };
 
     fetchFavoriteProperties();
-  }, [favorites, favoritesLoading, user, navigate]);
-
-  // Gérer les erreurs potentielles du hook useFavorites
-  if (favoritesError) {
-    console.error("Erreur lors du chargement des favoris:", favoritesError);
-  }
+  }, [favorites, favoritesLoading]);
 
   return (
     <div className="min-h-screen pb-20">
@@ -91,15 +77,13 @@ export default function Favorites() {
         ) : properties.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-gray-500">
             <Heart className="w-16 h-16 mb-4 stroke-1" />
-            <p className="text-lg">Vous n'avez aucun favori</p>
+            <p className="text-lg font-medium">Vous n'avez aucun favori</p>
             <p className="text-sm mt-2">Ajoutez des propriétés à vos favoris pour les retrouver ici</p>
           </div>
         ) : (
           <PropertyList properties={properties} loading={false} />
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 }

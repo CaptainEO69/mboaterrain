@@ -1,5 +1,10 @@
 
 import { AuthProvider } from "@/providers/AuthProvider";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth as useAuthHook } from "@/hooks/useAuth";
 
-export { AuthProvider, useAuth };
+// On exporte directement le hook useAuth pour éviter les importations circulaires
+export function useAuth() {
+  return useAuthHook();
+}
+
+export { AuthProvider };

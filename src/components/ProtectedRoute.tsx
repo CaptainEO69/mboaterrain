@@ -1,4 +1,5 @@
-import { useAuth } from "@/lib/auth";
+
+import { useAuth } from "@/hooks/useAuth";
 import { Navigate, useLocation } from "react-router-dom";
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
