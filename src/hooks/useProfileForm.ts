@@ -20,7 +20,7 @@ export function useProfileForm(user: User | null) {
     setIsEditing, 
     error: submitError,
     handleInputChange: baseHandleInputChange,
-    handleSubmit
+    handleSubmit: baseHandleSubmit
   } = useProfileSubmit(user, formData, setLoading);
   
   // If editing is enabled, ensure we have fresh data
@@ -38,6 +38,8 @@ export function useProfileForm(user: User | null) {
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name: string; value: any } }) => {
     const { name, value } = e.target;
+    console.log(`Setting form data for field ${name} to:`, value);
+    
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -45,6 +47,12 @@ export function useProfileForm(user: User | null) {
     
     // Also call the base handler for any additional logic
     baseHandleInputChange(e);
+  };
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Form submitted, current form data:", formData);
+    await baseHandleSubmit(e);
   };
 
   return {

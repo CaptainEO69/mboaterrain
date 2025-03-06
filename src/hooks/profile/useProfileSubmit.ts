@@ -34,7 +34,7 @@ export function useProfileSubmit(
     setError(null);
     
     try {
-      console.log("ProfileForm - Calling updateUserProfile");
+      console.log("ProfileForm - Calling updateUserProfile with data:", formData);
       const success = await updateUserProfile(user.id, formData);
       
       if (success) {
