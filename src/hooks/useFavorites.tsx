@@ -14,6 +14,7 @@ export function useFavorites() {
       if (!user?.id) return [];
       
       try {
+        console.log("Fetching favorites for user:", user.id);
         const { data, error } = await supabase
           .from("favorites")
           .select("property_id")
@@ -24,6 +25,7 @@ export function useFavorites() {
           return [];
         }
 
+        console.log("Favorites fetched:", data);
         return data?.map(fav => fav.property_id) || [];
       } catch (error) {
         console.error("Unexpected error fetching favorites:", error);
@@ -31,6 +33,8 @@ export function useFavorites() {
       }
     },
     enabled: !!user?.id,
+    retry: 1,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   const addToFavorites = useMutation({

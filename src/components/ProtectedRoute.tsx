@@ -9,11 +9,11 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   // Logs pour debug
   console.log("ProtectedRoute - Current state:", {
     loading,
-    user,
+    user: user ? "User authenticated" : "No user",
     pathname: location.pathname
   });
 
-  // Si l'authentification est en cours de chargement, afficher le loader
+  // Si l'authentification est en cours de chargement, afficher le loader (maximum 3 secondes)
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">

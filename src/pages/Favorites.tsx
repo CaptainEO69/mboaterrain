@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { PropertyList } from "@/components/PropertyList";
 import { useFavorites } from "@/hooks/useFavorites";
 import { Heart } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
 
 type Property = {
   id: string;
@@ -23,7 +22,6 @@ export default function Favorites() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { favorites, isLoading: favoritesLoading } = useFavorites();
-  const { user } = useAuth();
 
   useEffect(() => {
     if (favoritesLoading) return;
@@ -32,7 +30,10 @@ export default function Favorites() {
       setIsLoading(true);
       
       try {
+        console.log("Fetching favorite properties, favorites:", favorites);
+        
         if (!favorites || favorites.length === 0) {
+          console.log("No favorites found, setting empty properties array");
           setProperties([]);
           setIsLoading(false);
           return;
@@ -54,6 +55,7 @@ export default function Favorites() {
           throw error;
         }
 
+        console.log("Favorite properties fetched:", data);
         setProperties(data || []);
       } catch (error: any) {
         console.error("Erreur lors du chargement des propriétés:", error.message);
@@ -75,10 +77,12 @@ export default function Favorites() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cmr-green"></div>
           </div>
         ) : properties.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 text-gray-500">
+          <div className="flex flex-col items-center justify-center py-16 text-gray-500 bg-white rounded-lg shadow-sm">
             <Heart className="w-16 h-16 mb-4 stroke-1" />
             <p className="text-lg font-medium">Vous n'avez aucun favori</p>
-            <p className="text-sm mt-2">Ajoutez des propriétés à vos favoris pour les retrouver ici</p>
+            <p className="text-sm mt-2 text-center max-w-md">
+              Explorez les annonces disponibles et ajoutez-les à vos favoris pour les retrouver ici
+            </p>
           </div>
         ) : (
           <PropertyList properties={properties} loading={false} />
