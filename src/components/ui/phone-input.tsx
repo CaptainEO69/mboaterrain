@@ -55,17 +55,13 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
               ))}
             </SelectContent>
           </Select>
-          <div className="relative flex-grow">
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-muted-foreground">
-              +{getCountryCallingCode(countryCode)}
-            </div>
-            <Input
-              className={cn("pl-12", className)}
-              onChange={handlePhoneChange}
-              ref={ref}
-              {...props}
-            />
-          </div>
+          <Input
+            className={cn("", className)}
+            onChange={handlePhoneChange}
+            ref={ref}
+            placeholder="Numéro de téléphone"
+            {...props}
+          />
         </div>
       </div>
     );

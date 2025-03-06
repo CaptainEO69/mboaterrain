@@ -42,6 +42,11 @@ export function BasicInfoSection({
     setCountryCode(code);
   };
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Juste passer la valeur telle quelle
+    onInputChange(e);
+  };
+
   return (
     <>
       <div className="space-y-2">
@@ -83,7 +88,7 @@ export function BasicInfoSection({
           onCountryChange={handleCountryChange}
           value={phoneNumber}
           name="phone_number"
-          onChange={onInputChange}
+          onChange={handlePhoneChange}
           disabled={!isEditing}
         />
       ) : (

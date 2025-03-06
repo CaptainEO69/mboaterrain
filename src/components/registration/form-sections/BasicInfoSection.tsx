@@ -33,6 +33,12 @@ export function BasicInfoSection({ formData, setters }: BasicInfoSectionProps) {
     setCountryCode(code);
   };
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Extraire seulement le numéro, sans l'indicatif
+    let phoneNumber = e.target.value;
+    setters.setPhoneNumber(phoneNumber);
+  };
+
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const dateValue = e.target.value;
     if (dateValue) {
@@ -83,7 +89,7 @@ export function BasicInfoSection({ formData, setters }: BasicInfoSectionProps) {
           countryCode={countryCode}
           onCountryChange={handleCountryChange}
           value={formData.phoneNumber}
-          onChange={(e) => setters.setPhoneNumber(e.target.value)}
+          onChange={handlePhoneChange}
           required
         />
 
