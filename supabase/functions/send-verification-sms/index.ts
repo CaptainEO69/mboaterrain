@@ -58,11 +58,16 @@ serve(async (req) => {
     console.log("Twilio SID available:", !!accountSid);
     console.log("Twilio Auth Token available:", !!authToken);
 
-    // Format the phone number (ensure it has country code)
+    // Improved phone number formatting
     let formattedPhone = phoneNumber;
     if (!phoneNumber.startsWith("+")) {
-      // Default to Cameroon country code if none provided
-      formattedPhone = "+237" + phoneNumber.replace(/^0+/, "");
+      // Check if it starts with a country code without the plus
+      if (phoneNumber.startsWith("237") || phoneNumber.startsWith("33") || phoneNumber.startsWith("1")) {
+        formattedPhone = "+" + phoneNumber;
+      } else {
+        // Default to Cameroon country code if none provided
+        formattedPhone = "+237" + phoneNumber.replace(/^0+/, "");
+      }
     }
 
     console.log("Formatted phone number:", formattedPhone);
@@ -81,7 +86,7 @@ serve(async (req) => {
     // Send the SMS with the verification code
     const message = await twilio.messages.create({
       body: `Votre code de vérification MboaTer est: ${code}. Ce code expire dans 10 minutes.`,
-      from: twilioPhoneNumber, // Use the environment variable
+      from: twilioPhoneNumber,
       to: formattedPhone,
     });
 
