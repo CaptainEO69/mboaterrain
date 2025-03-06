@@ -13,7 +13,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowLoader(false);
-    }, 2000); // Réduit à 2 secondes pour une meilleure expérience
+    }, 2000); // Timeout réduit pour une meilleure expérience
     
     return () => clearTimeout(timer);
   }, []);
@@ -26,13 +26,13 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     showLoader
   });
 
-  // Si toujours en chargement après 2 secondes ou aucun utilisateur, rediriger vers login
+  // Si aucun utilisateur et chargement terminé, rediriger vers login
   if (!user && !loading) {
     console.log("ProtectedRoute - Redirecting to login from:", location.pathname);
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Si l'authentification est en cours de chargement et moins de 2 secondes se sont écoulées
+  // Si l'authentification est en cours de chargement et le timeout n'est pas atteint
   if (loading && showLoader) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -44,6 +44,6 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     );
   }
 
-  // Si l'utilisateur est connecté, afficher le contenu protégé
+  // Si l'utilisateur est connecté ou si nous avons dépassé le timeout, afficher le contenu
   return <>{children}</>;
 }
