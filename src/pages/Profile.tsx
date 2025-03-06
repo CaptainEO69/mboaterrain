@@ -89,6 +89,21 @@ export default function Profile() {
     return <ProfileLoading message="Chargement des données de votre profil..." />;
   }
 
+  const handleSignOut = async () => {
+    console.log("Sign out button clicked");
+    if (signOut) {
+      try {
+        await signOut();
+      } catch (error) {
+        console.error("Error during sign out:", error);
+        toast.error("Erreur lors de la déconnexion");
+      }
+    } else {
+      console.error("signOut function is undefined");
+      toast.error("Erreur: Fonction de déconnexion non disponible");
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 pb-24 max-w-2xl">
       <Card className="border-cmr-green">
@@ -106,7 +121,7 @@ export default function Profile() {
               setIsEditing(false);
               resetForm();
             }}
-            onSignOut={signOut}
+            onSignOut={handleSignOut}
             userEmail={user?.email || ""}
             userType={formData.user_type}
           />
