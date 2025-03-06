@@ -67,8 +67,8 @@ export function ChatWindow() {
   // Vérifier si l'image est chargée
   const [imageLoaded, setImageLoaded] = useState(false);
   
-  // Url de l'image - utiliser celle que l'utilisateur vient de téléverser
-  const imageUrl = '/lovable-uploads/88b68d0c-94d9-4cc8-8f5f-c27a5942663c.png';
+  // Utilisons une image du dossier public (non dans lovable-uploads)
+  const imageUrl = '/placeholder.svg'; // Une image qui existe déjà dans le projet
 
   useEffect(() => {
     // Si le chat est ouvert, réinitialiser le compteur de messages non lus
@@ -80,11 +80,12 @@ export function ChatWindow() {
     const img = new Image();
     img.src = imageUrl;
     img.onload = () => {
-      console.log("Image chargée avec succès");
+      console.log("Image chargée avec succès:", imageUrl);
       setImageLoaded(true);
     };
     img.onerror = (e) => {
       console.error("Erreur de chargement de l'image:", e);
+      console.log("Essai avec une image par défaut");
       setImageLoaded(false);
     };
   }, [isChatOpen, imageUrl]);
@@ -163,17 +164,18 @@ export function ChatWindow() {
   return (
     <div className="fixed bottom-16 right-4 z-50 w-[90vw] md:w-80 h-[60vh] md:h-96">
       <div className="absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white">
-        {/* Image de fond - affichage conditionnel basé sur le chargement */}
-        {imageLoaded ? (
+        {/* Utilisez un dégradé de couleur comme fond de secours */}
+        <div className="absolute inset-0 z-0 bg-gradient-to-br from-cmr-green/10 to-cmr-yellow/10"></div>
+        
+        {/* Image de fond - affichage uniquement si chargée avec succès */}
+        {imageLoaded && (
           <div 
             className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
             style={{
               backgroundImage: `url('${imageUrl}')`,
-              opacity: 0.3,  // Augmenté l'opacité pour une meilleure visibilité
+              opacity: 0.3,
             }}
           ></div>
-        ) : (
-          <div className="absolute inset-0 z-0 bg-gradient-to-br from-cmr-green/10 to-cmr-yellow/10"></div>
         )}
       </div>
       
@@ -186,7 +188,7 @@ export function ChatWindow() {
       {/* Message de débogage pour vérifier le chargement de l'image - visible en développement */}
       {process.env.NODE_ENV === 'development' && !imageLoaded && (
         <div className="absolute bottom-0 left-0 bg-cmr-red text-white p-1 text-xs">
-          Image non chargée
+          Image non chargée: utilisez le dégradé à la place
         </div>
       )}
     </div>
