@@ -35,7 +35,7 @@ export function LocationSelect({
     longitude: number | null;
   }>({ latitude: null, longitude: null });
 
-  // Fetch cities when a region is selected
+  // Charger les villes lorsqu'une région est sélectionnée
   useEffect(() => {
     async function fetchCities() {
       if (!selectedRegion) {
@@ -45,9 +45,9 @@ export function LocationSelect({
 
       try {
         setLoadingCities(true);
-        console.log("Fetching cities for region:", selectedRegion);
+        console.log("Chargement des villes pour la région:", selectedRegion);
         
-        // First get the region ID
+        // D'abord récupérer l'ID de la région
         const { data: regionData, error: regionError } = await supabase
           .from('regions')
           .select('id')
@@ -55,22 +55,22 @@ export function LocationSelect({
           .single();
         
         if (regionError) {
-          console.error('Error fetching region:', regionError);
+          console.error('Erreur lors de la récupération de la région:', regionError);
           toast.error("Impossible de récupérer les informations de la région");
           setCities([]);
           return;
         }
         
         if (!regionData || !regionData.id) {
-          console.error('No region data found');
+          console.error('Aucune donnée de région trouvée');
           toast.error("Région non trouvée");
           setCities([]);
           return;
         }
         
-        console.log("Found region data:", regionData);
+        console.log("Données de région trouvées:", regionData);
         
-        // Then get cities for that region
+        // Puis récupérer les villes pour cette région
         const { data: citiesData, error: citiesError } = await supabase
           .from('cities')
           .select('id, name')
@@ -78,19 +78,19 @@ export function LocationSelect({
           .order('name');
         
         if (citiesError) {
-          console.error('Error loading cities:', citiesError);
+          console.error('Erreur lors du chargement des villes:', citiesError);
           toast.error("Impossible de charger les villes");
           setCities([]);
         } else if (!citiesData || citiesData.length === 0) {
-          console.log("No cities found for this region");
+          console.log("Aucune ville trouvée pour cette région");
           toast.info("Aucune ville trouvée pour cette région");
           setCities([]);
         } else {
-          console.log("Cities loaded:", citiesData);
+          console.log("Villes chargées:", citiesData);
           setCities(citiesData);
         }
       } catch (error) {
-        console.error('Error loading cities:', error);
+        console.error('Erreur lors du chargement des villes:', error);
         toast.error("Une erreur est survenue lors du chargement des villes");
         setCities([]);
       } finally {
@@ -101,19 +101,19 @@ export function LocationSelect({
     fetchCities();
   }, [selectedRegion]);
   
-  // Function called when geolocation is successful
+  // Fonction appelée lorsque la géolocalisation réussit
   const handleLocationFound = async (latitude: number, longitude: number) => {
     try {
       setLocationInfo({ latitude, longitude });
       
-      // Store coordinates temporarily
+      // Stocker les coordonnées temporairement
       localStorage.setItem('userLatitude', latitude.toString());
       localStorage.setItem('userLongitude', longitude.toString());
       
       toast.success("Position enregistrée avec succès");
-      console.log("Geographic coordinates:", { latitude, longitude });
+      console.log("Coordonnées géographiques:", { latitude, longitude });
     } catch (error) {
-      console.error('Error processing geolocation:', error);
+      console.error('Erreur lors du traitement de la géolocalisation:', error);
       toast.error("Erreur lors du traitement de votre localisation");
     }
   };
@@ -133,6 +133,7 @@ export function LocationSelect({
       
       <RegionSelect
         onRegionChange={(region) => {
+          console.log("Région sélectionnée:", region);
           setSelectedRegion(region);
           setSelectedCity("");
         }}
@@ -143,6 +144,7 @@ export function LocationSelect({
         <Select
           value={selectedCity}
           onValueChange={(value) => {
+            console.log("Ville sélectionnée:", value);
             setSelectedCity(value);
             onCityChange(value);
           }}

@@ -1,5 +1,5 @@
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 interface GeolocationState {
   latitude: number | null;
@@ -21,68 +21,28 @@ const initialState: GeolocationState = {
 
 export function useGeolocation() {
   const [state, setState] = useState<GeolocationState>(initialState);
-  const timeoutRef = useRef<number | null>(null);
-  const watchIdRef = useRef<number | null>(null);
-
-  // Cleanup function
-  const cleanupGeolocation = useCallback(() => {
-    if (timeoutRef.current) {
-      window.clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-    
-    if (watchIdRef.current !== null) {
-      navigator.geolocation.clearWatch(watchIdRef.current);
-      watchIdRef.current = null;
-    }
-  }, []);
-
-  // Clean up on component unmount
-  useEffect(() => {
-    return () => {
-      cleanupGeolocation();
-    };
-  }, [cleanupGeolocation]);
-
+  
   const getPosition = useCallback(() => {
-    // Clean up any existing geolocation requests
-    cleanupGeolocation();
-
-    // Check if geolocation is supported
+    // Vérifier si la géolocalisation est supportée
     if (!navigator.geolocation) {
       setState({
         ...initialState,
-        error: "La géolocalisation n'est pas supportée par votre navigateur",
+        error: "La géolocalisation n'est pas supportée par votre navigateur"
       });
       return;
     }
 
-    // Update state to indicate geolocation is in progress
+    // Mettre à jour l'état pour indiquer que la géolocalisation est en cours
     setState({
       ...initialState,
       loading: true
     });
 
-    // Set timeout for geolocation request
-    timeoutRef.current = window.setTimeout(() => {
-      setState({
-        ...initialState,
-        error: "La demande de géolocalisation a expiré. Veuillez réessayer.",
-      });
-      
-      if (watchIdRef.current !== null) {
-        navigator.geolocation.clearWatch(watchIdRef.current);
-        watchIdRef.current = null;
-      }
-    }, 15000); // 15 seconds timeout
-
     try {
-      // Try to get high accuracy position first
-      watchIdRef.current = navigator.geolocation.watchPosition(
-        // Success
+      navigator.geolocation.getCurrentPosition(
+        // Succès
         (position) => {
-          cleanupGeolocation();
-          console.log("Geolocation successful:", position.coords);
+          console.log("Géolocalisation réussie:", position.coords);
           setState({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
@@ -92,13 +52,12 @@ export function useGeolocation() {
             success: true
           });
         },
-        // Error
+        // Erreur
         (error) => {
-          cleanupGeolocation();
-          console.error("Geolocation error:", error);
+          console.error("Erreur de géolocalisation:", error);
           let errorMessage = "Erreur de géolocalisation inconnue";
           
-          // Translate common error messages
+          // Traduire les messages d'erreur courants
           switch(error.code) {
             case error.PERMISSION_DENIED:
               errorMessage = "Vous avez refusé l'accès à la géolocalisation";
@@ -124,19 +83,18 @@ export function useGeolocation() {
         }
       );
     } catch (e) {
-      console.error("Exception during geolocation request:", e);
+      console.error("Exception lors de la demande de géolocalisation:", e);
       setState({
         ...initialState,
         error: "Une erreur s'est produite lors de la demande de localisation"
       });
     }
-  }, [cleanupGeolocation]);
+  }, []);
 
-  // Reset state
+  // Réinitialiser l'état
   const resetGeolocation = useCallback(() => {
-    cleanupGeolocation();
     setState(initialState);
-  }, [cleanupGeolocation]);
+  }, []);
 
   return { ...state, getPosition, resetGeolocation };
 }

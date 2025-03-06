@@ -20,29 +20,32 @@ export function GeolocationButton({ onLocationFound }: GeolocationButtonProps) {
     resetGeolocation 
   } = useGeolocation();
 
-  // When geolocation is successful, call the callback
+  // Lorsque la géolocalisation réussit, appeler le callback
   useEffect(() => {
     if (success && latitude && longitude) {
+      console.log("Géolocalisation réussie, envoi des coordonnées:", latitude, longitude);
       onLocationFound(latitude, longitude);
     }
   }, [success, latitude, longitude, onLocationFound]);
 
-  // Show error toast when geolocation fails
+  // Afficher un toast d'erreur lorsque la géolocalisation échoue
   useEffect(() => {
     if (error) {
+      console.error("Erreur de géolocalisation dans le composant:", error);
       toast.error(`Erreur de géolocalisation: ${error}`);
       resetGeolocation();
     }
   }, [error, resetGeolocation]);
 
-  // Handle button click
+  // Gérer le clic sur le bouton
   const handleGeolocationClick = () => {
     if (loading) return;
     
-    // Clear any previous errors
+    // Effacer les erreurs précédentes
     resetGeolocation();
     
-    // Request position
+    // Demander la position
+    console.log("Demande de géolocalisation...");
     getPosition();
   };
 
