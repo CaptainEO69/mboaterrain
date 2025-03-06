@@ -147,7 +147,7 @@ export function ChatWindow() {
         <div 
           className="absolute inset-0 z-0"
           style={{
-            backgroundImage: `url('/lovable-uploads/Lion.png')`,
+            backgroundImage: `url('/lovable-uploads/34d61d7a-8ad7-4c42-b801-3b79bf3450fc.png')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
