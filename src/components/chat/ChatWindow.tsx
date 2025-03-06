@@ -7,6 +7,7 @@ import { ChatButton } from "./ChatButton";
 import { useChatMessages } from "./useChatMessages";
 import { useEffect } from "react";
 import { useBackgroundImage } from "./useBackgroundImage";
+import { Toaster } from "@/components/ui/toaster";
 
 export * from "./types";
 
@@ -34,26 +35,29 @@ export function ChatWindow() {
   }
 
   return (
-    <div className="fixed bottom-16 right-4 z-50 w-[90vw] md:w-80 h-[60vh] md:h-96">
-      <div className="absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white">
-        {/* Préchargement de l'image en arrière-plan avec transition douce */}
-        <div 
-          className={`absolute inset-0 z-0 bg-gradient-to-br from-cmr-green/20 to-cmr-yellow/20 transition-opacity duration-300 ${imageLoaded ? 'opacity-0' : 'opacity-100'}`}
-        ></div>
-        
-        {imageLoaded && (
+    <>
+      <div className="fixed bottom-16 right-4 z-50 w-[90vw] md:w-80 h-[60vh] md:h-96">
+        <div className="absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white">
+          {/* Préchargement de l'image en arrière-plan avec transition douce */}
           <div 
-            className="absolute inset-0 z-0 bg-cover bg-center opacity-60 transition-opacity duration-300 ease-in-out" 
-            style={{ backgroundImage: `url(${imageSrc})` }}
+            className={`absolute inset-0 z-0 bg-gradient-to-br from-cmr-green/20 to-cmr-yellow/20 transition-opacity duration-300 ${imageLoaded ? 'opacity-0' : 'opacity-100'}`}
           ></div>
-        )}
+          
+          {imageLoaded && (
+            <div 
+              className="absolute inset-0 z-0 bg-cover bg-center opacity-60 transition-opacity duration-300 ease-in-out" 
+              style={{ backgroundImage: `url(${imageSrc})` }}
+            ></div>
+          )}
+        </div>
+        
+        <div className="relative h-full flex flex-col rounded-lg overflow-hidden">
+          <ChatHeader toggleChat={toggleChat} unreadCount={unreadCount} />
+          <ChatMessages messages={messages} />
+          <ChatInput onSendMessage={handleSendMessage} messages={messages} />
+        </div>
       </div>
-      
-      <div className="relative h-full flex flex-col rounded-lg overflow-hidden">
-        <ChatHeader toggleChat={toggleChat} unreadCount={unreadCount} />
-        <ChatMessages messages={messages} />
-        <ChatInput onSendMessage={handleSendMessage} />
-      </div>
-    </div>
+      <Toaster />
+    </>
   );
 }

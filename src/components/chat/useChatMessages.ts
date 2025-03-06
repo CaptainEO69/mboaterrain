@@ -1,12 +1,13 @@
 
 import { useState, useEffect } from "react";
 import { Message, PREDEFINED_RESPONSES } from "./types";
+import { useToast } from "@/hooks/use-toast";
 
 export function useChatMessages() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      content: "Bienvenue sur CamerImmo! Comment puis-je vous aider dans votre projet immobilier aujourd'hui?",
+      content: "Bienvenue sur CamerImmo! 👋 Je suis votre assistant immobilier virtuel. Je peux vous aider sur:\n• Prix du marché\n• Conseils pour acheter/vendre\n• Quartiers recherchés\n• Démarches administratives\n• Financement\n\nQue puis-je faire pour vous aujourd'hui?",
       sender: "bot",
       timestamp: new Date()
     }
@@ -14,6 +15,7 @@ export function useChatMessages() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Si le chat est ouvert, réinitialiser le compteur de messages non lus
@@ -58,12 +60,29 @@ export function useChatMessages() {
       // Retire l'indicateur de frappe et ajoute la réponse
       setMessages(prev => {
         const withoutTyping = prev.filter(msg => msg.id !== typingIndicator.id);
+        const botResponse = generateResponse(input);
         const botMessage: Message = {
           id: `bot-${Date.now()}`,
-          content: generateResponse(input),
+          content: botResponse,
           sender: "bot",
           timestamp: new Date()
         };
+        
+        // Si la réponse contient une indication d'expert (signalée par [EXPERT])
+        if (botResponse.includes("[EXPERT]")) {
+          // Retirer le tag [EXPERT] de la réponse visible
+          botMessage.content = botResponse.replace("[EXPERT]", "");
+          
+          // Afficher une notification toast pour indiquer une réponse d'expert
+          setTimeout(() => {
+            toast({
+              title: "Conseil d'expert",
+              description: "Notre assistant vous a fourni une information spécialisée",
+              duration: 3000,
+            });
+          }, 500);
+        }
+        
         return [...withoutTyping, botMessage];
       });
       
@@ -98,22 +117,42 @@ export function useChatMessages() {
       "estimation": ["estimer", "estimation", "evaluer", "évaluer", "evaluation", "évaluation", "valeur", "vaut"],
       "notaire": ["notaire", "acte", "authentique", "officiel", "légalisation", "legalisation"]
     };
+
+    // Analyser si la question est une demande d'information approfondie (ajout du préfixe [EXPERT])
+    const isExpertQuestion = 
+      normalizedQuestion.includes("exactement") || 
+      normalizedQuestion.includes("precisement") || 
+      normalizedQuestion.includes("précisément") ||
+      normalizedQuestion.includes("detail") || 
+      normalizedQuestion.includes("détail") ||
+      normalizedQuestion.includes("expliquez") ||
+      normalizedQuestion.includes("pourquoi") ||
+      normalizedQuestion.includes("comment") && (
+        normalizedQuestion.includes("fonctionne") || 
+        normalizedQuestion.includes("procédure") || 
+        normalizedQuestion.includes("procedure")
+      );
     
     // Chercher la première correspondance
     for (const [category, keywords] of Object.entries(keywordMappings)) {
       if (keywords.some(keyword => normalizedQuestion.includes(keyword))) {
-        return getRandomResponse(category);
+        const response = getRandomResponse(category);
+        return isExpertQuestion ? `[EXPERT]${response}` : response;
       }
     }
     
     // Analyse contextuelle plus avancée pour les questions complexes
     if (normalizedQuestion.includes("meilleur") && normalizedQuestion.includes("moment")) {
-      return "Le meilleur moment pour acheter est généralement en début d'année ou pendant la saison des pluies quand il y a moins d'activité sur le marché. Les prix sont souvent plus négociables à ces périodes.";
+      return isExpertQuestion 
+        ? "[EXPERT]Le meilleur moment pour acheter est généralement en début d'année ou pendant la saison des pluies quand il y a moins d'activité sur le marché. Les prix sont souvent plus négociables à ces périodes. Les statistiques montrent une baisse d'activité de 15-20% pendant ces périodes."
+        : "Le meilleur moment pour acheter est généralement en début d'année ou pendant la saison des pluies quand il y a moins d'activité sur le marché. Les prix sont souvent plus négociables à ces périodes.";
     }
     
     if ((normalizedQuestion.includes("delai") || normalizedQuestion.includes("durée") || normalizedQuestion.includes("duree") || normalizedQuestion.includes("temps")) && 
         (normalizedQuestion.includes("vente") || normalizedQuestion.includes("vendre") || normalizedQuestion.includes("transaction"))) {
-      return "La durée moyenne d'une transaction immobilière complète au Cameroun est de 2 à 3 mois. Cela inclut la période de mise en vente, les visites, la négociation, et les formalités administratives et notariales.";
+      return isExpertQuestion
+        ? "[EXPERT]La durée moyenne d'une transaction immobilière complète au Cameroun est de 2 à 3 mois. Cela inclut la période de mise en vente (2-3 semaines), les visites (1-2 semaines), la négociation (1-2 semaines), et les formalités administratives et notariales (3-4 semaines)."
+        : "La durée moyenne d'une transaction immobilière complète au Cameroun est de 2 à 3 mois. Cela inclut la période de mise en vente, les visites, la négociation, et les formalités administratives et notariales.";
     }
     
     if (normalizedQuestion.includes("merci") || normalizedQuestion.includes("super") || normalizedQuestion.includes("excellent")) {
