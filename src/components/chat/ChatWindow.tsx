@@ -67,8 +67,8 @@ export function ChatWindow() {
   // Vérifier si l'image est chargée
   const [imageLoaded, setImageLoaded] = useState(false);
   
-  // Utilisons une image du dossier public (non dans lovable-uploads)
-  const imageUrl = '/placeholder.svg'; // Une image qui existe déjà dans le projet
+  // Utiliser l'image Lion.png du dossier public
+  const imageUrl = '/Lion.png';
 
   useEffect(() => {
     // Si le chat est ouvert, réinitialiser le compteur de messages non lus
@@ -85,7 +85,7 @@ export function ChatWindow() {
     };
     img.onerror = (e) => {
       console.error("Erreur de chargement de l'image:", e);
-      console.log("Essai avec une image par défaut");
+      console.log("L'image Lion.png n'a pas été trouvée dans le dossier public");
       setImageLoaded(false);
     };
   }, [isChatOpen, imageUrl]);
@@ -188,7 +188,7 @@ export function ChatWindow() {
       {/* Message de débogage pour vérifier le chargement de l'image - visible en développement */}
       {process.env.NODE_ENV === 'development' && !imageLoaded && (
         <div className="absolute bottom-0 left-0 bg-cmr-red text-white p-1 text-xs">
-          Image non chargée: utilisez le dégradé à la place
+          Image Lion.png non trouvée dans le dossier public
         </div>
       )}
     </div>
