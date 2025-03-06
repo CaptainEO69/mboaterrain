@@ -22,7 +22,7 @@ export function useBackgroundImage(imagePath: string) {
           resolve(false);
         };
         
-        // Ajouter un timestamp pour éviter la mise en cache du navigateur
+        // IMPORTANT: Désactiver la mise en cache pour être sûr d'avoir l'image la plus récente
         img.src = `${src}?t=${new Date().getTime()}`;
       });
     };
@@ -36,10 +36,12 @@ export function useBackgroundImage(imagePath: string) {
           throw new Error("Chemin d'image vide");
         }
         
+        // Forcer le chargement sans cache
         const exists = await checkImage(imagePath);
         if (exists) {
           console.log(`✅ Image chargée avec succès: ${imagePath}`);
-          setImageSrc(imagePath);
+          // Ajouter un paramètre aléatoire pour éviter le cache du navigateur
+          setImageSrc(`${imagePath}?nocache=${Date.now()}`);
           setImageLoaded(true);
           setError(null);
           return;

@@ -20,7 +20,7 @@ export function ChatWindow() {
     toggleChat
   } = useChatMessages();
   
-  // Utiliser l'image du lion téléversée
+  // Utiliser l'image du lion téléversée avec un chemin confirmé
   const imageUrl = '/lovable-uploads/83fc2739-1a70-4b50-b7a3-127bda76b51d.png';
   const { imageLoaded, imageSrc, error } = useBackgroundImage(imageUrl);
 
@@ -40,7 +40,7 @@ export function ChatWindow() {
             className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
             style={{
               backgroundImage: `url('${imageSrc}')`,
-              opacity: 0.3,
+              opacity: 0.7, // Augmenter l'opacité pour rendre l'image plus visible
             }}
           ></div>
         ) : (
