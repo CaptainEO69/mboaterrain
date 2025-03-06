@@ -10,7 +10,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   const [showLoader, setShowLoader] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
   
-  // Set a timeout to prevent infinite loading
+  // Reduce timeout to prevent long waiting times
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowLoader(false);
@@ -19,7 +19,15 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
       if (!user && !loading) {
         toast.error("Session expirée ou non connecté. Veuillez vous reconnecter.");
       }
-    }, 2000);
+    }, 1000); // Reduced from 2000ms to 1000ms for faster feedback
+    
+    // If authentication completes before timeout, update state immediately
+    if (!loading) {
+      setAuthChecked(true);
+      if (user) {
+        setShowLoader(false);
+      }
+    }
     
     return () => clearTimeout(timer);
   }, [loading, user]);

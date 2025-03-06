@@ -15,7 +15,7 @@ export function ProfileLoading({ message = "Chargement de votre profil..." }: Pr
         <CardContent className="p-6">
           <div className="flex flex-col items-center justify-center py-8">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cmr-green mb-4"></div>
-            <p>{message}</p>
+            <p className="text-center">{message}</p>
           </div>
         </CardContent>
       </Card>

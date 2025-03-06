@@ -41,6 +41,7 @@ export async function updateUserProfile(userId: string, formData: ProfileFormDat
 
     if (updateError) {
       console.error("Error updating user metadata:", updateError);
+      toast.error(`Erreur de mise à jour des données: ${updateError.message}`);
       throw updateError;
     }
 
@@ -82,6 +83,7 @@ export async function updateUserProfile(userId: string, formData: ProfileFormDat
 
     if (profileError) {
       console.error("Error updating profile in database:", profileError);
+      toast.error(`Erreur de mise à jour du profil dans la base de données: ${profileError.message}`);
       throw profileError;
     }
 
@@ -89,6 +91,7 @@ export async function updateUserProfile(userId: string, formData: ProfileFormDat
     return true;
   } catch (error: any) {
     console.error("Error updating profile:", error);
+    toast.error(`Erreur lors de la mise à jour: ${error.message || 'Erreur inconnue'}`);
     return false;
   }
 }

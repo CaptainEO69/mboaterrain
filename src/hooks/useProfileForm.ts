@@ -42,8 +42,17 @@ export function useProfileForm(user: User | null) {
     console.log("ProfileForm - Loading user data, user present:", !!user);
     setError(null);
     
+    // Set a timeout to prevent infinite loading
+    const loadingTimeout = setTimeout(() => {
+      setLoading(false);
+      if (!user) {
+        console.log("ProfileForm - Loading timeout exceeded, no user found");
+      }
+    }, 2000);
+    
     if (user && user.user_metadata) {
       try {
+        console.log("ProfileForm - User metadata found, setting form data");
         setFormData({
           first_name: user.user_metadata?.first_name || "",
           last_name: user.user_metadata?.last_name || "",
@@ -72,17 +81,20 @@ export function useProfileForm(user: User | null) {
           insurance_included: user.user_metadata?.insurance_included || false,
           notary_office: user.user_metadata?.notary_office || "",
         });
+        clearTimeout(loadingTimeout);
+        setLoading(false);
       } catch (error: any) {
         console.error("Error setting form data:", error);
         setError("Erreur lors du chargement des données du profil: " + (error.message || "Erreur inconnue"));
+        setLoading(false);
       }
     } else {
-      // Reset the form if no user is found
+      // Reset the form if no user is found, and stop loading
       resetForm();
+      setLoading(false);
     }
     
-    // Always finish loading, even if there's an error
-    setLoading(false);
+    return () => clearTimeout(loadingTimeout);
   }, [user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name: string; value: any } }) => {
@@ -104,6 +116,7 @@ export function useProfileForm(user: User | null) {
     setError(null);
     
     try {
+      console.log("ProfileForm - Submitting profile update");
       const success = await updateUserProfile(user.id, formData);
       if (success) {
         setIsEditing(false);
