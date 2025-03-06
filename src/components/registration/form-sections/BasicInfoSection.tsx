@@ -1,16 +1,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
 import { PasswordStrength } from "@/components/ui/password-strength";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { useState } from "react";
@@ -41,6 +32,20 @@ export function BasicInfoSection({ formData, setters }: BasicInfoSectionProps) {
   const handleCountryChange = (code: CountryCode) => {
     setCountryCode(code);
   };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const dateValue = e.target.value;
+    if (dateValue) {
+      setters.setBirthDate(new Date(dateValue));
+    } else {
+      setters.setBirthDate(null);
+    }
+  };
+
+  // Format de la date pour l'input
+  const formattedDate = formData.birthDate 
+    ? formData.birthDate.toISOString().split('T')[0] 
+    : "";
 
   return (
     <div className="flex flex-col space-y-4">
@@ -84,32 +89,12 @@ export function BasicInfoSection({ formData, setters }: BasicInfoSectionProps) {
 
         <div className="space-y-2">
           <Label>Date de naissance</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={`w-full justify-start text-left font-normal ${
-                  !formData.birthDate && "text-muted-foreground"
-                }`}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {formData.birthDate ? (
-                  format(formData.birthDate, "P", { locale: fr })
-                ) : (
-                  <span>Sélectionner une date</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 bg-white" align="start">
-              <Calendar
-                mode="single"
-                selected={formData.birthDate || undefined}
-                onSelect={(date) => setters.setBirthDate(date)}
-                initialFocus
-                locale={fr}
-              />
-            </PopoverContent>
-          </Popover>
+          <Input
+            type="date"
+            value={formattedDate}
+            onChange={handleDateChange}
+            required
+          />
         </div>
 
         <div className="space-y-2">
