@@ -67,8 +67,8 @@ export function ChatWindow() {
   // Vérifier si l'image est chargée
   const [imageLoaded, setImageLoaded] = useState(false);
   
-  // Utiliser l'image Lion.png du dossier public
-  const imageUrl = '/Lion.png';
+  // Utiliser l'image Lion du dossier public (sans extension)
+  const imageUrl = '/Lion';
 
   useEffect(() => {
     // Si le chat est ouvert, réinitialiser le compteur de messages non lus
@@ -85,8 +85,19 @@ export function ChatWindow() {
     };
     img.onerror = (e) => {
       console.error("Erreur de chargement de l'image:", e);
-      console.log("L'image Lion.png n'a pas été trouvée dans le dossier public");
-      setImageLoaded(false);
+      console.log("L'image Lion n'a pas été trouvée dans le dossier public");
+      
+      // Essayer avec une autre extension
+      const imgWithExt = new Image();
+      imgWithExt.src = imageUrl + '.jpg';
+      imgWithExt.onload = () => {
+        console.log("Image chargée avec succès en essayant l'extension .jpg");
+        setImageLoaded(true);
+      };
+      imgWithExt.onerror = () => {
+        console.log("Échec également avec l'extension .jpg");
+        setImageLoaded(false);
+      };
     };
   }, [isChatOpen, imageUrl]);
 
@@ -188,7 +199,7 @@ export function ChatWindow() {
       {/* Message de débogage pour vérifier le chargement de l'image - visible en développement */}
       {process.env.NODE_ENV === 'development' && !imageLoaded && (
         <div className="absolute bottom-0 left-0 bg-cmr-red text-white p-1 text-xs">
-          Image Lion.png non trouvée dans le dossier public
+          Image Lion non trouvée dans le dossier public (essai sans extension)
         </div>
       )}
     </div>
