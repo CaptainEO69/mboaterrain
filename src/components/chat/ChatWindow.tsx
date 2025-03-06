@@ -6,6 +6,7 @@ import { ChatInput } from "./ChatInput";
 import { ChatButton } from "./ChatButton";
 import { useChatMessages } from "./useChatMessages";
 import { useBackgroundImage } from "./useBackgroundImage";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export * from "./types";
 
@@ -19,8 +20,8 @@ export function ChatWindow() {
     toggleChat
   } = useChatMessages();
   
-  // Utiliser le chemin absolu pour être sûr de pointer vers le dossier public
-  const imageUrl = '/lion';
+  // Essayer avec le nom de fichier complet
+  const imageUrl = '/lion.png';
   const { imageLoaded, imageSrc, error } = useBackgroundImage(imageUrl);
 
   if (!isChatOpen) {
@@ -34,7 +35,7 @@ export function ChatWindow() {
         <div className="absolute inset-0 z-0 bg-gradient-to-br from-cmr-green/10 to-cmr-yellow/10"></div>
         
         {/* Image de fond - affichage uniquement si chargée avec succès */}
-        {imageLoaded && imageSrc && (
+        {imageLoaded && imageSrc ? (
           <div 
             className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
             style={{
@@ -42,6 +43,10 @@ export function ChatWindow() {
               opacity: 0.3,
             }}
           ></div>
+        ) : (
+          <div className="absolute inset-0 z-0 flex items-center justify-center">
+            <Skeleton className="h-full w-full opacity-10" />
+          </div>
         )}
       </div>
       
