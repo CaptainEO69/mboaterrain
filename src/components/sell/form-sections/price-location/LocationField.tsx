@@ -25,13 +25,6 @@ export function LocationField() {
             formData.set('neighborhood', neighborhood);
           }
         }}
-        onDepartmentChange={(department) => {
-          const form = document.querySelector('form');
-          if (form) {
-            const formData = new FormData(form);
-            formData.set('department', department);
-          }
-        }}
         onDistrictChange={(district) => {
           const form = document.querySelector('form');
           if (form) {

@@ -10,7 +10,6 @@ export type PropertyFilters = {
   propertyType?: string;
   city?: string;
   neighborhood?: string;
-  department?: string;
   district?: string;
   maxPrice?: number;
   minSize?: number;
@@ -54,7 +53,6 @@ export function PropertySearchForm({ transactionType, onSearch }: PropertySearch
           <LocationSelect
             onCityChange={(city) => setFilters({ ...filters, city })}
             onNeighborhoodChange={(neighborhood) => setFilters({ ...filters, neighborhood })}
-            onDepartmentChange={(department) => setFilters({ ...filters, department })}
             onDistrictChange={(district) => setFilters({ ...filters, district })}
           />
         </div>

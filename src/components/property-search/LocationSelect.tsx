@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import {
   Select,
@@ -16,14 +15,12 @@ import { GeolocationButton } from "./GeolocationButton";
 interface LocationSelectProps {
   onCityChange: (city: string) => void;
   onNeighborhoodChange: (neighborhood: string) => void;
-  onDepartmentChange: (department: string) => void;
   onDistrictChange: (district: string) => void;
 }
 
 export function LocationSelect({ 
   onCityChange, 
   onNeighborhoodChange,
-  onDepartmentChange,
   onDistrictChange
 }: LocationSelectProps) {
   const [cities, setCities] = useState<{ id: string; name: string }[]>([]);
@@ -123,15 +120,6 @@ export function LocationSelect({
           setNeighborhoods([]);
         }}
       />
-
-      <div>
-        <Label>Département</Label>
-        <Input
-          placeholder="Entrez le département"
-          onChange={(e) => onDepartmentChange(e.target.value)}
-          className="w-full"
-        />
-      </div>
 
       <div>
         <Label>Ville</Label>
