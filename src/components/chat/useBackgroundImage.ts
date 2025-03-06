@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 export function useBackgroundImage(imagePath: string) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageSrc, setImageSrc] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Fonction pour vérifier si une image existe
@@ -18,42 +19,61 @@ export function useBackgroundImage(imagePath: string) {
 
     // Essayer avec différentes extensions
     const tryLoadImage = async () => {
+      // S'assurer que le chemin commence par "/"
+      const normalizedPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+      
       // Récupérer le chemin de base sans extension
-      const basePath = imagePath.includes('.')
-        ? imagePath.substring(0, imagePath.lastIndexOf('.'))
-        : imagePath;
+      const basePath = normalizedPath.includes('.')
+        ? normalizedPath.substring(0, normalizedPath.lastIndexOf('.'))
+        : normalizedPath;
       
       // Extensions à essayer
       const extensions = ['.png', '.jpg', '.jpeg', '.webp', '.svg'];
       
       // Si le chemin original inclut déjà une extension, l'essayer en premier
-      if (imagePath.includes('.')) {
-        const exists = await checkImage(imagePath);
+      if (normalizedPath.includes('.')) {
+        console.log("Trying with original path:", normalizedPath);
+        const exists = await checkImage(normalizedPath);
         if (exists) {
-          setImageSrc(imagePath);
+          console.log("✅ Image loaded successfully:", normalizedPath);
+          setImageSrc(normalizedPath);
           setImageLoaded(true);
+          setError(null);
           return;
         }
       }
       
       // Sinon, essayer avec différentes extensions
+      let allAttemptsFailed = true;
       for (const ext of extensions) {
         const fullPath = `${basePath}${ext}`;
+        console.log("Trying path:", fullPath);
         const exists = await checkImage(fullPath);
         if (exists) {
+          console.log("✅ Image loaded successfully:", fullPath);
           setImageSrc(fullPath);
           setImageLoaded(true);
+          setError(null);
+          allAttemptsFailed = false;
           return;
         }
       }
       
       // Si aucune image n'est trouvée, définir imageLoaded à false
-      console.log("Aucune image trouvée pour le chemin:", basePath);
-      setImageLoaded(false);
+      if (allAttemptsFailed) {
+        const errorMsg = `Aucune image trouvée pour le chemin: ${basePath}`;
+        console.error(errorMsg);
+        console.log("Chemins essayés:", [
+          normalizedPath.includes('.') ? normalizedPath : null,
+          ...extensions.map(ext => `${basePath}${ext}`)
+        ].filter(Boolean));
+        setError(errorMsg);
+        setImageLoaded(false);
+      }
     };
 
     tryLoadImage();
   }, [imagePath]);
 
-  return { imageLoaded, imageSrc };
+  return { imageLoaded, imageSrc, error };
 }

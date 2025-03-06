@@ -19,9 +19,9 @@ export function ChatWindow() {
     toggleChat
   } = useChatMessages();
   
-  // Utiliser le hook amélioré d'image de fond
-  const imageUrl = '/lion';  // Sans extension, le hook essaiera différentes extensions
-  const { imageLoaded, imageSrc } = useBackgroundImage(imageUrl);
+  // Utiliser le chemin absolu pour être sûr de pointer vers le dossier public
+  const imageUrl = '/lion';
+  const { imageLoaded, imageSrc, error } = useBackgroundImage(imageUrl);
 
   if (!isChatOpen) {
     return <ChatButton toggleChat={toggleChat} unreadCount={unreadCount} />;
@@ -51,9 +51,10 @@ export function ChatWindow() {
         <ChatInput onSendMessage={handleSendMessage} />
       </div>
       
+      {/* Affichage des informations de débogage en mode développement */}
       {process.env.NODE_ENV === 'development' && !imageLoaded && (
-        <div className="absolute bottom-0 left-0 bg-orange-500 text-white p-1 text-xs">
-          Image de fond non chargée. Vérifiez que l'image existe dans le dossier public.
+        <div className="absolute bottom-0 left-0 bg-orange-500 text-white p-1 text-xs max-w-full overflow-hidden">
+          {error || "Image de fond non chargée. Vérifiez que l'image existe dans le dossier public."}
         </div>
       )}
     </div>
