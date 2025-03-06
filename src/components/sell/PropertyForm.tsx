@@ -57,7 +57,7 @@ export function PropertyForm({ onSubmit, isSubmitting = false, transactionType }
         </>
       )}
 
-      {propertyType === "house" && (
+      {(propertyType === "house" || propertyType === "apartment") && (
         <>
           <LandTitleSection errors={validationErrors} />
           <LandDocumentsSection errors={validationErrors} forHouse={true} />

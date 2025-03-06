@@ -22,6 +22,7 @@ export function PropertyTypeSelect({ onValueChange, transactionType }: PropertyT
         {transactionType === "sale" ? (
           <>
             <SelectItem value="house">Maison</SelectItem>
+            <SelectItem value="apartment">Appartement</SelectItem>
             <SelectItem value="land">Terrain</SelectItem>
           </>
         ) : (
