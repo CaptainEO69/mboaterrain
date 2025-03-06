@@ -5,7 +5,8 @@ import { ChatMessages } from "./ChatMessages";
 import { ChatInput } from "./ChatInput";
 import { ChatButton } from "./ChatButton";
 import { useChatMessages } from "./useChatMessages";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useBackgroundImage } from "./useBackgroundImage";
 
 export * from "./types";
 
@@ -18,24 +19,15 @@ export function ChatWindow() {
     handleSendMessage,
     toggleChat
   } = useChatMessages();
-  const [backgroundImageLoaded, setBackgroundImageLoaded] = useState(false);
+  
+  const backgroundImagePath = "/lovable-uploads/1f09cbc4-45e2-4b8c-8e32-75019e404759.png";
+  const { imageLoaded, imageSrc, error } = useBackgroundImage(backgroundImagePath);
 
   // Afficher des informations de débogage dans la console
   useEffect(() => {
     console.log("Chat window rendered, chat open:", isChatOpen);
-    
-    // Vérifie si l'image existe avec le chemin correct
-    const img = new Image();
-    img.onload = () => {
-      console.log("Image de fond chargée avec succès:", img.src);
-      setBackgroundImageLoaded(true);
-    };
-    img.onerror = (error) => {
-      console.error("Erreur lors du chargement de l'image de fond:", error);
-      console.log("Chemin de l'image tentée:", img.src);
-    };
-    img.src = "/lovable-uploads/1f09cbc4-45e2-4b8c-8e32-75019e404759.png"; // Utilisation de la nouvelle image téléchargée
-  }, [isChatOpen]);
+    console.log("Background image status:", { loaded: imageLoaded, src: imageSrc, error });
+  }, [isChatOpen, imageLoaded, imageSrc, error]);
 
   if (!isChatOpen) {
     return <ChatButton toggleChat={toggleChat} unreadCount={unreadCount} />;
@@ -44,14 +36,16 @@ export function ChatWindow() {
   return (
     <div className="fixed bottom-16 right-4 z-50 w-[90vw] md:w-80 h-[60vh] md:h-96">
       <div className="absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white">
-        {/* Image d'arrière-plan ou dégradé de secours */}
-        {backgroundImageLoaded ? (
+        {/* Préchargement de l'image en arrière-plan avec transition douce */}
+        <div 
+          className={`absolute inset-0 z-0 bg-gradient-to-br from-cmr-green/20 to-cmr-yellow/20 transition-opacity duration-300 ${imageLoaded ? 'opacity-0' : 'opacity-100'}`}
+        ></div>
+        
+        {imageLoaded && (
           <div 
-            className="absolute inset-0 z-0 bg-cover bg-center opacity-60" 
-            style={{ backgroundImage: 'url(/lovable-uploads/1f09cbc4-45e2-4b8c-8e32-75019e404759.png)' }}
+            className="absolute inset-0 z-0 bg-cover bg-center opacity-60 transition-opacity duration-300 ease-in-out" 
+            style={{ backgroundImage: `url(${imageSrc})` }}
           ></div>
-        ) : (
-          <div className="absolute inset-0 z-0 bg-gradient-to-br from-cmr-green/20 to-cmr-yellow/20"></div>
         )}
       </div>
       

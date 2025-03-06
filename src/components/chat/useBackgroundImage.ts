@@ -15,37 +15,28 @@ export function useBackgroundImage(imagePath: string) {
       return;
     }
 
-    const loadImage = async () => {
-      try {
-        const img = new Image();
-        
-        const imageLoadPromise = new Promise<void>((resolve, reject) => {
-          img.onload = () => {
-            resolve();
-          };
-          
-          img.onerror = () => {
-            reject(new Error(`Échec du chargement de l'image: ${imagePath}`));
-          };
-        });
-        
-        img.src = imagePath;
-        
-        await imageLoadPromise;
-        
-        setImageSrc(img.src);
-        setImageLoaded(true);
-        setError(null);
-        
-      } catch (err) {
-        setError("Erreur lors du chargement de l'image");
-        setImageLoaded(false);
-      }
+    // Précharger l'image avant de la définir comme chargée
+    const img = new Image();
+    
+    img.onload = () => {
+      setImageSrc(img.src);
+      setImageLoaded(true);
+      setError(null);
+      console.log("Image de fond chargée avec succès:", img.src);
     };
-
-    loadImage();
+    
+    img.onerror = (err) => {
+      setError("Erreur lors du chargement de l'image");
+      setImageLoaded(false);
+      console.error("Erreur lors du chargement de l'image de fond:", err);
+      console.log("Chemin de l'image tentée:", img.src);
+    };
+    
+    // Important: définir src après avoir défini les gestionnaires d'événements
+    img.src = imagePath;
     
     return () => {
+      // Nettoyage lors du démontage du composant
       setImageLoaded(false);
       setImageSrc("");
       setError(null);
