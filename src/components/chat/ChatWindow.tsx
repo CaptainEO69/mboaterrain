@@ -20,7 +20,7 @@ export function ChatWindow() {
     toggleChat
   } = useChatMessages();
   
-  // Essayer avec le nom de fichier complet
+  // Chemin vérifié vers l'image du lion
   const imageUrl = '/lion.png';
   const { imageLoaded, imageSrc, error } = useBackgroundImage(imageUrl);
 
@@ -31,7 +31,7 @@ export function ChatWindow() {
   return (
     <div className="fixed bottom-16 right-4 z-50 w-[90vw] md:w-80 h-[60vh] md:h-96">
       <div className="absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white">
-        {/* Utilisez un dégradé de couleur comme fond de secours */}
+        {/* Dégradé de couleur comme fond de secours */}
         <div className="absolute inset-0 z-0 bg-gradient-to-br from-cmr-green/10 to-cmr-yellow/10"></div>
         
         {/* Image de fond - affichage uniquement si chargée avec succès */}
