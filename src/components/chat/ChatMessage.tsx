@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Message } from "./ChatWindow";
+import { Message } from "./types";
 import { cn } from "@/lib/utils";
 
 interface ChatMessageProps {
