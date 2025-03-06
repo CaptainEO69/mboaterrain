@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { User } from "@supabase/supabase-js";
 import { ProfileFormData } from "@/types/profile";
 import { updateUserProfile } from "@/services/profileService";
@@ -38,22 +38,29 @@ export function useProfileForm(user: User | null) {
     notary_office: "",
   });
 
-  useEffect(() => {
+  const loadUserData = useCallback(() => {
     console.log("ProfileForm - Loading user data, user present:", !!user);
     setError(null);
     
+    if (loading && !user) {
+      console.log("ProfileForm - No user found, stopping loading");
+      setLoading(false);
+      return;
+    }
+    
     // Set a timeout to prevent infinite loading
     const loadingTimeout = setTimeout(() => {
-      setLoading(false);
-      if (!user) {
-        console.log("ProfileForm - Loading timeout exceeded, no user found");
+      if (loading) {
+        console.log("ProfileForm - Loading timeout exceeded, forcing load complete");
+        setLoading(false);
       }
-    }, 2000);
+    }, 3000); // Reduced timeout to 3 seconds
     
     if (user && user.user_metadata) {
       try {
         console.log("ProfileForm - User metadata found, setting form data");
-        setFormData({
+        // Create a copy of the default state with user data
+        const newFormData = {
           first_name: user.user_metadata?.first_name || "",
           last_name: user.user_metadata?.last_name || "",
           phone_number: user.user_metadata?.phone_number || "",
@@ -80,7 +87,9 @@ export function useProfileForm(user: User | null) {
           transport_capacity: user.user_metadata?.transport_capacity || "",
           insurance_included: user.user_metadata?.insurance_included || false,
           notary_office: user.user_metadata?.notary_office || "",
-        });
+        };
+        
+        setFormData(newFormData);
         clearTimeout(loadingTimeout);
         setLoading(false);
       } catch (error: any) {
@@ -95,7 +104,19 @@ export function useProfileForm(user: User | null) {
     }
     
     return () => clearTimeout(loadingTimeout);
-  }, [user]);
+  }, [user, loading]);
+
+  // Load user data on initial mount or when user changes
+  useEffect(() => {
+    loadUserData();
+  }, [loadUserData]);
+
+  // If editing is enabled, ensure we have fresh data
+  useEffect(() => {
+    if (isEditing && user) {
+      console.log("Edit mode enabled, ensuring fresh user data");
+    }
+  }, [isEditing, user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name: string; value: any } }) => {
     const { name, value } = e.target;
@@ -107,6 +128,7 @@ export function useProfileForm(user: User | null) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!user) {
       setError("Vous devez être connecté pour mettre à jour votre profil");
       return;
@@ -118,6 +140,7 @@ export function useProfileForm(user: User | null) {
     try {
       console.log("ProfileForm - Submitting profile update");
       const success = await updateUserProfile(user.id, formData);
+      
       if (success) {
         setIsEditing(false);
         toast.success("Profil mis à jour avec succès");
@@ -127,6 +150,7 @@ export function useProfileForm(user: User | null) {
     } catch (error: any) {
       console.error("Error in handleSubmit:", error);
       setError("Erreur lors de la mise à jour du profil: " + (error.message || "Erreur inconnue"));
+      toast.error("Erreur lors de la mise à jour du profil. Veuillez réessayer.");
     } finally {
       setLoading(false);
     }

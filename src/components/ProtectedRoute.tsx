@@ -9,17 +9,26 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   const location = useLocation();
   const [showLoader, setShowLoader] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
+  const [timeoutReached, setTimeoutReached] = useState(false);
   
-  // Reduce timeout to prevent long waiting times
+  // Initial auth check on component mount
   useEffect(() => {
+    console.log("ProtectedRoute - Initial check:", {
+      loading,
+      user: user ? "User authenticated" : "No user",
+      pathname: location.pathname
+    });
+    
+    // Set a short timeout to prevent showing loader for too long
     const timer = setTimeout(() => {
       setShowLoader(false);
       setAuthChecked(true);
+      setTimeoutReached(true);
       
       if (!user && !loading) {
         toast.error("Session expirée ou non connecté. Veuillez vous reconnecter.");
       }
-    }, 1000); // Reduced from 2000ms to 1000ms for faster feedback
+    }, 1000);
     
     // If authentication completes before timeout, update state immediately
     if (!loading) {
@@ -30,21 +39,22 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     }
     
     return () => clearTimeout(timer);
-  }, [loading, user]);
+  }, [loading, user, location.pathname]);
 
   // Logs for debugging
   useEffect(() => {
-    console.log("ProtectedRoute - Current state:", {
+    console.log("ProtectedRoute - State updated:", {
       loading,
       user: user ? "User authenticated" : "No user",
       pathname: location.pathname,
       showLoader,
-      authChecked
+      authChecked,
+      timeoutReached
     });
-  }, [loading, user, location.pathname, showLoader, authChecked]);
+  }, [loading, user, location.pathname, showLoader, authChecked, timeoutReached]);
 
   // If no user and loading completed, redirect to login
-  if (!user && (!loading || authChecked)) {
+  if (!user && (!loading || timeoutReached)) {
     console.log("ProtectedRoute - Redirecting to login from:", location.pathname);
     return <Navigate to="/login" state={{ from: location }} replace />;
   }

@@ -15,7 +15,6 @@ export default function Profile() {
   const [authChecked, setAuthChecked] = useState(false);
   const [localLoading, setLocalLoading] = useState(true);
 
-  // Reduce timeout to 1 second for better UX
   useEffect(() => {
     console.log("Profile component - Auth state:", { 
       user: user ? "Authenticated" : "Not authenticated", 
@@ -27,7 +26,7 @@ export default function Profile() {
     const timer = setTimeout(() => {
       setLocalLoading(false);
       setAuthChecked(true);
-    }, 1000); // Reduced from 2000 to 1000ms
+    }, 1000); // Keep reduced timeout
     
     // If user is already loaded, no need to wait
     if (user) {
@@ -85,7 +84,7 @@ export default function Profile() {
     );
   }
 
-  // Show loading screen while form data is being loaded, but with a maximum wait time
+  // Show loading screen while form data is being loaded, with max 3 seconds wait time
   if (formLoading) {
     return <ProfileLoading message="Chargement des données de votre profil..." />;
   }

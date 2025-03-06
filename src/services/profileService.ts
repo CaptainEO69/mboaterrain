@@ -17,7 +17,7 @@ export async function updateUserProfile(userId: string, formData: ProfileFormDat
         id_number: formData.id_number,
         profession: formData.profession,
         residence_place: formData.residence_place,
-        birth_date: formData.birth_date?.toISOString(),
+        birth_date: formData.birth_date ? formData.birth_date.toISOString() : null,
         user_type: formData.user_type,
         agency_name: formData.agency_name,
         commercial_register: formData.commercial_register,
