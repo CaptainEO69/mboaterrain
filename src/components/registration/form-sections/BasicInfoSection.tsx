@@ -100,7 +100,7 @@ export function BasicInfoSection({ formData, setters }: BasicInfoSectionProps) {
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent className="w-auto p-0 bg-white" align="start">
               <Calendar
                 mode="single"
                 selected={formData.birthDate || undefined}

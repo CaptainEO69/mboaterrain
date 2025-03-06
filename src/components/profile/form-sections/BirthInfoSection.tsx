@@ -68,7 +68,7 @@ export function BirthInfoSection({
             <SelectTrigger className={!isEditing ? "bg-gray-50" : ""}>
               <SelectValue placeholder="Jour" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
               {days.map((day) => (
                 <SelectItem key={day} value={day.toString()}>
                   {day}
@@ -85,7 +85,7 @@ export function BirthInfoSection({
             <SelectTrigger className={!isEditing ? "bg-gray-50" : ""}>
               <SelectValue placeholder="Mois" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
               {months.map((month) => (
                 <SelectItem key={month.value} value={month.value.toString()}>
                   {month.label}
@@ -102,7 +102,7 @@ export function BirthInfoSection({
             <SelectTrigger className={!isEditing ? "bg-gray-50" : ""}>
               <SelectValue placeholder="Année" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
               {years.map((year) => (
                 <SelectItem key={year} value={year.toString()}>
                   {year}
