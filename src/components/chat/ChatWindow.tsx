@@ -20,8 +20,8 @@ export function ChatWindow() {
     toggleChat
   } = useChatMessages();
   
-  // Utiliser spécifiquement l'image du lion
-  const imageUrl = '/lovable-uploads/a3ffe062-c7f9-4c48-9958-60db36d00526.png';
+  // Utiliser une des images disponibles dans le projet
+  const imageUrl = '/lovable-uploads/83fc2739-1a70-4b50-b7a3-127bda76b51d.png';
   const { imageLoaded, imageSrc, error } = useBackgroundImage(imageUrl);
 
   // Afficher des informations de débogage dans la console

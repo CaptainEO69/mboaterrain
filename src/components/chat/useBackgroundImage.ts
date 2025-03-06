@@ -33,7 +33,7 @@ export function useBackgroundImage(imagePath: string) {
           
           img.onerror = (e) => {
             console.error(`❌ Échec du chargement de l'image: ${imagePath}`, e);
-            reject(new Error(`Image '${imagePath}' non trouvée`));
+            reject(new Error(`Impossible de charger l'image`));
           };
         });
         
@@ -60,7 +60,7 @@ export function useBackgroundImage(imagePath: string) {
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
         console.error(`❌ Erreur lors du chargement de l'image: ${errorMessage}`);
-        setError(`Erreur: ${errorMessage}`);
+        setError(errorMessage);
         setImageLoaded(false);
         setImageSrc("");
       }
