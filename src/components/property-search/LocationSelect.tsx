@@ -1,12 +1,14 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RegionSelect } from "./RegionSelect";
 import { CitySelect } from "./CitySelect";
+import { ManualCityInput } from "./ManualCityInput";
 import { LocationTextFields } from "./LocationTextFields";
 import { LocationDisplay } from "./LocationDisplay";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import { useLocationStorage } from "@/hooks/useLocationStorage";
+import { Switch } from "@/components/ui/switch";
 
 interface LocationSelectProps {
   onCityChange: (city: string) => void;
@@ -20,7 +22,13 @@ export function LocationSelect({
   onDistrictChange
 }: LocationSelectProps) {
   const [selectedRegion, setSelectedRegion] = useState<string>("");
+  const [useManualCityInput, setUseManualCityInput] = useState<boolean>(false);
   const { saveLocation } = useLocationStorage();
+  
+  // Debug
+  useEffect(() => {
+    console.log("LocationSelect state:", { selectedRegion, useManualCityInput });
+  }, [selectedRegion, useManualCityInput]);
 
   // Fonction appelée lorsque la géolocalisation réussit
   const handleLocationFound = async (latitude: number, longitude: number) => {
@@ -42,18 +50,33 @@ export function LocationSelect({
       
       <RegionSelect
         onRegionChange={(region) => {
-          console.log("Région sélectionnée:", region);
+          console.log("Région sélectionnée dans LocationSelect:", region);
           setSelectedRegion(region);
         }}
       />
 
-      <div>
+      <div className="flex items-center justify-between mb-2">
         <Label>Ville</Label>
+        <div className="flex items-center space-x-2">
+          <Label htmlFor="manual-city-mode" className="text-xs text-muted-foreground">
+            Saisie manuelle
+          </Label>
+          <Switch
+            id="manual-city-mode"
+            checked={useManualCityInput}
+            onCheckedChange={setUseManualCityInput}
+          />
+        </div>
+      </div>
+      
+      {useManualCityInput ? (
+        <ManualCityInput onCityChange={onCityChange} />
+      ) : (
         <CitySelect 
           selectedRegion={selectedRegion} 
           onCityChange={onCityChange} 
         />
-      </div>
+      )}
 
       <LocationTextFields 
         onDistrictChange={onDistrictChange}

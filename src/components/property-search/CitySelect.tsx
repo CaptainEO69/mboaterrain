@@ -22,7 +22,18 @@ export function CitySelect({ selectedRegion, onCityChange }: CitySelectProps) {
   // Réinitialiser la ville sélectionnée quand la région change
   useEffect(() => {
     setSelectedCity("");
-  }, [selectedRegion]);
+    onCityChange(""); // Réinitialiser aussi la valeur dans le composant parent
+  }, [selectedRegion, onCityChange]);
+
+  // Debug
+  useEffect(() => {
+    console.log("État actuel du composant CitySelect:", {
+      selectedRegion,
+      citiesCount: cities?.length || 0,
+      loadingCities,
+      selectedCity
+    });
+  }, [selectedRegion, cities, loadingCities, selectedCity]);
 
   return (
     <Select
