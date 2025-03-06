@@ -2,7 +2,6 @@
 import { Label } from "@/components/ui/label";
 import { MapPin } from "lucide-react";
 import { LocationSelect } from "@/components/property-search/LocationSelect";
-import { GeolocationButton } from "@/components/property-search/GeolocationButton";
 import { useLocationStorage } from "@/hooks/useLocationStorage";
 
 export function LocationField() {
@@ -35,19 +34,16 @@ export function LocationField() {
     console.log("Arrondissement saisi:", district);
   };
   
+  // Cette fonction ne fait rien pour l'instant car la géolocalisation est désactivée
   const handleLocationFound = (latitude: number, longitude: number) => {
-    // Utiliser notre nouveau hook pour sauvegarder les coordonnées
     saveLocation(latitude, longitude);
     
-    // Ajouter les coordonnées au formulaire
     const form = document.querySelector('form');
     if (form) {
       const formData = new FormData(form);
       formData.set('latitude', latitude.toString());
       formData.set('longitude', longitude.toString());
     }
-    
-    console.log("Géolocalisation dans LocationField:", { latitude, longitude });
   };
   
   return (
@@ -62,11 +58,6 @@ export function LocationField() {
         onNeighborhoodChange={handleNeighborhoodChange}
         onDistrictChange={handleDistrictChange}
       />
-
-      <div className="mt-4 flex items-center gap-2">
-        <Label className="text-sm">Position exacte:</Label>
-        <GeolocationButton onLocationFound={handleLocationFound} />
-      </div>
 
       {hasLocation && location.latitude && location.longitude && (
         <div className="mt-2 text-xs text-muted-foreground">

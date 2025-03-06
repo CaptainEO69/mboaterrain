@@ -5,9 +5,7 @@ import { CitySelect } from "./CitySelect";
 import { ManualCityInput } from "./ManualCityInput";
 import { LocationTextFields } from "./LocationTextFields";
 import { LocationDisplay } from "./LocationDisplay";
-import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
-import { useLocationStorage } from "@/hooks/useLocationStorage";
 import { Switch } from "@/components/ui/switch";
 
 interface LocationSelectProps {
@@ -23,25 +21,15 @@ export function LocationSelect({
 }: LocationSelectProps) {
   const [selectedRegion, setSelectedRegion] = useState<string>("");
   const [useManualCityInput, setUseManualCityInput] = useState<boolean>(false);
-  const { saveLocation } = useLocationStorage();
   
   // Debug
   useEffect(() => {
     console.log("LocationSelect state:", { selectedRegion, useManualCityInput });
   }, [selectedRegion, useManualCityInput]);
 
-  // Fonction appelée lorsque la géolocalisation réussit
-  const handleLocationFound = async (latitude: number, longitude: number) => {
-    try {
-      // Utiliser notre nouveau hook pour stocker les coordonnées
-      saveLocation(latitude, longitude);
-      
-      toast.success("Position enregistrée avec succès");
-      console.log("Coordonnées géographiques:", { latitude, longitude });
-    } catch (error) {
-      console.error('Erreur lors du traitement de la géolocalisation:', error);
-      toast.error("Erreur lors du traitement de votre localisation");
-    }
+  // Fonction de géolocalisation désactivée
+  const handleLocationFound = (latitude: number, longitude: number) => {
+    console.log("Géolocalisation désactivée temporairement");
   };
 
   return (
