@@ -6,7 +6,6 @@ import { ChatInput } from "./ChatInput";
 import { ChatButton } from "./ChatButton";
 import { useChatMessages } from "./useChatMessages";
 import { useBackgroundImage } from "./useBackgroundImage";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect } from "react";
 
 export * from "./types";
@@ -21,7 +20,7 @@ export function ChatWindow() {
     toggleChat
   } = useChatMessages();
   
-  // Utiliser l'image du lion téléversée avec un chemin confirmé
+  // Utiliser l'image du lion avec le chemin correct
   const imageUrl = '/lovable-uploads/83fc2739-1a70-4b50-b7a3-127bda76b51d.png';
   const { imageLoaded, imageSrc, error } = useBackgroundImage(imageUrl);
 
@@ -40,8 +39,8 @@ export function ChatWindow() {
         {/* Dégradé de couleur comme fond de secours */}
         <div className="absolute inset-0 z-0 bg-gradient-to-br from-cmr-green/10 to-cmr-yellow/10"></div>
         
-        {/* Image de fond avec style direct et forced display */}
-        {imageLoaded && (
+        {/* Image de fond */}
+        {imageLoaded && imageSrc && (
           <div 
             className="absolute inset-0 z-0"
             style={{
@@ -49,8 +48,8 @@ export function ChatWindow() {
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
-              opacity: 1,
-              display: 'block',
+              opacity: 0.8,
+              display: 'block !important'
             }}
           ></div>
         )}
@@ -65,7 +64,10 @@ export function ChatWindow() {
       {/* Affichage des informations de débogage en mode développement */}
       {process.env.NODE_ENV === 'development' && (
         <div className="absolute bottom-0 left-0 bg-orange-500 text-white p-1 text-xs max-w-full overflow-hidden">
-          {error || (imageLoaded ? `Image chargée: ${imageSrc}` : "Image de fond non chargée. Vérifiez la console.")}
+          {error ? 
+            `Erreur: ${error}` : 
+            (imageLoaded ? `Image chargée: ${imageSrc.substring(0, 30)}...` : "Chargement de l'image...")
+          }
         </div>
       )}
     </div>

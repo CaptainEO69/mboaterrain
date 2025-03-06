@@ -34,7 +34,9 @@ export function useBackgroundImage(imagePath: string) {
         
         // Définir le src après avoir défini les gestionnaires d'événements
         // Ajout d'un paramètre aléatoire pour contourner le cache du navigateur
-        img.src = `${imagePath}?nocache=${Date.now()}`;
+        const cacheBuster = `?nocache=${Date.now()}`;
+        const fullPath = imagePath.startsWith('http') ? imagePath : `${imagePath}${cacheBuster}`;
+        img.src = fullPath;
         
         // Attendre que l'image soit chargée
         await imageLoadPromise;
