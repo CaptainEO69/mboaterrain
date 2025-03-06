@@ -50,7 +50,7 @@ export function useCitySelector(selectedRegion: string) {
           .eq('region_id', regionData.id)
           .order('name');
         
-        console.log("Réponse du serveur pour les villes:", { citiesData, citiesError });
+        console.log("Réponse du serveur pour les villes:", { data: citiesData, error: citiesError });
         
         if (citiesError) {
           console.error('Erreur lors du chargement des villes:', citiesError);

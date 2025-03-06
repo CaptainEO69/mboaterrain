@@ -27,7 +27,7 @@ export function CitySelect({ selectedRegion, onCityChange }: CitySelectProps) {
         setSelectedCity(value);
         onCityChange(value);
       }}
-      disabled={loadingCities}
+      disabled={loadingCities || !selectedRegion}
     >
       <SelectTrigger className="w-full">
         {loadingCities ? (
@@ -37,9 +37,9 @@ export function CitySelect({ selectedRegion, onCityChange }: CitySelectProps) {
           </div>
         ) : (
           <SelectValue placeholder={
-            selectedRegion 
-              ? (cities.length === 0 ? "Aucune ville disponible pour cette région" : "Sélectionnez une ville") 
-              : "Sélectionnez d'abord une région"
+            !selectedRegion 
+              ? "Sélectionnez d'abord une région" 
+              : (cities.length === 0 ? "Aucune ville disponible pour cette région" : "Sélectionnez une ville")
           } />
         )}
       </SelectTrigger>
@@ -54,9 +54,9 @@ export function CitySelect({ selectedRegion, onCityChange }: CitySelectProps) {
           <SelectItem value="no-cities" disabled>
             {loadingCities 
               ? "Chargement..." 
-              : (selectedRegion 
-                  ? "Aucune ville disponible pour cette région" 
-                  : "Sélectionnez d'abord une région"
+              : (!selectedRegion 
+                  ? "Sélectionnez d'abord une région" 
+                  : "Aucune ville disponible pour cette région"
                 )
             }
           </SelectItem>
