@@ -29,6 +29,11 @@ export function useBackgroundImage(imagePath: string) {
           throw new Error("Chemin d'image vide");
         }
         
+        // Ignorons explicitement les chemins problématiques
+        if (imagePath.includes('83fc2739-1a70-4b50-b7a3-127bda76b51d')) {
+          throw new Error("Image spécifique ignorée intentionnellement");
+        }
+        
         // Créer un nouvel objet Image et le précharger
         const img = new Image();
         

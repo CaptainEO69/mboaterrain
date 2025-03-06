@@ -20,10 +20,10 @@ export function ChatWindow() {
     toggleChat
   } = useChatMessages();
   
-  // Utiliser uniquement un dégradé de couleur comme fond (sans image)
-  const [useImageBackground, setUseImageBackground] = useState(false);
+  // Utiliser l'image lion.png comme fond par défaut
+  const [useImageBackground, setUseImageBackground] = useState(true);
   const { imageLoaded, imageSrc, error } = useBackgroundImage(
-    useImageBackground ? '/lovable-uploads/83fc2739-1a70-4b50-b7a3-127bda76b51d.png' : ''
+    useImageBackground ? '/lion.png' : ''
   );
 
   // Afficher des informations de débogage dans la console
