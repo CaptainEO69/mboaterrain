@@ -24,6 +24,7 @@ export function useChatMessages() {
     lastRegion?: string;
     lastNeighborhood?: string;
     lastTopic?: string;
+    lastPropertyType?: string;
     userPreferences?: {
       budget?: string;
       propertyType?: string;
@@ -193,6 +194,28 @@ export function useChatMessages() {
       }
     }
 
+    // Détection de type de bien immobilier
+    const propertyTypes = [
+      { type: "terrain", keywords: ["terrain", "parcelle", "lot", "hectare", "are", "m2"] },
+      { type: "maison", keywords: ["maison", "villa", "pavillon", "domicile", "residence", "résidence"] },
+      { type: "appartement", keywords: ["appartement", "studio", "f1", "f2", "f3", "f4", "f5", "t1", "t2", "t3", "t4", "t5"] },
+      { type: "bureau", keywords: ["bureau", "local", "commerce", "commercial", "boutique", "magasin", "shop"] },
+      { type: "immeuble", keywords: ["immeuble", "building", "batiment", "bâtiment"] }
+    ];
+
+    for (const { type, keywords } of propertyTypes) {
+      if (keywords.some(keyword => normalizedQuery.includes(keyword))) {
+        setConversationContext(prev => ({ ...prev, lastPropertyType: type }));
+        
+        // Mise à jour des préférences utilisateur
+        setConversationContext(prev => ({
+          ...prev,
+          userPreferences: { ...prev.userPreferences, propertyType: type }
+        }));
+        break;
+      }
+    }
+
     // Détection de préférences
     if (normalizedQuery.includes("acheter") || normalizedQuery.includes("achat")) {
       setConversationContext(prev => ({
@@ -249,6 +272,24 @@ export function useChatMessages() {
         userPreferences: { ...prev.userPreferences, budget: budget }
       }));
     }
+
+    // Détection de sujets/topics
+    const topicKeywords: Record<string, string[]> = {
+      "prix": ["prix", "coute", "cout", "cher", "budget", "tarif", "cout", "coutent", "valent", "vaut"],
+      "marché": ["marche", "marché", "tendance", "evolution", "évolution", "demande", "offre"],
+      "investissement": ["investir", "investissement", "placement", "rendement", "rentabilite", "rentabilité"],
+      "document": ["document", "papier", "titre", "foncier", "contrat", "notaire", "acte", "légal", "legal"],
+      "financement": ["credit", "crédit", "pret", "prêt", "banque", "financement", "financer"],
+      "démarche": ["demarche", "démarche", "procedure", "procédure", "étape", "etape", "comment", "processus"],
+      "sécurité": ["securite", "sécurité", "sur", "sûr", "fiable", "confiance", "arnaque", "risque"]
+    };
+
+    for (const [topic, keywords] of Object.entries(topicKeywords)) {
+      if (keywords.some(keyword => normalizedQuery.includes(keyword))) {
+        setConversationContext(prev => ({ ...prev, lastTopic: topic }));
+        break;
+      }
+    }
   };
 
   // Fonction pour trouver les informations sur une ville
@@ -300,7 +341,7 @@ export function useChatMessages() {
 
   // Fonction pour générer une réponse personnalisée
   const generatePersonalizedResponse = (normalizedQuestion: string): { content: string, isPersonalized: boolean, isExpert: boolean } | null => {
-    const { userProfile, userPreferences, lastCity, lastRegion } = conversationContext;
+    const { userProfile, userPreferences, lastCity, lastRegion, lastPropertyType } = conversationContext;
     
     // Personnalisation pour utilisateurs connectés
     if (userProfile?.isLoggedIn) {
@@ -320,7 +361,36 @@ export function useChatMessages() {
       
       // Personnalisation basée sur les préférences utilisateur
       if (userPreferences) {
-        if (lastCity && userPreferences.purpose) {
+        // Si nous avons une ville et un type de propriété
+        if (lastCity && userPreferences.purpose && lastPropertyType) {
+          const city = findCityInfo(lastCity);
+          if (city) {
+            const propertyTypeMsg = lastPropertyType === "terrain" ? "terrains" : 
+                                  lastPropertyType === "maison" ? "maisons" :
+                                  lastPropertyType === "appartement" ? "appartements" :
+                                  lastPropertyType === "bureau" ? "bureaux/commerces" : "biens immobiliers";
+            
+            const popularAreas = city.neighborhoods
+              .filter(n => n.isPopular)
+              .map(n => n.name)
+              .slice(0, 3)
+              .join(", ");
+            
+            return {
+              content: `Selon votre profil et votre intérêt pour ${userPreferences.purpose === "achat" ? "l'achat" : 
+                         userPreferences.purpose === "location" ? "la location" : "l'investissement"} de ${propertyTypeMsg} 
+                       à ${city.name}, je vous recommande particulièrement les quartiers de ${popularAreas}.
+                       ${userPreferences.budget ? `Avec un budget de ${userPreferences.budget}, vous pourriez ${
+                         userPreferences.purpose === "achat" ? "acquérir" : 
+                         userPreferences.purpose === "location" ? "louer" : "investir dans"
+                       } un bien de bonne qualité dans ces zones.` : ""}`,
+              isPersonalized: true,
+              isExpert: true
+            };
+          }
+        }
+        // Si nous avons juste une ville
+        else if (lastCity && userPreferences.purpose) {
           const city = findCityInfo(lastCity);
           if (city) {
             const popularAreas = city.neighborhoods
@@ -352,15 +422,7 @@ export function useChatMessages() {
   const generateResponse = (question: string): { content: string, isPersonalized: boolean, isExpert: boolean } => {
     const normalizedQuestion = question.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     console.log("Génération de réponse pour:", normalizedQuestion);
-    
-    // NOUVEAU: Détection directe des questions sur les terrains à Yaoundé
-    if (normalizedQuestion.includes("terrain") && normalizedQuestion.includes("yaounde")) {
-      return {
-        content: "À Yaoundé, les meilleurs terrains se trouvent dans les quartiers de Odza, Nsimeyong et Mfandena. Ces zones offrent un bon compromis entre accessibilité, sécurité et potentiel de valorisation. Les prix varient entre 15 000 et 35 000 FCFA/m² selon l'emplacement et la viabilisation. Les zones en expansion comme Nkoabang et Simbock présentent également de bonnes opportunités d'investissement avec des prix plus abordables.",
-        isPersonalized: false,
-        isExpert: true
-      };
-    }
+    console.log("Contexte actuel:", conversationContext);
     
     // Tentative de réponse personnalisée
     const personalizedResponse = generatePersonalizedResponse(normalizedQuestion);
@@ -385,46 +447,38 @@ export function useChatMessages() {
     const cityRegex = /(?:a|de|sur|pour|dans|quartiers?(?:\sde)?)\s+([a-zA-Zé\s]+?)(?:$|\s+[?.,]|\s+(?:qui|pour|comment|est|sont))/i;
     const cityMatch = normalizedQuestion.match(cityRegex);
     
-    // NOUVEAU: Détection spécifique des questions sur les terrains
-    if (normalizedQuestion.includes("terrain") || normalizedQuestion.includes("parcelle")) {
-      // Vérifier s'il y a une ville mentionnée
-      if (conversationContext.lastCity) {
-        return {
-          content: `À ${conversationContext.lastCity}, les terrains les plus intéressants se trouvent ${
-            conversationContext.lastCity === "Yaoundé" ? "dans les quartiers d'Odza, Nsimeyong et Mfandena" : 
-            conversationContext.lastCity === "Douala" ? "dans les quartiers de Yassa, Logbessou et Bonamoussadi" :
-            "généralement en périphérie de la ville, dans les zones en développement"
-          }. Les prix varient entre ${
-            conversationContext.lastCity === "Yaoundé" ? "15 000 et 35 000 FCFA/m²" : 
-            conversationContext.lastCity === "Douala" ? "20 000 et 40 000 FCFA/m²" :
-            "10 000 et 25 000 FCFA/m²"
-          } selon l'emplacement et la viabilisation.`,
-          isPersonalized: false,
-          isExpert: true
-        };
+    // Détection de type de bien dans la question
+    const propertyTypes = {
+      "terrain": ["terrain", "parcelle", "lot"],
+      "maison": ["maison", "villa", "pavillon"],
+      "appartement": ["appartement", "studio", "f1", "f2", "f3"],
+      "commercial": ["bureau", "commerce", "local", "boutique"]
+    };
+    
+    let detectedPropertyType: string | null = null;
+    
+    for (const [type, keywords] of Object.entries(propertyTypes)) {
+      if (keywords.some(keyword => normalizedQuestion.includes(keyword))) {
+        detectedPropertyType = type;
+        break;
       }
     }
     
-    if (cityMatch) {
-      const potentialCity = cityMatch[1].trim();
-      if (potentialCity && potentialCity.length > 3) {
-        // Vérifier si c'est une demande de quartiers
-        if (normalizedQuestion.includes("quartier")) {
-          const cityInfo = findCityInfo(potentialCity);
-          if (cityInfo) {
-            return {
-              content: getPopularNeighborhoods(potentialCity),
-              isPersonalized: false,
-              isExpert: true
-            };
-          }
-        }
-        
-        // NOUVEAU: Vérifier si c'est une demande sur les terrains dans une ville
-        if (normalizedQuestion.includes("terrain") || normalizedQuestion.includes("parcelle")) {
-          const cityInfo = findCityInfo(potentialCity);
-          if (cityInfo) {
-            return {
+    // Si un type de propriété est détecté dans la question ou dans le contexte
+    const propertyType = detectedPropertyType || conversationContext.lastPropertyType;
+    
+    if (propertyType) {
+      // Vérifier s'il y a une ville mentionnée ou en contexte
+      const cityName = (cityMatch ? cityMatch[1].trim() : null) || conversationContext.lastCity;
+      
+      if (cityName) {
+        const cityInfo = findCityInfo(cityName);
+        if (cityInfo) {
+          // Réponse spécifique au type de bien et à la ville
+          let propertyResponse: { content: string, isPersonalized: boolean, isExpert: boolean } | null = null;
+          
+          if (propertyType === "terrain") {
+            propertyResponse = {
               content: `À ${cityInfo.name}, les terrains les plus intéressants se trouvent ${
                 cityInfo.name === "Yaoundé" ? "dans les quartiers d'Odza, Nsimeyong et Mfandena" : 
                 cityInfo.name === "Douala" ? "dans les quartiers de Yassa, Logbessou et Bonamoussadi" :
@@ -437,10 +491,80 @@ export function useChatMessages() {
               isPersonalized: false,
               isExpert: true
             };
+          } else if (propertyType === "maison") {
+            propertyResponse = {
+              content: `À ${cityInfo.name}, le marché des maisons et villas est particulièrement dynamique dans ${
+                cityInfo.name === "Yaoundé" ? "les quartiers de Bastos, Omnisport et Santa Barbara" : 
+                cityInfo.name === "Douala" ? "les quartiers de Bonanjo, Bonapriso et Bonamoussadi" :
+                "les quartiers résidentiels calmes et sécurisés"
+              }. Les prix pour une maison de qualité varient entre ${
+                cityInfo.name === "Yaoundé" ? "50 et 200 millions FCFA" : 
+                cityInfo.name === "Douala" ? "70 et 250 millions FCFA" :
+                "30 et 150 millions FCFA"
+              } selon l'emplacement, la taille et les finitions.`,
+              isPersonalized: false,
+              isExpert: true
+            };
+          } else if (propertyType === "appartement") {
+            propertyResponse = {
+              content: `À ${cityInfo.name}, les appartements les plus recherchés se situent dans ${
+                cityInfo.name === "Yaoundé" ? "les quartiers du Centre-ville, Bastos et Nlongkak" : 
+                cityInfo.name === "Douala" ? "les quartiers de Bonapriso, Bonanjo et Akwa" :
+                "les quartiers centraux et bien desservis"
+              }. Pour un appartement de 2-3 chambres, comptez entre ${
+                cityInfo.name === "Yaoundé" ? "20 et 60 millions FCFA" : 
+                cityInfo.name === "Douala" ? "25 et 80 millions FCFA" :
+                "15 et 50 millions FCFA"
+              } à l'achat, ou entre ${
+                cityInfo.name === "Yaoundé" ? "150 000 et 400 000 FCFA" : 
+                cityInfo.name === "Douala" ? "200 000 et 500 000 FCFA" :
+                "100 000 et 300 000 FCFA"
+              } par mois en location.`,
+              isPersonalized: false,
+              isExpert: true
+            };
+          } else if (propertyType === "commercial") {
+            propertyResponse = {
+              content: `À ${cityInfo.name}, les espaces commerciaux et bureaux les plus prisés se trouvent ${
+                cityInfo.name === "Yaoundé" ? "au centre-ville, à Bastos et à Hippodrome" : 
+                cityInfo.name === "Douala" ? "à Akwa, Bonanjo et Bali" :
+                "généralement dans les zones à fort passage et les centres d'affaires"
+              }. Les prix de location varient entre ${
+                cityInfo.name === "Yaoundé" ? "10 000 et 25 000 FCFA/m²/mois" : 
+                cityInfo.name === "Douala" ? "15 000 et 30 000 FCFA/m²/mois" :
+                "7 000 et 20 000 FCFA/m²/mois"
+              } selon l'emplacement et la qualité des finitions.`,
+              isPersonalized: false,
+              isExpert: true
+            };
+          }
+          
+          if (propertyResponse) {
+            return propertyResponse;
           }
         }
-        
-        // Vérifier si c'est une demande sur la ville en général
+      }
+    }
+    
+    // Vérifier si c'est une demande de quartiers pour une ville spécifique
+    if (cityMatch && normalizedQuestion.includes("quartier")) {
+      const potentialCity = cityMatch[1].trim();
+      if (potentialCity && potentialCity.length > 3) {
+        const cityInfo = findCityInfo(potentialCity);
+        if (cityInfo) {
+          return {
+            content: getPopularNeighborhoods(potentialCity),
+            isPersonalized: false,
+            isExpert: true
+          };
+        }
+      }
+    }
+    
+    // Vérifier si c'est une demande sur une ville en général
+    if (cityMatch) {
+      const potentialCity = cityMatch[1].trim();
+      if (potentialCity && potentialCity.length > 3) {
         const cityInfo = findCityInfo(potentialCity);
         if (cityInfo) {
           const popularAreas = cityInfo.neighborhoods
@@ -507,13 +631,13 @@ Les quartiers les plus recherchés sont ${popularAreas}.`,
       }
     }
     
-    // NOUVEAU: Détection améliorée des questions sur les meilleurs emplacements
+    // Détection améliorée des questions sur les meilleurs emplacements
     if ((normalizedQuestion.includes("meilleur") || normalizedQuestion.includes("mieux") || 
          normalizedQuestion.includes("ideal") || normalizedQuestion.includes("idéal") || 
          normalizedQuestion.includes("bon")) && 
         (normalizedQuestion.includes("endroit") || normalizedQuestion.includes("emplacement") || 
          normalizedQuestion.includes("quartier") || normalizedQuestion.includes("lieu") ||
-         normalizedQuestion.includes("zone") || normalizedQuestion.includes("terrain"))) {
+         normalizedQuestion.includes("zone"))) {
         
       // Chercher si une ville est mentionnée ou en contexte
       const cityName = conversationContext.lastCity || 
@@ -530,15 +654,36 @@ Les quartiers les plus recherchés sont ${popularAreas}.`,
             .slice(0, 3)
             .join(", ");
             
+          // Adapter la réponse en fonction du type de bien détecté
+          let propertySpecificAdvice = "";
+          if (propertyType === "terrain") {
+            propertySpecificAdvice = `Pour les terrains spécifiquement, les zones de ${
+              cityInfo.name === "Yaoundé" ? "Odza, Nsimeyong et Mfandena" : 
+              cityInfo.name === "Douala" ? "Yassa, Logbessou et Bonamoussadi" :
+              "la périphérie en développement"
+            } offrent le meilleur potentiel d'investissement.`;
+          } else if (propertyType === "maison") {
+            propertySpecificAdvice = `Pour les maisons familiales, les quartiers de ${
+              cityInfo.name === "Yaoundé" ? "Bastos, Omnisport et Santa Barbara" : 
+              cityInfo.name === "Douala" ? "Bonanjo, Bonapriso et Bonamoussadi" :
+              "zones résidentielles calmes"
+            } offrent le meilleur cadre de vie.`;
+          } else if (propertyType === "appartement") {
+            propertySpecificAdvice = `Pour les appartements, les immeubles dans ${
+              cityInfo.name === "Yaoundé" ? "le Centre-ville, Bastos et Nlongkak" : 
+              cityInfo.name === "Douala" ? "Bonapriso, Bonanjo et Akwa" :
+              "le centre-ville"
+            } sont les plus valorisés.`;
+          } else if (propertyType === "commercial") {
+            propertySpecificAdvice = `Pour les espaces commerciaux, les zones à fort passage comme ${
+              cityInfo.name === "Yaoundé" ? "le centre-ville, Mvog-Mbi et Mokolo" : 
+              cityInfo.name === "Douala" ? "Akwa, Mboppi et Ndokoti" :
+              "les marchés et axes commerciaux"
+            } sont à privilégier.`;
+          }
+            
           return {
-            content: `Les meilleurs emplacements à ${cityInfo.name} sont ${bestAreas}. Ces quartiers offrent un excellent compromis entre accessibilité, sécurité et qualité de vie. ${
-              normalizedQuestion.includes("terrain") ? 
-              `Pour les terrains spécifiquement, les zones de ${
-                cityInfo.name === "Yaoundé" ? "Odza, Nsimeyong et Mfandena" : 
-                cityInfo.name === "Douala" ? "Yassa, Logbessou et Bonamoussadi" :
-                "la périphérie en développement"
-              } offrent le meilleur potentiel d'investissement.` : ""
-            }`,
+            content: `Les meilleurs emplacements à ${cityInfo.name} sont ${bestAreas}. Ces quartiers offrent un excellent compromis entre accessibilité, sécurité et qualité de vie. ${propertySpecificAdvice}`,
             isPersonalized: false,
             isExpert: true
           };
@@ -574,6 +719,41 @@ Les quartiers les plus recherchés sont ${popularAreas}.`,
           ...prev,
           lastTopic: category
         }));
+        
+        // Si nous avons un type de bien et une catégorie, personnaliser la réponse
+        if (propertyType) {
+          const propertyTypeMsg = propertyType === "terrain" ? "terrains" : 
+                                propertyType === "maison" ? "maisons" :
+                                propertyType === "appartement" ? "appartements" :
+                                propertyType === "commercial" ? "espaces commerciaux" : "biens immobiliers";
+          
+          // Personnaliser pour les catégories les plus importantes
+          if (category === "prix") {
+            return {
+              content: `Les ${propertyTypeMsg} au Cameroun ont des prix qui varient considérablement selon la ville et le quartier. ${
+                propertyType === "terrain" ? "Dans les grandes villes comme Douala et Yaoundé, les terrains coûtent entre 15 000 et 40 000 FCFA/m² dans les zones prisées, tandis que dans les villes secondaires ou en périphérie, on trouve des opportunités entre 5 000 et 15 000 FCFA/m²." :
+                propertyType === "maison" ? "Pour une maison de qualité, comptez entre 50 et 250 millions FCFA à Douala et Yaoundé (quartiers résidentiels), et entre 30 et 150 millions FCFA dans les villes secondaires." :
+                propertyType === "appartement" ? "Pour un appartement standard de 2-3 chambres, les prix varient entre 20 et 80 millions FCFA à l'achat dans les grandes villes, ou entre 150 000 et 500 000 FCFA par mois en location." :
+                propertyType === "commercial" ? "Les espaces commerciaux bien situés se louent entre 10 000 et 30 000 FCFA/m²/mois dans les zones d'affaires de Douala et Yaoundé, avec des prix d'achat pouvant atteindre 1 million FCFA/m² pour les emplacements premium." :
+                "Les prix varient selon le type de bien, l'emplacement et la qualité des finitions. N'hésitez pas à me préciser quel type de bien vous intéresse pour des informations plus détaillées."
+              }`,
+              isPersonalized: false,
+              isExpert: true
+            };
+          } else if (category === "investissement") {
+            return {
+              content: `Pour investir dans les ${propertyTypeMsg} au Cameroun, ${
+                propertyType === "terrain" ? "concentrez-vous sur les zones en développement des grandes villes comme Yassa à Douala ou Odza à Yaoundé, ou sur les villes en croissance comme Kribi. Les rendements potentiels sur 5-10 ans peuvent atteindre 100-200% si vous choisissez bien l'emplacement." :
+                propertyType === "maison" ? "les propriétés résidentielles dans les quartiers sécurisés comme Bonamoussadi (Douala) ou Bastos (Yaoundé) offrent un rendement locatif de 6-8% et une bonne valorisation. Les maisons divisées en plusieurs appartements peuvent générer jusqu'à 10-12% de rendement." :
+                propertyType === "appartement" ? "les petites unités (studios, 2 pièces) près des universités et zones d'affaires offrent les meilleurs rendements locatifs (8-14%). Privilégiez les immeubles récents avec ascenseur et sécurité pour attirer une clientèle d'expatriés et cadres." :
+                propertyType === "commercial" ? "les emplacements stratégiques dans les zones commerciales à fort passage comme Akwa (Douala) peuvent générer des rendements de 10-15%. Assurez-vous d'obtenir des baux commerciaux sécurisés pour garantir la stabilité de vos revenus." :
+                "choisissez des emplacements stratégiques en fonction du type de bien visé. Les zones en développement offrent le meilleur potentiel de plus-value, tandis que les quartiers établis garantissent des revenus locatifs plus stables."
+              }`,
+              isPersonalized: false,
+              isExpert: true
+            };
+          }
+        }
         
         const response = getRandomResponse(category);
         return {
@@ -624,6 +804,12 @@ Les quartiers les plus recherchés sont ${popularAreas}.`,
         suggestedTopic = `Concernant la région ${conversationContext.lastRegion}, je peux vous informer sur les principales villes, le marché immobilier local ou les spécificités de cette zone. Que voulez-vous explorer?`;
       } else if (conversationContext.lastTopic) {
         suggestedTopic = `Pour approfondir sur le sujet "${conversationContext.lastTopic}", avez-vous des questions plus spécifiques? Je peux vous donner des détails précis adaptés à votre situation.`;
+      } else if (conversationContext.lastPropertyType) {
+        const propertyTypeMsg = conversationContext.lastPropertyType === "terrain" ? "terrains" : 
+                              conversationContext.lastPropertyType === "maison" ? "maisons" :
+                              conversationContext.lastPropertyType === "appartement" ? "appartements" :
+                              conversationContext.lastPropertyType === "commercial" ? "espaces commerciaux" : "biens immobiliers";
+        suggestedTopic = `Concernant les ${propertyTypeMsg}, je peux vous informer sur les prix, les meilleures zones, ou les conseils d'achat/investissement. Que voulez-vous savoir plus précisément?`;
       } else {
         suggestedTopic = "Je peux vous renseigner sur les villes et quartiers du Cameroun, les prix du marché, les démarches d'achat/vente, ou l'investissement immobilier. Quel sujet vous intéresse en particulier?";
       }
