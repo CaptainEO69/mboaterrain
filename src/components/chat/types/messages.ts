@@ -7,4 +7,6 @@ export interface Message {
   timestamp: Date;
   isPersonalized?: boolean;
   isExpert?: boolean;
+  // Champ pour suivre la question à laquelle ce message répond (pour le débogage)
+  relatedToQuestion?: string;
 }

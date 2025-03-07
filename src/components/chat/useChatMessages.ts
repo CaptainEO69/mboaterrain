@@ -34,7 +34,9 @@ export function useChatMessages() {
       isLoggedIn: boolean;
       userType?: string; // particulier, agent, notaire, etc.
       interests?: string[];
-    }
+    };
+    // Historique des recherches récentes pour mieux comprendre le contexte
+    recentSearches?: string[];
   }>({});
 
   // Initialisation du contexte utilisateur
@@ -69,6 +71,8 @@ export function useChatMessages() {
   const handleSendMessage = useCallback((input: string) => {
     if (!input.trim()) return;
 
+    console.log("Message utilisateur reçu:", input);
+
     // Message de l'utilisateur
     const userMessage: Message = {
       id: `user-${Date.now()}`,
@@ -78,6 +82,12 @@ export function useChatMessages() {
     };
 
     setMessages(prev => [...prev, userMessage]);
+
+    // Ajout à l'historique des recherches récentes
+    setConversationContext(prev => ({
+      ...prev,
+      recentSearches: [...(prev.recentSearches || []), input.toLowerCase()]
+    }));
 
     // Indicateur de frappe
     const typingIndicator: Message = {
@@ -104,13 +114,18 @@ export function useChatMessages() {
       setMessages(prev => {
         const withoutTyping = prev.filter(msg => msg.id !== typingIndicator.id);
         const botResponse = generateResponse(input);
+        
+        console.log("Contexte de conversation:", conversationContext);
+        console.log("Réponse générée:", botResponse);
+        
         const botMessage: Message = {
           id: `bot-${Date.now()}`,
           content: botResponse.content,
           sender: "bot",
           timestamp: new Date(),
           isPersonalized: botResponse.isPersonalized,
-          isExpert: botResponse.isExpert
+          isExpert: botResponse.isExpert,
+          relatedToQuestion: input // Tracer la question pour le débogage
         };
         
         // Notification pour les réponses d'expert
@@ -336,6 +351,16 @@ export function useChatMessages() {
   // Fonction principale pour générer une réponse
   const generateResponse = (question: string): { content: string, isPersonalized: boolean, isExpert: boolean } => {
     const normalizedQuestion = question.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    console.log("Génération de réponse pour:", normalizedQuestion);
+    
+    // NOUVEAU: Détection directe des questions sur les terrains à Yaoundé
+    if (normalizedQuestion.includes("terrain") && normalizedQuestion.includes("yaounde")) {
+      return {
+        content: "À Yaoundé, les meilleurs terrains se trouvent dans les quartiers de Odza, Nsimeyong et Mfandena. Ces zones offrent un bon compromis entre accessibilité, sécurité et potentiel de valorisation. Les prix varient entre 15 000 et 35 000 FCFA/m² selon l'emplacement et la viabilisation. Les zones en expansion comme Nkoabang et Simbock présentent également de bonnes opportunités d'investissement avec des prix plus abordables.",
+        isPersonalized: false,
+        isExpert: true
+      };
+    }
     
     // Tentative de réponse personnalisée
     const personalizedResponse = generatePersonalizedResponse(normalizedQuestion);
@@ -360,6 +385,26 @@ export function useChatMessages() {
     const cityRegex = /(?:a|de|sur|pour|dans|quartiers?(?:\sde)?)\s+([a-zA-Zé\s]+?)(?:$|\s+[?.,]|\s+(?:qui|pour|comment|est|sont))/i;
     const cityMatch = normalizedQuestion.match(cityRegex);
     
+    // NOUVEAU: Détection spécifique des questions sur les terrains
+    if (normalizedQuestion.includes("terrain") || normalizedQuestion.includes("parcelle")) {
+      // Vérifier s'il y a une ville mentionnée
+      if (conversationContext.lastCity) {
+        return {
+          content: `À ${conversationContext.lastCity}, les terrains les plus intéressants se trouvent ${
+            conversationContext.lastCity === "Yaoundé" ? "dans les quartiers d'Odza, Nsimeyong et Mfandena" : 
+            conversationContext.lastCity === "Douala" ? "dans les quartiers de Yassa, Logbessou et Bonamoussadi" :
+            "généralement en périphérie de la ville, dans les zones en développement"
+          }. Les prix varient entre ${
+            conversationContext.lastCity === "Yaoundé" ? "15 000 et 35 000 FCFA/m²" : 
+            conversationContext.lastCity === "Douala" ? "20 000 et 40 000 FCFA/m²" :
+            "10 000 et 25 000 FCFA/m²"
+          } selon l'emplacement et la viabilisation.`,
+          isPersonalized: false,
+          isExpert: true
+        };
+      }
+    }
+    
     if (cityMatch) {
       const potentialCity = cityMatch[1].trim();
       if (potentialCity && potentialCity.length > 3) {
@@ -369,6 +414,26 @@ export function useChatMessages() {
           if (cityInfo) {
             return {
               content: getPopularNeighborhoods(potentialCity),
+              isPersonalized: false,
+              isExpert: true
+            };
+          }
+        }
+        
+        // NOUVEAU: Vérifier si c'est une demande sur les terrains dans une ville
+        if (normalizedQuestion.includes("terrain") || normalizedQuestion.includes("parcelle")) {
+          const cityInfo = findCityInfo(potentialCity);
+          if (cityInfo) {
+            return {
+              content: `À ${cityInfo.name}, les terrains les plus intéressants se trouvent ${
+                cityInfo.name === "Yaoundé" ? "dans les quartiers d'Odza, Nsimeyong et Mfandena" : 
+                cityInfo.name === "Douala" ? "dans les quartiers de Yassa, Logbessou et Bonamoussadi" :
+                "généralement en périphérie de la ville, dans les zones en développement"
+              }. Les prix varient entre ${
+                cityInfo.name === "Yaoundé" ? "15 000 et 35 000 FCFA/m²" : 
+                cityInfo.name === "Douala" ? "20 000 et 40 000 FCFA/m²" :
+                "10 000 et 25 000 FCFA/m²"
+              } selon l'emplacement et la viabilisation.`,
               isPersonalized: false,
               isExpert: true
             };
@@ -438,6 +503,45 @@ Les quartiers les plus recherchés sont ${popularAreas}.`,
               };
             }
           }
+        }
+      }
+    }
+    
+    // NOUVEAU: Détection améliorée des questions sur les meilleurs emplacements
+    if ((normalizedQuestion.includes("meilleur") || normalizedQuestion.includes("mieux") || 
+         normalizedQuestion.includes("ideal") || normalizedQuestion.includes("idéal") || 
+         normalizedQuestion.includes("bon")) && 
+        (normalizedQuestion.includes("endroit") || normalizedQuestion.includes("emplacement") || 
+         normalizedQuestion.includes("quartier") || normalizedQuestion.includes("lieu") ||
+         normalizedQuestion.includes("zone") || normalizedQuestion.includes("terrain"))) {
+        
+      // Chercher si une ville est mentionnée ou en contexte
+      const cityName = conversationContext.lastCity || 
+                      (cityMatch ? cityMatch[1].trim() : null) ||
+                      (normalizedQuestion.includes("yaounde") ? "Yaoundé" : 
+                       normalizedQuestion.includes("douala") ? "Douala" : null);
+                       
+      if (cityName) {
+        const cityInfo = findCityInfo(cityName);
+        if (cityInfo) {
+          const bestAreas = cityInfo.neighborhoods
+            .filter(n => n.isPopular)
+            .map(n => n.name)
+            .slice(0, 3)
+            .join(", ");
+            
+          return {
+            content: `Les meilleurs emplacements à ${cityInfo.name} sont ${bestAreas}. Ces quartiers offrent un excellent compromis entre accessibilité, sécurité et qualité de vie. ${
+              normalizedQuestion.includes("terrain") ? 
+              `Pour les terrains spécifiquement, les zones de ${
+                cityInfo.name === "Yaoundé" ? "Odza, Nsimeyong et Mfandena" : 
+                cityInfo.name === "Douala" ? "Yassa, Logbessou et Bonamoussadi" :
+                "la périphérie en développement"
+              } offrent le meilleur potentiel d'investissement.` : ""
+            }`,
+            isPersonalized: false,
+            isExpert: true
+          };
         }
       }
     }
