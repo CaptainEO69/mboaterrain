@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Send, Loader } from "lucide-react";
-import { PREDEFINED_RESPONSES } from "./types";
+import { PREDEFINED_RESPONSES, CAMEROON_CITIES } from "./types";
 
 interface ChatInputProps {
   onSendMessage: (input: string) => void;
@@ -20,21 +20,75 @@ export function ChatInput({ onSendMessage, messages }: ChatInputProps) {
     "Quartiers prisés"
   ]);
 
+  // Extraction des villes pour les suggestions
+  const getAllCities = (): string[] => {
+    const cities: string[] = [];
+    for (const region in CAMEROON_CITIES) {
+      cities.push(...CAMEROON_CITIES[region].map(city => city.name));
+    }
+    return cities;
+  };
+
+  // Extraire les dernières entités mentionnées dans les messages
+  const extractEntities = () => {
+    if (messages.length === 0) return null;
+    
+    const lastMessages = messages.slice(-3);
+    let lastCity: string | null = null;
+    let lastRegion: string | null = null;
+    
+    // Chercher les mentions de ville ou région
+    for (const msg of lastMessages) {
+      const content = msg.content.toLowerCase();
+      
+      // Vérifier les villes
+      for (const region in CAMEROON_CITIES) {
+        for (const city of CAMEROON_CITIES[region]) {
+          if (content.includes(city.name.toLowerCase())) {
+            lastCity = city.name;
+            lastRegion = region;
+            break;
+          }
+        }
+        if (lastCity) break;
+        
+        // Vérifier la région elle-même
+        if (content.includes(region.toLowerCase())) {
+          lastRegion = region;
+        }
+      }
+      
+      if (lastCity) break;
+    }
+    
+    return { lastCity, lastRegion };
+  };
+
   // Générer des suggestions contextuelles basées sur les derniers messages
   useEffect(() => {
     if (messages.length > 0) {
       const lastBotMessage = [...messages].reverse().find(msg => msg.sender === "bot");
+      const entities = extractEntities();
       
       if (lastBotMessage) {
         const content = lastBotMessage.content.toLowerCase();
         
         // Suggestions contextuelles basées sur le dernier message du bot
         if (content.includes("quartier") || content.includes("emplacement")) {
-          setSuggestions([
-            "Meilleurs quartiers?",
-            "Prix à Bonapriso?",
-            "Sécurité du quartier?"
-          ]);
+          if (entities?.lastCity) {
+            setSuggestions([
+              `Meilleurs quartiers à ${entities.lastCity}?`,
+              `Prix à ${entities.lastCity}?`,
+              `Sécurité à ${entities.lastCity}?`
+            ]);
+          } else {
+            const cities = getAllCities().sort(() => 0.5 - Math.random()).slice(0, 3);
+            setSuggestions([
+              `Quartiers à ${cities[0]}?`,
+              `Quartiers à ${cities[1]}?`,
+              `Quartiers à ${cities[2]}?`
+            ]);
+          }
         } else if (content.includes("investissement") || content.includes("placement")) {
           setSuggestions([
             "Rendement locatif?",
@@ -52,6 +106,25 @@ export function ChatInput({ onSendMessage, messages }: ChatInputProps) {
             "Meilleur taux?",
             "Conditions requises?",
             "Délai d'obtention?"
+          ]);
+        } else if (entities?.lastCity) {
+          // Suggestions basées sur la dernière ville mentionnée
+          setSuggestions([
+            `Prix à ${entities.lastCity}?`,
+            `Quartiers prisés à ${entities.lastCity}?`,
+            `Investir à ${entities.lastCity}?`
+          ]);
+        } else if (entities?.lastRegion) {
+          // Suggestions basées sur la dernière région mentionnée
+          const cities = CAMEROON_CITIES[entities.lastRegion]
+            .map(city => city.name)
+            .sort(() => 0.5 - Math.random())
+            .slice(0, 2);
+            
+          setSuggestions([
+            `Villes en ${entities.lastRegion}?`,
+            `Quartiers à ${cities[0]}?`,
+            `Marché à ${cities[1]}?`
           ]);
         } else {
           // Suggestions par défaut basées sur les catégories populaires
@@ -71,6 +144,8 @@ export function ChatInput({ onSendMessage, messages }: ChatInputProps) {
               case "visite": return "Organiser une visite?";
               case "estimation": return "Estimer mon bien?";
               case "notaire": return "Rôle du notaire?";
+              case "villes": return "Principales villes?";
+              case "regions": return "Infos sur les régions?";
               default: return `Infos sur ${category}?`;
             }
           });

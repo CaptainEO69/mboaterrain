@@ -5,7 +5,255 @@ export interface Message {
   content: string;
   sender: "user" | "bot";
   timestamp: Date;
+  isPersonalized?: boolean;
 }
+
+export interface City {
+  name: string;
+  region: string;
+  neighborhoods: string[];
+  popularAreas: string[];
+  priceRange: string;
+  description: string;
+}
+
+// Base de données des villes et quartiers du Cameroun
+export const CAMEROON_CITIES: Record<string, City[]> = {
+  "Littoral": [
+    {
+      name: "Douala",
+      region: "Littoral",
+      neighborhoods: [
+        "Akwa", "Bonanjo", "Bonapriso", "Bonamoussadi", "Makepe", "Deido", "Bepanda", 
+        "New Bell", "Ndokotti", "Bonaberi", "PK8", "PK10", "PK12", "PK14", "Logpom", 
+        "Kotto", "Nyalla", "Logbessou", "Yassa", "Cité des Palmiers", "Village", "Denver",
+        "Mboppi", "Bessengue", "Bali", "Akwa-Nord", "Nylon", "Ndogbong", "Cité SIC", 
+        "Madagascar", "Brazzaville", "Mabanda", "Japoma", "Bobongo", "Bassa", "Youpwe",
+        "Bonejang", "Bonelang", "Ndoghem", "Soboum", "Boko", "Likoko", "Sodiko"
+      ],
+      popularAreas: ["Bonanjo", "Bonapriso", "Bonamoussadi", "Akwa", "Makepe", "Deido"],
+      priceRange: "150 000 - 500 000 FCFA/m²",
+      description: "Capitale économique du Cameroun, Douala est une ville portuaire dynamique avec des quartiers résidentiels et d'affaires en plein essor."
+    },
+    {
+      name: "Nkongsamba",
+      region: "Littoral",
+      neighborhoods: ["Centre-ville", "Quartier Haoussa", "Quartier administratif", "Bonaberi", "Bakoko"],
+      popularAreas: ["Centre-ville"],
+      priceRange: "50 000 - 150 000 FCFA/m²",
+      description: "Troisième ville la plus importante du Littoral, elle est située au pied du Mont Manengouba."
+    },
+    {
+      name: "Edéa",
+      region: "Littoral",
+      neighborhoods: ["Centre-ville", "Ekité", "Mbanda", "Bilalang", "Pongo"],
+      popularAreas: ["Centre-ville", "Ekité"],
+      priceRange: "40 000 - 120 000 FCFA/m²",
+      description: "Ville industrielle avec une importante centrale hydroélectrique sur la Sanaga."
+    }
+  ],
+  "Centre": [
+    {
+      name: "Yaoundé",
+      region: "Centre",
+      neighborhoods: [
+        "Bastos", "Nlongkak", "Tsinga", "Etoa-Meki", "Biyem-Assi", "Mvan", "Mendong", 
+        "Mimboman", "Mvog-Mbi", "Omnisport", "Mfandena", "Nkol-Eton", "Centre administratif", 
+        "Elig-Essono", "Elig-Edzoa", "Mokolo", "Madagascar", "Briqueterie", "Ngoa-Ekelle", 
+        "Obili", "Messassi", "Efoulan", "Dakar", "Ekounou", "Nkolbisson", "Messa", "Oyom-Abang",
+        "Nsimeyong", "Nkomo", "Kondengui", "Ahala", "Mbankolo", "Ngoulmakong", "Olezoa",
+        "Nkolondom", "Minkoameyos", "Emana", "Simbock", "Santa Barbara", "Mvog-Betsi", "Odza"
+      ],
+      popularAreas: ["Bastos", "Omnisport", "Nsimeyong", "Biyem-Assi", "Centre administratif"],
+      priceRange: "150 000 - 450 000 FCFA/m²",
+      description: "Capitale politique du Cameroun, Yaoundé est une ville de collines avec des quartiers résidentiels haut de gamme et administratifs."
+    },
+    {
+      name: "Mbalmayo",
+      region: "Centre",
+      neighborhoods: ["Centre-ville", "Quartier administratif", "Nkolyem", "Abang", "Nkolngok"],
+      popularAreas: ["Centre-ville"],
+      priceRange: "30 000 - 100 000 FCFA/m²",
+      description: "Ville située au sud de Yaoundé, connue pour son école des eaux et forêts."
+    },
+    {
+      name: "Eséka",
+      region: "Centre",
+      neighborhoods: ["Centre-ville", "Quartier administratif", "Quartier Haoussa"],
+      popularAreas: ["Centre-ville"],
+      priceRange: "20 000 - 80 000 FCFA/m²",
+      description: "Ville ferroviaire entre Douala et Yaoundé."
+    }
+  ],
+  "Ouest": [
+    {
+      name: "Bafoussam",
+      region: "Ouest",
+      neighborhoods: ["Centre commercial", "Kamkop", "Tamdja", "Banengo", "Djeleng", "Tougang", "Famla", "Tyo-ville"],
+      popularAreas: ["Centre commercial", "Kamkop", "Tamdja"],
+      priceRange: "50 000 - 200 000 FCFA/m²",
+      description: "Capitale régionale de l'Ouest, centre commercial important et carrefour des Grassfields."
+    },
+    {
+      name: "Dschang",
+      region: "Ouest",
+      neighborhoods: ["Centre-ville", "Mingmeto", "Paid Ground", "Campus", "Tsinkop", "Foto", "Vallée"],
+      popularAreas: ["Centre-ville", "Campus"],
+      priceRange: "30 000 - 150 000 FCFA/m²",
+      description: "Ville universitaire au climat frais, située dans les montagnes."
+    },
+    {
+      name: "Bafang",
+      region: "Ouest",
+      neighborhoods: ["Centre-ville", "Bafang rural", "Bandja", "Baboaté"],
+      popularAreas: ["Centre-ville"],
+      priceRange: "25 000 - 100 000 FCFA/m²",
+      description: "Centre commercial important dans la région du Haut-Nkam."
+    }
+  ],
+  "Sud-Ouest": [
+    {
+      name: "Buéa",
+      region: "Sud-Ouest",
+      neighborhoods: ["Molyko", "Great Soppo", "Small Soppo", "Bonduma", "Clerks Quarter", "Federal Quarter", "Mile 16", "Mile 17", "Mile 18"],
+      popularAreas: ["Molyko", "Great Soppo", "Federal Quarter"],
+      priceRange: "40 000 - 180 000 FCFA/m²",
+      description: "Ancienne capitale du Cameroun allemand, située au pied du mont Cameroun avec un climat frais."
+    },
+    {
+      name: "Limbé",
+      region: "Sud-Ouest",
+      neighborhoods: ["Down Beach", "Mile 4", "Bota", "GRA", "Middle Farms", "Unity Quarter", "Church Street", "New Town"],
+      popularAreas: ["Down Beach", "GRA", "Bota"],
+      priceRange: "35 000 - 150 000 FCFA/m²",
+      description: "Ville côtière avec des plages de sable noir, site de la raffinerie nationale et du jardin botanique."
+    },
+    {
+      name: "Kumba",
+      region: "Sud-Ouest",
+      neighborhoods: ["Fiango", "Bamileke Quarter", "Station", "Kosala", "Three Corners", "Mbonge Road"],
+      popularAreas: ["Fiango", "Station"],
+      priceRange: "25 000 - 90 000 FCFA/m²",
+      description: "Centre commercial important, surnommé 'K-Town'."
+    }
+  ],
+  "Nord-Ouest": [
+    {
+      name: "Bamenda",
+      region: "Nord-Ouest",
+      neighborhoods: ["Commercial Avenue", "Up Station", "Down Town", "Old Town", "Nkwen", "Bambili", "Mankon", "Mendakwe", "Mile 2", "Mile 4", "Mile 6", "Ntarikon"],
+      popularAreas: ["Commercial Avenue", "Up Station", "Nkwen"],
+      priceRange: "30 000 - 150 000 FCFA/m²",
+      description: "Capitale régionale du Nord-Ouest, centre commercial et culturel des Grassfields anglophones."
+    },
+    {
+      name: "Kumbo",
+      region: "Nord-Ouest",
+      neighborhoods: ["Squares", "Tobin", "Mbveh", "Romajay", "Takui"],
+      popularAreas: ["Squares"],
+      priceRange: "20 000 - 80 000 FCFA/m²",
+      description: "Deuxième ville du Nord-Ouest, située en altitude avec un climat frais."
+    }
+  ],
+  "Sud": [
+    {
+      name: "Ebolowa",
+      region: "Sud",
+      neighborhoods: ["Centre administratif", "Nko'ovos", "Mvog-Betsi", "Angalé"],
+      popularAreas: ["Centre administratif"],
+      priceRange: "25 000 - 100 000 FCFA/m²",
+      description: "Capitale régionale du Sud, connue pour ses plantations de cacao."
+    },
+    {
+      name: "Kribi",
+      region: "Sud",
+      neighborhoods: ["Centre-ville", "Dombé", "Mboa-Manga", "Afan-Mabé", "Talla", "Mpangou"],
+      popularAreas: ["Centre-ville", "Afan-Mabé"],
+      priceRange: "50 000 - 200 000 FCFA/m²",
+      description: "Station balnéaire avec des plages de sable fin, port en eau profonde."
+    },
+    {
+      name: "Sangmélima",
+      region: "Sud",
+      neighborhoods: ["Centre-ville", "Bingou", "Oyack", "Messok"],
+      popularAreas: ["Centre-ville"],
+      priceRange: "20 000 - 80 000 FCFA/m²",
+      description: "Ville commerciale située dans une zone de production cacaoyère."
+    }
+  ],
+  "Est": [
+    {
+      name: "Bertoua",
+      region: "Est",
+      neighborhoods: ["Centre administratif", "Nkolbikon", "Madagascar", "Mokolo", "Haoussa"],
+      popularAreas: ["Centre administratif"],
+      priceRange: "25 000 - 90 000 FCFA/m²",
+      description: "Capitale régionale de l'Est, point de départ vers les parcs nationaux."
+    },
+    {
+      name: "Abong-Mbang",
+      region: "Est",
+      neighborhoods: ["Centre-ville", "Quartier administratif"],
+      popularAreas: ["Centre-ville"],
+      priceRange: "15 000 - 60 000 FCFA/m²",
+      description: "Ville commerciale dans la zone forestière de l'Est."
+    }
+  ],
+  "Adamaoua": [
+    {
+      name: "Ngaoundéré",
+      region: "Adamaoua",
+      neighborhoods: ["Baladji", "Dang", "Bamyanga", "Mbideng", "Béka Matari", "Madagascar"],
+      popularAreas: ["Baladji", "Dang"],
+      priceRange: "20 000 - 90 000 FCFA/m²",
+      description: "Capitale régionale de l'Adamaoua, située en altitude sur les hauts plateaux."
+    },
+    {
+      name: "Meiganga",
+      region: "Adamaoua",
+      neighborhoods: ["Centre-ville", "Quartier Haoussa", "Goba"],
+      popularAreas: ["Centre-ville"],
+      priceRange: "15 000 - 50 000 FCFA/m²",
+      description: "Ville de transit vers la République Centrafricaine."
+    }
+  ],
+  "Nord": [
+    {
+      name: "Garoua",
+      region: "Nord",
+      neighborhoods: ["Bibémiré", "Marouaré", "Lopéré", "Foulbéré", "Poumpoumré", "Djamboutou"],
+      popularAreas: ["Bibémiré", "Marouaré"],
+      priceRange: "20 000 - 85 000 FCFA/m²",
+      description: "Capitale régionale du Nord, ville portuaire sur la Bénoué."
+    },
+    {
+      name: "Guider",
+      region: "Nord",
+      neighborhoods: ["Centre-ville", "Quartier Lam"],
+      popularAreas: ["Centre-ville"],
+      priceRange: "10 000 - 45 000 FCFA/m²",
+      description: "Centre minier et agricole."
+    }
+  ],
+  "Extrême-Nord": [
+    {
+      name: "Maroua",
+      region: "Extrême-Nord",
+      neighborhoods: ["Domayo", "Kakataré", "Djarengol", "Dougoï", "Palar", "Baouliwol"],
+      popularAreas: ["Domayo", "Djarengol"],
+      priceRange: "15 000 - 75 000 FCFA/m²",
+      description: "Capitale régionale de l'Extrême-Nord, centre artisanal et touristique."
+    },
+    {
+      name: "Kousseri",
+      region: "Extrême-Nord",
+      neighborhoods: ["Centre-ville", "Lac", "Douanes"],
+      popularAreas: ["Centre-ville"],
+      priceRange: "15 000 - 60 000 FCFA/m²",
+      description: "Ville frontalière avec le Tchad, située sur le fleuve Logone."
+    }
+  ]
+};
 
 // Questions et réponses prédéfinies pour le chatbot immobilier
 export const PREDEFINED_RESPONSES: Record<string, string[]> = {
@@ -89,6 +337,16 @@ export const PREDEFINED_RESPONSES: Record<string, string[]> = {
     "Un notaire est indispensable pour sécuriser votre transaction immobilière. Ses honoraires sont généralement de 4-7% du prix de vente.",
     "Nous collaborons avec un réseau de notaires expérimentés dans toutes les grandes villes du Cameroun. Nous pouvons vous recommander des professionnels fiables.",
     "Le notaire vérifie l'authenticité des documents, rédige l'acte de vente et s'occupe des démarches administratives de transfert de propriété. C'est une sécurité essentielle."
+  ],
+  "regions": [
+    "Le Cameroun est divisé en 10 régions administratives: Littoral, Centre, Ouest, Nord-Ouest, Sud-Ouest, Sud, Est, Adamaoua, Nord et Extrême-Nord. Chacune a ses particularités immobilières.",
+    "Les régions du Littoral et du Centre (avec Douala et Yaoundé) concentrent les marchés immobiliers les plus actifs du pays.",
+    "Les régions de l'Ouest et du Nord-Ouest connaissent un développement immobilier intéressant dans les villes comme Bafoussam, Bamenda et Dschang."
+  ],
+  "villes": [
+    "Les principales villes du marché immobilier camerounais sont Douala (capitale économique), Yaoundé (capitale politique), Bafoussam, Bamenda, Garoua, Maroua, Buéa, Limbé et Kribi.",
+    "Chaque ville camerounaise a ses spécificités en termes de prix et d'attractivité. Douala et Yaoundé sont les plus chères, suivies par Kribi, Limbé et Bafoussam.",
+    "Les villes secondaires comme Edéa, Nkongsamba, Ebolowa ou Bertoua offrent des opportunités d'investissement à des prix plus abordables, mais avec un marché moins dynamique."
   ]
 };
 
