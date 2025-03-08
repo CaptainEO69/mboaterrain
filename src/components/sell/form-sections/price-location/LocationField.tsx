@@ -5,7 +5,7 @@ import { LocationSelect } from "@/components/property-search/LocationSelect";
 import { useLocationStorage } from "@/hooks/useLocationStorage";
 
 export function LocationField() {
-  const { location, saveLocation, hasLocation } = useLocationStorage();
+  const { location, hasLocation } = useLocationStorage();
   
   const handleCityChange = (city: string) => {
     const form = document.querySelector('form');
@@ -32,18 +32,6 @@ export function LocationField() {
       formData.set('district', district);
     }
     console.log("Arrondissement saisi:", district);
-  };
-  
-  // Cette fonction ne fait rien pour l'instant car la géolocalisation est désactivée
-  const handleLocationFound = (latitude: number, longitude: number) => {
-    saveLocation(latitude, longitude);
-    
-    const form = document.querySelector('form');
-    if (form) {
-      const formData = new FormData(form);
-      formData.set('latitude', latitude.toString());
-      formData.set('longitude', longitude.toString());
-    }
   };
   
   return (

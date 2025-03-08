@@ -1,25 +1,15 @@
 
 import { Label } from "@/components/ui/label";
-import { GeolocationButton } from "./GeolocationButton";
 import { useLocationStorage } from "@/hooks/useLocationStorage";
 
-interface LocationDisplayProps {
-  onLocationFound: (latitude: number, longitude: number) => void;
-}
-
-export function LocationDisplay({ onLocationFound }: LocationDisplayProps) {
+export function LocationDisplay() {
+  // N'utilisons plus la géolocalisation
   const { location, hasLocation } = useLocationStorage();
-
-  // La fonction de géolocalisation est désactivée
-  const handleLocationFound = (latitude: number, longitude: number) => {
-    onLocationFound(latitude, longitude);
-  };
 
   return (
     <>
       <div className="flex items-center justify-between">
         <Label>Région</Label>
-        <GeolocationButton onLocationFound={handleLocationFound} />
       </div>
       
       {hasLocation && location.latitude && location.longitude && (

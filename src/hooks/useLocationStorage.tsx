@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 
 interface LocationStorage {
   latitude: number | null;
@@ -30,25 +30,19 @@ export function useLocationStorage() {
     }
   }, []);
 
-  // Sauvegarder les coordonnées dans localStorage
-  const saveLocation = useCallback((latitude: number, longitude: number) => {
-    // Mettre à jour le state
-    setLocation({ latitude, longitude });
-    
-    // Sauvegarder dans localStorage
-    localStorage.setItem('userLatitude', latitude.toString());
-    localStorage.setItem('userLongitude', longitude.toString());
-    
-    console.log("Coordonnées sauvegardées dans localStorage:", { latitude, longitude });
-  }, []);
+  // Cette fonction est maintenue pour compatibilité avec le code existant
+  // mais ne permet plus d'accéder à la géolocalisation
+  const saveLocation = () => {
+    console.log("La géolocalisation a été désactivée");
+  };
 
   // Effacer les coordonnées du localStorage
-  const clearLocation = useCallback(() => {
+  const clearLocation = () => {
     setLocation({ latitude: null, longitude: null });
     localStorage.removeItem('userLatitude');
     localStorage.removeItem('userLongitude');
     console.log("Coordonnées effacées du localStorage");
-  }, []);
+  };
 
   return {
     location,

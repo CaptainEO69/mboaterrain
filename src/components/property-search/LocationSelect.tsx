@@ -27,14 +27,9 @@ export function LocationSelect({
     console.log("LocationSelect state:", { selectedRegion, useManualCityInput });
   }, [selectedRegion, useManualCityInput]);
 
-  // Fonction de géolocalisation désactivée
-  const handleLocationFound = (latitude: number, longitude: number) => {
-    console.log("Géolocalisation désactivée temporairement");
-  };
-
   return (
     <div className="space-y-4">
-      <LocationDisplay onLocationFound={handleLocationFound} />
+      <LocationDisplay />
       
       <RegionSelect
         onRegionChange={(region) => {
