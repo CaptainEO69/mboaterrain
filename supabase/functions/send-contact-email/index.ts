@@ -25,81 +25,129 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    // Vérifier que la clé API est présente
-    const apiKey = req.headers.get('apikey') || new URL(req.url).searchParams.get('apikey');
+    console.log("Request received for send-contact-email");
     
-    if (!apiKey) {
-      console.error("No API key found in request");
+    // Check for RESEND_API_KEY
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    if (!resendApiKey) {
+      console.error("RESEND_API_KEY is not configured");
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: "No API key found in request" 
+          error: "Email service configuration error" 
         }),
         { 
-          status: 401, 
+          status: 500, 
           headers: { "Content-Type": "application/json", ...corsHeaders } 
         }
       );
     }
     
+    // Log headers for debugging
     console.log("Request headers:", Object.fromEntries([...req.headers.entries()]));
-    console.log("API Key found:", !!apiKey);
-    console.log("RESEND_API_KEY available:", !!Deno.env.get("RESEND_API_KEY"));
-
-    const { name, email, subject, message }: ContactEmailRequest = await req.json();
+    
+    let requestBody;
+    try {
+      requestBody = await req.json();
+    } catch (error) {
+      console.error("Failed to parse request body:", error);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: "Invalid request body" 
+        }),
+        { 
+          status: 400, 
+          headers: { "Content-Type": "application/json", ...corsHeaders } 
+        }
+      );
+    }
+    
+    const { name, email, subject, message } = requestBody as ContactEmailRequest;
+    
+    if (!name || !email || !subject || !message) {
+      console.error("Missing required fields in request body", { name, email, subject, message: !!message });
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: "Missing required fields" 
+        }),
+        { 
+          status: 400, 
+          headers: { "Content-Type": "application/json", ...corsHeaders } 
+        }
+      );
+    }
 
     console.log(`Sending contact email from ${name} <${email}> with subject: ${subject}`);
 
     // Email to the recipient (contactmboater@yahoo.com)
-    const emailToRecipient = await resend.emails.send({
-      from: "MboaTer <onboarding@resend.dev>",
-      to: [RECIPIENT_EMAIL],
-      subject: `Nouveau message: ${subject}`,
-      html: `
-        <h1>Nouveau message de ${name}</h1>
-        <p><strong>De:</strong> ${name} (${email})</p>
-        <p><strong>Sujet:</strong> ${subject}</p>
-        <p><strong>Message:</strong></p>
-        <p>${message.replace(/\n/g, '<br>')}</p>
-      `,
-    });
+    try {
+      const emailToRecipient = await resend.emails.send({
+        from: "MBoaTer <onboarding@resend.dev>",
+        to: [RECIPIENT_EMAIL],
+        subject: `Nouveau message: ${subject}`,
+        html: `
+          <h1>Nouveau message de ${name}</h1>
+          <p><strong>De:</strong> ${name} (${email})</p>
+          <p><strong>Sujet:</strong> ${subject}</p>
+          <p><strong>Message:</strong></p>
+          <p>${message.replace(/\n/g, '<br>')}</p>
+        `,
+      });
 
-    console.log("Email to recipient sent:", emailToRecipient);
+      console.log("Email to recipient sent:", emailToRecipient);
+      
+      // Confirmation email to the sender
+      const confirmationEmail = await resend.emails.send({
+        from: "MBoaTer <onboarding@resend.dev>",
+        to: [email],
+        subject: "Votre message a été reçu",
+        html: `
+          <h1>Merci de nous avoir contacté, ${name}!</h1>
+          <p>Nous avons bien reçu votre message concernant "${subject}" et nous vous répondrons dans les plus brefs délais.</p>
+          <p>Cordialement,<br>L'équipe MBoaTer</p>
+        `,
+      });
 
-    // Confirmation email to the sender
-    const confirmationEmail = await resend.emails.send({
-      from: "MBoaTer <onboarding@resend.dev>",
-      to: [email],
-      subject: "Votre message a été reçu",
-      html: `
-        <h1>Merci de nous avoir contacté, ${name}!</h1>
-        <p>Nous avons bien reçu votre message concernant "${subject}" et nous vous répondrons dans les plus brefs délais.</p>
-        <p>Cordialement,<br>L'équipe MBoaTer</p>
-      `,
-    });
+      console.log("Confirmation email sent:", confirmationEmail);
 
-    console.log("Confirmation email sent:", confirmationEmail);
-
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        recipientEmail: emailToRecipient, 
-        confirmationEmail 
-      }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          ...corsHeaders,
-        },
-      }
-    );
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          recipientEmail: emailToRecipient, 
+          confirmationEmail 
+        }),
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            ...corsHeaders,
+          },
+        }
+      );
+    } catch (emailError: any) {
+      console.error("Error sending email with Resend:", emailError);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: emailError.message || "Failed to send email" 
+        }),
+        {
+          status: 500,
+          headers: { 
+            "Content-Type": "application/json", 
+            ...corsHeaders 
+          },
+        }
+      );
+    }
   } catch (error: any) {
     console.error("Error in send-contact-email function:", error);
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error.message 
+        error: error.message || "An unknown error occurred" 
       }),
       {
         status: 500,

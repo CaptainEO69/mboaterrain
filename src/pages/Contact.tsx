@@ -22,7 +22,7 @@ export default function Contact() {
     setIsLoading(true);
     
     try {
-      console.log("Sending contact email...");
+      console.log("Sending contact email with data:", { name, email, subject, messageLength: message.length });
       
       const { data, error } = await supabase.functions.invoke("send-contact-email", {
         body: {
@@ -155,6 +155,8 @@ export default function Contact() {
           </form>
         </div>
       </div>
+      
+      <BottomNav />
     </div>
   );
 }
