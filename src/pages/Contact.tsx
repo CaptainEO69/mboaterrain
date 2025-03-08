@@ -16,6 +16,7 @@ export default function Contact() {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
 
   const validateForm = () => {
     if (!name.trim()) {
@@ -45,11 +46,15 @@ export default function Contact() {
     }
     
     setIsLoading(true);
+    setDebugInfo(null);
     
     try {
       console.log("Envoi du formulaire de contact:", { name, email, subject, messageLength: message.length });
       
-      const { data, error } = await supabase.functions.invoke("send-contact-email", {
+      // Vérifier si la fonction edge existe
+      toast.info("Tentative d'envoi du message...");
+      
+      const functionResponse = await supabase.functions.invoke("send-contact-email", {
         body: {
           name,
           email,
@@ -58,15 +63,23 @@ export default function Contact() {
         }
       });
 
-      console.log("Réponse de la fonction send-contact-email:", data, error);
-
-      if (error) {
-        console.error("Erreur Supabase:", error);
-        throw new Error(error.message || "Erreur lors de l'envoi du message");
+      console.log("Réponse brute de la fonction:", functionResponse);
+      
+      // Sauvegarder les infos de débogage
+      setDebugInfo(functionResponse);
+      
+      // Vérifier si la réponse contient une erreur
+      if (functionResponse.error) {
+        console.error("Erreur retournée par la fonction:", functionResponse.error);
+        throw new Error(functionResponse.error.message || "Erreur lors de l'envoi du message");
       }
 
+      // Vérifier la structure de la réponse
+      const data = functionResponse.data;
+      console.log("Données reçues:", data);
+
       if (!data?.success) {
-        console.error("Échec de l'envoi:", data?.error);
+        console.error("Échec de l'envoi indiqué dans la réponse:", data?.error);
         throw new Error(data?.error || "Erreur lors de l'envoi du message");
       }
 
@@ -180,6 +193,15 @@ export default function Contact() {
               )}
             </Button>
           </form>
+          
+          {debugInfo && (
+            <div className="mt-6 p-4 bg-gray-100 rounded-md">
+              <h3 className="text-sm font-medium mb-2">Informations de débogage:</h3>
+              <pre className="text-xs overflow-auto p-2 bg-gray-200 rounded">
+                {JSON.stringify(debugInfo, null, 2)}
+              </pre>
+            </div>
+          )}
         </div>
       </div>
       
