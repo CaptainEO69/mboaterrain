@@ -1,6 +1,5 @@
-
 import { ConversationContext } from "../types/conversationContext";
-import { CAMEROON_CITIES } from "../types";
+import { CAMEROON_CITIES } from "../data/citiesData";
 
 /**
  * Extrait le contexte à partir de la question posée par l'utilisateur

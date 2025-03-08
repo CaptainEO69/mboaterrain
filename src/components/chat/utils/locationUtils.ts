@@ -1,5 +1,6 @@
 
-import { City, Neighborhood, CAMEROON_CITIES } from "../types";
+import { City, Neighborhood } from "../types/locationTypes";
+import { CAMEROON_CITIES } from "../data/citiesData";
 
 /**
  * Trouve les informations sur une ville

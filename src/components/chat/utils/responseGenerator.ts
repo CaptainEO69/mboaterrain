@@ -2,7 +2,7 @@
 import { ConversationContext, GeneratedResponse } from "../types/conversationContext";
 import { PREDEFINED_RESPONSES } from "../types";
 import { findCityInfo, findNeighborhoodInfo, getPopularNeighborhoods } from "./locationUtils";
-import { CAMEROON_CITIES } from "../types/locations";
+import { CAMEROON_CITIES } from "../data/citiesData";
 import { generatePersonalizedResponse } from "./personalizedResponses";
 import { generatePropertyTypeResponse, generatePropertyCategoryResponse, generateBestLocationResponse } from "./propertyTypeResponses";
 import { generateCityResponse, findAndGenerateNeighborhoodResponse } from "./locationResponses";

@@ -1,5 +1,5 @@
 
-import { City, Neighborhood } from "../types/locations";
+import { City, Neighborhood } from "../types/locationTypes";
 import { GeneratedResponse } from "../types/conversationContext";
 import { findCityInfo, findNeighborhoodInfo, getPopularNeighborhoods } from "./locationUtils";
 
