@@ -2,11 +2,8 @@
 import { Label } from "@/components/ui/label";
 import { MapPin } from "lucide-react";
 import { LocationSelect } from "@/components/property-search/LocationSelect";
-import { useLocationStorage } from "@/hooks/useLocationStorage";
 
 export function LocationField() {
-  const { location, hasLocation } = useLocationStorage();
-  
   const handleCityChange = (city: string) => {
     const form = document.querySelector('form');
     if (form) {
@@ -46,12 +43,6 @@ export function LocationField() {
         onNeighborhoodChange={handleNeighborhoodChange}
         onDistrictChange={handleDistrictChange}
       />
-
-      {hasLocation && location.latitude && location.longitude && (
-        <div className="mt-2 text-xs text-muted-foreground">
-          Coordonnées: {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)}
-        </div>
-      )}
     </div>
   );
 }
