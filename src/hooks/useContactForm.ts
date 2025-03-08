@@ -8,6 +8,7 @@ export function useContactForm(userEmail: string | undefined) {
   const [email, setEmail] = useState(userEmail || "");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
+  const [files, setFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [debugInfo, setDebugInfo] = useState<any>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -32,6 +33,19 @@ export function useContactForm(userEmail: string | undefined) {
     return true;
   };
 
+  const handleAddFile = (file: File) => {
+    // Limite la taille des fichiers à 5 Mo
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Le fichier est trop volumineux (max 5 Mo)");
+      return;
+    }
+    setFiles(prev => [...prev, file]);
+  };
+
+  const handleRemoveFile = (index: number) => {
+    setFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -43,17 +57,55 @@ export function useContactForm(userEmail: string | undefined) {
     setDebugInfo(null);
     
     try {
-      console.log("Envoi du formulaire de contact:", { name, email, subject, messageLength: message.length });
+      console.log("Envoi du formulaire de contact:", { name, email, subject, messageLength: message.length, filesCount: files.length });
       
       // Vérifier si la fonction edge existe
       toast.info("Tentative d'envoi du message...");
       
+      // Créer la requête avec les données du formulaire
+      const formData = {
+        name,
+        email,
+        subject,
+        message,
+        hasAttachments: files.length > 0
+      };
+
+      let fileUrls: string[] = [];
+
+      // Télécharger les fichiers s'il y en a
+      if (files.length > 0) {
+        toast.info(`Téléchargement de ${files.length} fichier(s)...`);
+        
+        // Télécharger chaque fichier
+        for (const file of files) {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+          const filePath = `contact_attachments/${fileName}`;
+          
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('contact_attachments')
+            .upload(filePath, file);
+            
+          if (uploadError) {
+            console.error("Erreur lors du téléchargement du fichier:", uploadError);
+            throw new Error(`Erreur lors du téléchargement du fichier: ${uploadError.message}`);
+          }
+          
+          // Obtenir l'URL publique du fichier
+          const { data: { publicUrl } } = supabase.storage
+            .from('contact_attachments')
+            .getPublicUrl(filePath);
+            
+          fileUrls.push(publicUrl);
+        }
+      }
+      
+      // Appeler la fonction edge avec les données du formulaire et les URLs des fichiers
       const functionResponse = await supabase.functions.invoke("send-contact-email", {
         body: {
-          name,
-          email,
-          subject,
-          message
+          ...formData,
+          fileUrls
         }
       });
 
@@ -85,9 +137,10 @@ export function useContactForm(userEmail: string | undefined) {
         setShowConfirmation(false);
       }, 5000);
       
-      // Réinitialiser uniquement le sujet et le message
+      // Réinitialiser le formulaire
       setSubject("");
       setMessage("");
+      setFiles([]);
     } catch (error: any) {
       console.error("Erreur lors de l'envoi du message:", error);
       toast.error(error.message || "Erreur lors de l'envoi du message. Veuillez réessayer plus tard.");
@@ -105,6 +158,9 @@ export function useContactForm(userEmail: string | undefined) {
     setSubject,
     message,
     setMessage,
+    files,
+    handleAddFile,
+    handleRemoveFile,
     isLoading,
     debugInfo,
     showConfirmation,

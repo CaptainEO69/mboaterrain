@@ -4,18 +4,22 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
 import { DebugInfo } from "./DebugInfo";
+import { FileUploader } from "./FileUploader";
 
 interface ContactFormProps {
   name: string;
   email: string;
   subject: string;
   message: string;
+  files: File[];
   isLoading: boolean;
   debugInfo: any;
   onNameChange: (value: string) => void;
   onEmailChange: (value: string) => void;
   onSubjectChange: (value: string) => void;
   onMessageChange: (value: string) => void;
+  onAddFile: (file: File) => void;
+  onRemoveFile: (index: number) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
 
@@ -24,12 +28,15 @@ export function ContactForm({
   email,
   subject,
   message,
+  files,
   isLoading,
   debugInfo,
   onNameChange,
   onEmailChange,
   onSubjectChange,
   onMessageChange,
+  onAddFile,
+  onRemoveFile,
   onSubmit
 }: ContactFormProps) {
   return (
@@ -92,6 +99,18 @@ export function ContactForm({
             disabled={isLoading}
             placeholder="Votre message..."
             rows={5}
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Pièces jointes
+          </label>
+          <FileUploader 
+            files={files}
+            onAddFile={onAddFile}
+            onRemoveFile={onRemoveFile}
+            disabled={isLoading}
           />
         </div>
         

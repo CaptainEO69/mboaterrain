@@ -13,6 +13,8 @@ interface ContactEmailRequest {
   email: string;
   subject: string;
   message: string;
+  fileUrls?: string[];
+  hasAttachments?: boolean;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -70,8 +72,15 @@ const handler = async (req: Request): Promise<Response> => {
     }
     
     // Extraction et validation des données
-    const { name, email, subject, message } = requestBody as ContactEmailRequest;
-    console.log("Données extraites:", { name, email, subject, messageLength: message?.length });
+    const { name, email, subject, message, fileUrls = [], hasAttachments = false } = requestBody as ContactEmailRequest;
+    console.log("Données extraites:", { 
+      name, 
+      email, 
+      subject, 
+      messageLength: message?.length,
+      hasAttachments,
+      fileUrlsCount: fileUrls?.length 
+    });
     
     if (!name || !email || !subject || !message) {
       console.error("Champs requis manquants:", { name: !!name, email: !!email, subject: !!subject, message: !!message });
@@ -90,6 +99,17 @@ const handler = async (req: Request): Promise<Response> => {
     const RECIPIENT_EMAIL = "contactmboater@yahoo.com";
     console.log(`Envoi d'email de contact à ${RECIPIENT_EMAIL}`);
 
+    // Préparer la section des pièces jointes pour l'email
+    let attachmentSection = "";
+    if (hasAttachments && fileUrls.length > 0) {
+      attachmentSection = `
+        <h3>Pièces jointes:</h3>
+        <ul>
+          ${fileUrls.map((url, index) => `<li><a href="${url}" target="_blank">Pièce jointe ${index + 1}</a></li>`).join('')}
+        </ul>
+      `;
+    }
+
     // Email au destinataire (contactmboater@yahoo.com)
     try {
       console.log("Tentative d'envoi d'email au destinataire");
@@ -103,6 +123,7 @@ const handler = async (req: Request): Promise<Response> => {
           <p><strong>Sujet:</strong> ${subject}</p>
           <p><strong>Message:</strong></p>
           <p>${message.replace(/\n/g, '<br>')}</p>
+          ${attachmentSection}
         `,
       });
 
@@ -117,6 +138,7 @@ const handler = async (req: Request): Promise<Response> => {
         html: `
           <h1>Merci de nous avoir contacté, ${name}!</h1>
           <p>Nous avons bien reçu votre message concernant "${subject}" et nous vous répondrons dans les plus brefs délais.</p>
+          ${hasAttachments ? '<p>Nous avons bien reçu vos pièces jointes.</p>' : ''}
           <p>Cordialement,<br>L'équipe MBoaTer</p>
         `,
       });

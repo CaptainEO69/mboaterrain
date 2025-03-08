@@ -18,6 +18,9 @@ export default function Contact() {
     setSubject,
     message,
     setMessage,
+    files,
+    handleAddFile,
+    handleRemoveFile,
     isLoading,
     debugInfo,
     showConfirmation,
@@ -46,12 +49,15 @@ export default function Contact() {
           email={email}
           subject={subject}
           message={message}
+          files={files}
           isLoading={isLoading}
           debugInfo={debugInfo}
           onNameChange={setName}
           onEmailChange={setEmail}
           onSubjectChange={setSubject}
           onMessageChange={setMessage}
+          onAddFile={handleAddFile}
+          onRemoveFile={handleRemoveFile}
           onSubmit={handleSubmit}
         />
       </div>
