@@ -25,13 +25,34 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Vérifier que la clé API est présente
+    const apiKey = req.headers.get('apikey') || new URL(req.url).searchParams.get('apikey');
+    
+    if (!apiKey) {
+      console.error("No API key found in request");
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: "No API key found in request" 
+        }),
+        { 
+          status: 401, 
+          headers: { "Content-Type": "application/json", ...corsHeaders } 
+        }
+      );
+    }
+    
+    console.log("Request headers:", Object.fromEntries([...req.headers.entries()]));
+    console.log("API Key found:", !!apiKey);
+    console.log("RESEND_API_KEY available:", !!Deno.env.get("RESEND_API_KEY"));
+
     const { name, email, subject, message }: ContactEmailRequest = await req.json();
 
     console.log(`Sending contact email from ${name} <${email}> with subject: ${subject}`);
 
     // Email to the recipient (contactmboater@yahoo.com)
     const emailToRecipient = await resend.emails.send({
-      from: "Contact Form <onboarding@resend.dev>",
+      from: "MboaTer <onboarding@resend.dev>",
       to: [RECIPIENT_EMAIL],
       subject: `Nouveau message: ${subject}`,
       html: `
@@ -42,6 +63,8 @@ const handler = async (req: Request): Promise<Response> => {
         <p>${message.replace(/\n/g, '<br>')}</p>
       `,
     });
+
+    console.log("Email to recipient sent:", emailToRecipient);
 
     // Confirmation email to the sender
     const confirmationEmail = await resend.emails.send({
@@ -55,10 +78,7 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Emails sent successfully:", { 
-      toRecipient: emailToRecipient, 
-      confirmation: confirmationEmail 
-    });
+    console.log("Confirmation email sent:", confirmationEmail);
 
     return new Response(
       JSON.stringify({ 

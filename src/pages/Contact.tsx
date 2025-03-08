@@ -22,6 +22,8 @@ export default function Contact() {
     setIsLoading(true);
     
     try {
+      console.log("Sending contact email...");
+      
       const { data, error } = await supabase.functions.invoke("send-contact-email", {
         body: {
           name,
@@ -31,8 +33,14 @@ export default function Contact() {
         }
       });
 
+      console.log("Contact email response:", data, error);
+
       if (error) {
-        throw new Error(error.message);
+        throw new Error(error.message || "Erreur lors de l'envoi du message");
+      }
+
+      if (!data?.success) {
+        throw new Error(data?.error || "Erreur lors de l'envoi du message");
       }
 
       toast.success("Votre message a été envoyé. Nous vous répondrons dans les plus brefs délais.");
@@ -41,7 +49,7 @@ export default function Contact() {
       setMessage("");
     } catch (error: any) {
       console.error("Erreur lors de l'envoi du message:", error);
-      toast.error("Erreur lors de l'envoi du message. Veuillez réessayer plus tard.");
+      toast.error(error.message || "Erreur lors de l'envoi du message. Veuillez réessayer plus tard.");
     } finally {
       setIsLoading(false);
     }
@@ -147,8 +155,6 @@ export default function Contact() {
           </form>
         </div>
       </div>
-      
-      <BottomNav />
     </div>
   );
 }
