@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useNavigate } from "react-router-dom";
@@ -47,6 +48,12 @@ export function useRegistrationForm(type: string | null) {
       e.preventDefault();
     }
     
+    // Vérification des champs obligatoires
+    if (!email || !password || !firstName || !lastName || !phoneNumber) {
+      toast.error("Veuillez remplir tous les champs obligatoires");
+      return;
+    }
+    
     // Vérification de la force du mot de passe
     const strength = passwordStrength(password);
     if (strength.score < 3) {
@@ -55,10 +62,15 @@ export function useRegistrationForm(type: string | null) {
     }
     
     try {
+      console.log("Creating account with:", { email, password, firstName, lastName, phoneNumber, type });
+      
       // Create the user in Supabase Auth
       const { data: authData, error: authError } = await signUp(email, password);
       
-      if (authError) throw authError;
+      if (authError) {
+        console.error("Auth error:", authError);
+        throw authError;
+      }
       
       // Extraire l'ID de l'utilisateur
       const userId = authData?.user?.id;
@@ -67,11 +79,10 @@ export function useRegistrationForm(type: string | null) {
         throw new Error("Impossible de créer le compte utilisateur");
       }
       
+      console.log("User created with ID:", userId);
+      
       // Convertir la date de naissance en année de naissance pour la BD
       const birthYear = birthDate ? birthDate.getFullYear() : null;
-      
-      // Format phone number if necessary
-      // Le numéro est déjà formaté avec l'indicatif grâce au composant PhoneInput
       
       // Create a profile record with additional information
       const { data: profile, error: profileError } = await supabase
@@ -91,6 +102,8 @@ export function useRegistrationForm(type: string | null) {
           is_certified: isCertified,
           notary_office: notaryOffice,
           service_prices: servicePrices,
+          is_phone_verified: true, // Puisque nous avons vérifié le téléphone
+          is_email_verified: true, // Puisque nous avons vérifié l'email
           
           // Nouveaux champs
           property_type: propertyType,
@@ -112,13 +125,23 @@ export function useRegistrationForm(type: string | null) {
         })
         .select();
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error("Profile error:", profileError);
+        throw profileError;
+      }
       
+      console.log("Profile created:", profile);
       toast.success("Inscription réussie! Veuillez vous connecter.");
       navigate("/login");
     } catch (error: any) {
       console.error("Registration error:", error);
-      toast.error(error.message || "Erreur lors de l'inscription");
+      
+      // Messages d'erreur plus spécifiques
+      if (error.message?.includes("duplicate key") || error.message?.includes("already exists")) {
+        toast.error("Cette adresse email est déjà utilisée.");
+      } else {
+        toast.error(error.message || "Erreur lors de l'inscription");
+      }
     }
   };
 

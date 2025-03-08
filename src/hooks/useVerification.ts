@@ -20,16 +20,29 @@ export function useVerification() {
       setIsSendingCode(true);
       const code = generateVerificationCode();
       
-      // Store the code in localStorage temporarily (in a real app, use a more secure method)
+      // Store the code in localStorage temporarily
       localStorage.setItem("verification_code", code);
       localStorage.setItem("verification_expires", (Date.now() + 600000).toString()); // 10 minutes
       
       console.log("Sending SMS verification with code:", code, "to phone:", phoneNumber);
       
-      // Appel à la fonction Edge Function avec les headers corrects
+      // Format the phone number correctly
+      let formattedPhone = phoneNumber;
+      if (!phoneNumber.startsWith("+")) {
+        // Check if it starts with a country code without the plus
+        if (phoneNumber.startsWith("237") || phoneNumber.startsWith("33") || phoneNumber.startsWith("1")) {
+          formattedPhone = "+" + phoneNumber;
+        } else {
+          // Default to Cameroon country code if none provided
+          formattedPhone = "+237" + phoneNumber.replace(/^0+/, "");
+        }
+      }
+      
+      console.log("Using formatted phone number for SMS:", formattedPhone);
+      
+      // Appel à la fonction Edge Function
       const { data, error } = await supabase.functions.invoke("send-verification-sms", {
-        body: { phoneNumber, code },
-        // S'assurer que les headers d'authentification sont envoyés automatiquement par le SDK
+        body: { phoneNumber: formattedPhone, code },
       });
 
       if (error) {
@@ -59,19 +72,23 @@ export function useVerification() {
       // Use the same code for both SMS and email
       const code = localStorage.getItem("verification_code") || generateVerificationCode();
       
-      // Store the code in localStorage temporarily (in a real app, use a more secure method)
+      // Store the code in localStorage
       localStorage.setItem("verification_code", code);
       localStorage.setItem("verification_expires", (Date.now() + 600000).toString()); // 10 minutes
       
-      console.log("Sending email verification with code:", code);
+      console.log("Sending email verification with code:", code, "to email:", email);
       
-      // Appel à la fonction Edge Function avec les headers corrects
+      // Appel à la fonction Edge Function
       const { data, error } = await supabase.functions.invoke("send-verification-email", {
         body: { email, code },
-        // S'assurer que les headers d'authentification sont envoyés automatiquement par le SDK
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error sending email:", error);
+        throw error;
+      }
+      
+      console.log("Email verification function response:", data);
       
       setIsCodeSent(true);
       toast.success("Un code de vérification a été envoyé par email");

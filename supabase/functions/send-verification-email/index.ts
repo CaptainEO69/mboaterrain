@@ -35,6 +35,7 @@ serve(async (req) => {
     // Loguer les en-têtes pour le débogage
     console.log("Request headers:", Object.fromEntries([...req.headers.entries()]));
     console.log("API Key found:", !!apiKey);
+    console.log("RESEND_API_KEY available:", !!Deno.env.get("RESEND_API_KEY"));
     
     const { email, code } = await req.json();
 
@@ -48,9 +49,12 @@ serve(async (req) => {
       );
     }
 
+    console.log("Attempting to send verification email to:", email);
+    console.log("Verification code:", code);
+
     // Send the email with the verification code
     const { data, error } = await resend.emails.send({
-      from: "MboaTer <contactmboater@yahoo.com>",
+      from: "MboaTer <verification@mboater.com>",
       to: [email],
       subject: "Vérification de votre compte MboaTer",
       html: `
@@ -69,13 +73,14 @@ serve(async (req) => {
     });
 
     if (error) {
+      console.error("Error sending email:", error);
       throw new Error(error.message);
     }
 
     console.log("Email sent successfully:", data);
 
     return new Response(
-      JSON.stringify({ success: true, message: "Email sent successfully" }),
+      JSON.stringify({ success: true, message: "Email sent successfully", id: data?.id }),
       { 
         status: 200, 
         headers: { ...corsHeaders, "Content-Type": "application/json" } 

@@ -93,7 +93,7 @@ serve(async (req) => {
     console.log("SMS sent successfully:", message.sid);
 
     return new Response(
-      JSON.stringify({ success: true, message: "SMS sent successfully" }),
+      JSON.stringify({ success: true, message: "SMS sent successfully", sid: message.sid }),
       { 
         status: 200, 
         headers: { ...corsHeaders, "Content-Type": "application/json" } 

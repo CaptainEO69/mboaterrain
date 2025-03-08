@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { VerificationForm } from "@/components/auth/VerificationForm";
 import { useVerification } from "@/hooks/useVerification";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 const userTypes = [
   { value: "owner", label: "Propriétaire" },
@@ -33,6 +35,7 @@ export default function RegisterForm() {
   const currentUserType = getCurrentUserType();
   const { formData, setters, handleSubmit: originalHandleSubmit } = useRegistrationForm(currentUserType);
   const [isAwaitingVerification, setIsAwaitingVerification] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const {
     verificationCode,
@@ -52,30 +55,57 @@ export default function RegisterForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // If we're not awaiting verification, send the codes first
+    // Vérifier que les données requises sont fournies
+    if (!formData.email || !formData.password || !formData.firstName || 
+        !formData.lastName || !formData.phoneNumber) {
+      toast.error("Veuillez remplir tous les champs obligatoires");
+      return;
+    }
+    
+    // Si nous ne sommes pas en attente de vérification, envoyer les codes
     if (!isAwaitingVerification) {
-      const emailSent = await sendEmailVerification(formData.email);
-      const smsSent = await sendSMSVerification(formData.phoneNumber);
-      
-      if (emailSent && smsSent) {
-        setIsAwaitingVerification(true);
+      setIsSubmitting(true);
+      try {
+        console.log("Sending verification codes to:", formData.email, formData.phoneNumber);
+        const emailSent = await sendEmailVerification(formData.email);
+        const smsSent = await sendSMSVerification(formData.phoneNumber);
+        
+        if (emailSent && smsSent) {
+          setIsAwaitingVerification(true);
+          toast.success("Codes de vérification envoyés");
+        } else {
+          toast.error("Erreur lors de l'envoi des codes de vérification");
+        }
+      } catch (error) {
+        console.error("Error sending verification codes:", error);
+        toast.error("Erreur lors de l'envoi des codes de vérification");
+      } finally {
+        setIsSubmitting(false);
       }
       return;
     }
     
-    // If we're here, it means verification was successful
-    // Now proceed with the actual registration
+    // Si nous sommes ici, cela signifie que la vérification a réussi
+    // Maintenant, procéder à l'inscription
     originalHandleSubmit(e);
   };
 
   const handleResendCode = async () => {
-    await Promise.all([
-      sendEmailVerification(formData.email),
-      sendSMSVerification(formData.phoneNumber)
-    ]);
+    try {
+      console.log("Resending verification codes to:", formData.email, formData.phoneNumber);
+      await Promise.all([
+        sendEmailVerification(formData.email),
+        sendSMSVerification(formData.phoneNumber)
+      ]);
+      toast.success("Codes de vérification renvoyés");
+    } catch (error) {
+      console.error("Error resending verification codes:", error);
+      toast.error("Erreur lors du renvoi des codes de vérification");
+    }
   };
 
   const handleVerificationSuccess = () => {
+    console.log("Verification successful, proceeding with registration");
     // Proceed with the actual registration
     originalHandleSubmit({ preventDefault: () => {} } as React.FormEvent);
   };
@@ -159,9 +189,16 @@ export default function RegisterForm() {
               <Button 
                 type="submit" 
                 className="w-full"
-                disabled={isSendingCode}
+                disabled={isSubmitting}
               >
-                {isSendingCode ? "Envoi du code..." : "S'inscrire"}
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Traitement en cours...
+                  </>
+                ) : (
+                  "S'inscrire"
+                )}
               </Button>
             )}
             <p className="text-center text-sm">

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { toast } from "sonner";
 
 interface VerificationFormProps {
   phoneNumber: string;
@@ -52,34 +53,48 @@ export function VerificationForm({
   }, []);
 
   const handleVerify = async () => {
+    if (verificationCode.length !== 6) {
+      toast.error("Veuillez entrer un code à 6 chiffres");
+      return;
+    }
+    
+    console.log("Attempting to verify code:", verificationCode);
     if (verifyCode(verificationCode)) {
+      console.log("Verification successful");
       onVerificationSuccess();
+    } else {
+      console.log("Verification failed");
     }
   };
 
   const handleResend = async () => {
-    await onResendCode();
-    
-    // Reset the timer
-    setTimer(60);
-    
-    // Clear existing interval if any
-    if (timerInterval) {
-      clearInterval(timerInterval);
+    try {
+      await onResendCode();
+      
+      // Reset the timer
+      setTimer(60);
+      
+      // Clear existing interval if any
+      if (timerInterval) {
+        clearInterval(timerInterval);
+      }
+      
+      // Start a new timer
+      const interval = setInterval(() => {
+        setTimer((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      
+      setTimerInterval(interval);
+    } catch (error) {
+      console.error("Error resending code:", error);
+      toast.error("Erreur lors de l'envoi du code");
     }
-    
-    // Start a new timer
-    const interval = setInterval(() => {
-      setTimer((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    
-    setTimerInterval(interval);
   };
 
   // Auto-verify when all 6 digits are entered
@@ -89,12 +104,17 @@ export function VerificationForm({
     }
   }, [verificationCode]);
 
+  const formatPhoneNumber = (phone: string) => {
+    if (!phone) return "";
+    return phone.startsWith("+") ? phone : `+${phone}`;
+  };
+
   return (
     <div className="space-y-4">
       <div className="text-center">
         <h2 className="text-lg font-semibold">Vérification</h2>
         <p className="text-sm text-gray-500">
-          Nous avons envoyé un code de vérification à votre email ({email}) et votre téléphone ({phoneNumber}).
+          Nous avons envoyé un code de vérification à votre email ({email}) et votre téléphone ({formatPhoneNumber(phoneNumber)}).
         </p>
       </div>
 
