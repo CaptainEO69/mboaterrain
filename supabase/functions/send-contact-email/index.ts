@@ -2,9 +2,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
-const RECIPIENT_EMAIL = "contactmboater@yahoo.com";
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -19,22 +16,26 @@ interface ContactEmailRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  // Log de début pour confirmer que la fonction est appelée
+  console.log("⭐️ Fonction send-contact-email démarrée");
+  
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
+    console.log("Requête OPTIONS CORS reçue");
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log("Request received for send-contact-email");
-    
-    // Check for RESEND_API_KEY
+    // Vérification de la clé API Resend
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    console.log("Vérification de la clé API Resend:", resendApiKey ? "Présente" : "Absente");
+    
     if (!resendApiKey) {
-      console.error("RESEND_API_KEY is not configured");
+      console.error("ERREUR CRITIQUE: RESEND_API_KEY n'est pas configurée");
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: "Email service configuration error" 
+          error: "Configuration du service d'email manquante" 
         }),
         { 
           status: 500, 
@@ -43,18 +44,23 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
     
-    // Log headers for debugging
-    console.log("Request headers:", Object.fromEntries([...req.headers.entries()]));
+    const resend = new Resend(resendApiKey);
+    console.log("Client Resend initialisé");
     
+    // Log des headers pour le débogage
+    console.log("Headers de la requête:", Object.fromEntries([...req.headers.entries()]));
+    
+    // Parse du corps de la requête
     let requestBody;
     try {
       requestBody = await req.json();
+      console.log("Corps de la requête parsé avec succès:", requestBody);
     } catch (error) {
-      console.error("Failed to parse request body:", error);
+      console.error("Échec du parsing du corps de la requête:", error);
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: "Invalid request body" 
+          error: "Corps de requête invalide" 
         }),
         { 
           status: 400, 
@@ -63,14 +69,16 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
     
+    // Extraction et validation des données
     const { name, email, subject, message } = requestBody as ContactEmailRequest;
+    console.log("Données extraites:", { name, email, subject, messageLength: message?.length });
     
     if (!name || !email || !subject || !message) {
-      console.error("Missing required fields in request body", { name, email, subject, message: !!message });
+      console.error("Champs requis manquants:", { name: !!name, email: !!email, subject: !!subject, message: !!message });
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: "Missing required fields" 
+          error: "Champs requis manquants" 
         }),
         { 
           status: 400, 
@@ -79,10 +87,12 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    console.log(`Sending contact email from ${name} <${email}> with subject: ${subject}`);
+    const RECIPIENT_EMAIL = "contactmboater@yahoo.com";
+    console.log(`Envoi d'email de contact à ${RECIPIENT_EMAIL}`);
 
-    // Email to the recipient (contactmboater@yahoo.com)
+    // Email au destinataire (contactmboater@yahoo.com)
     try {
+      console.log("Tentative d'envoi d'email au destinataire");
       const emailToRecipient = await resend.emails.send({
         from: "MBoaTer <onboarding@resend.dev>",
         to: [RECIPIENT_EMAIL],
@@ -96,9 +106,10 @@ const handler = async (req: Request): Promise<Response> => {
         `,
       });
 
-      console.log("Email to recipient sent:", emailToRecipient);
+      console.log("Email au destinataire envoyé avec succès:", emailToRecipient);
       
-      // Confirmation email to the sender
+      // Email de confirmation à l'expéditeur
+      console.log("Tentative d'envoi d'email de confirmation à", email);
       const confirmationEmail = await resend.emails.send({
         from: "MBoaTer <onboarding@resend.dev>",
         to: [email],
@@ -110,13 +121,16 @@ const handler = async (req: Request): Promise<Response> => {
         `,
       });
 
-      console.log("Confirmation email sent:", confirmationEmail);
+      console.log("Email de confirmation envoyé avec succès:", confirmationEmail);
 
       return new Response(
         JSON.stringify({ 
           success: true, 
-          recipientEmail: emailToRecipient, 
-          confirmationEmail 
+          message: "Emails envoyés avec succès",
+          data: {
+            recipientEmail: emailToRecipient, 
+            confirmationEmail
+          }
         }),
         {
           status: 200,
@@ -127,11 +141,13 @@ const handler = async (req: Request): Promise<Response> => {
         }
       );
     } catch (emailError: any) {
-      console.error("Error sending email with Resend:", emailError);
+      console.error("Erreur d'envoi d'email avec Resend:", emailError);
+      console.error("Détails de l'erreur:", JSON.stringify(emailError));
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: emailError.message || "Failed to send email" 
+          error: emailError.message || "Échec de l'envoi d'email",
+          details: emailError
         }),
         {
           status: 500,
@@ -143,11 +159,13 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
   } catch (error: any) {
-    console.error("Error in send-contact-email function:", error);
+    console.error("Erreur générale dans la fonction send-contact-email:", error);
+    console.error("Détails de l'erreur:", JSON.stringify(error));
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error.message || "An unknown error occurred" 
+        error: error.message || "Une erreur inconnue s'est produite",
+        details: error
       }),
       {
         status: 500,

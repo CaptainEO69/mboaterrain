@@ -17,12 +17,37 @@ export default function Contact() {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const validateForm = () => {
+    if (!name.trim()) {
+      toast.error("Veuillez entrer votre nom");
+      return false;
+    }
+    if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) {
+      toast.error("Veuillez entrer une adresse email valide");
+      return false;
+    }
+    if (!subject.trim()) {
+      toast.error("Veuillez entrer un sujet");
+      return false;
+    }
+    if (!message.trim()) {
+      toast.error("Veuillez entrer un message");
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
-      console.log("Sending contact email with data:", { name, email, subject, messageLength: message.length });
+      console.log("Envoi du formulaire de contact:", { name, email, subject, messageLength: message.length });
       
       const { data, error } = await supabase.functions.invoke("send-contact-email", {
         body: {
@@ -33,13 +58,15 @@ export default function Contact() {
         }
       });
 
-      console.log("Contact email response:", data, error);
+      console.log("Réponse de la fonction send-contact-email:", data, error);
 
       if (error) {
+        console.error("Erreur Supabase:", error);
         throw new Error(error.message || "Erreur lors de l'envoi du message");
       }
 
       if (!data?.success) {
+        console.error("Échec de l'envoi:", data?.error);
         throw new Error(data?.error || "Erreur lors de l'envoi du message");
       }
 
