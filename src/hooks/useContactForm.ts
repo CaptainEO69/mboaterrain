@@ -10,6 +10,7 @@ export function useContactForm(userEmail: string | undefined) {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [debugInfo, setDebugInfo] = useState<any>(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const validateForm = () => {
     if (!name.trim()) {
@@ -77,6 +78,13 @@ export function useContactForm(userEmail: string | undefined) {
       }
 
       toast.success("Votre message a été envoyé. Nous vous répondrons dans les plus brefs délais.");
+      // Afficher la confirmation
+      setShowConfirmation(true);
+      // Masquer la confirmation après 5 secondes
+      setTimeout(() => {
+        setShowConfirmation(false);
+      }, 5000);
+      
       // Réinitialiser uniquement le sujet et le message
       setSubject("");
       setMessage("");
@@ -99,6 +107,7 @@ export function useContactForm(userEmail: string | undefined) {
     setMessage,
     isLoading,
     debugInfo,
+    showConfirmation,
     handleSubmit
   };
 }
