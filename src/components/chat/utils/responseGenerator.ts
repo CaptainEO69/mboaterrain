@@ -1,7 +1,7 @@
-
 import { ConversationContext, GeneratedResponse } from "../types/conversationContext";
 import { PREDEFINED_RESPONSES } from "../types";
 import { findCityInfo, findNeighborhoodInfo, getPopularNeighborhoods } from "./locationUtils";
+import { CAMEROON_CITIES } from "../types/locations";
 
 /**
  * Génère une réponse personnalisée basée sur le contexte
