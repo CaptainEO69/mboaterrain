@@ -43,13 +43,38 @@ export function CitySelect({ selectedRegion, onCityChange }: CitySelectProps) {
       
       setLocalCities(formattedCities);
       console.log("Utilisation des données locales pour", selectedRegion, ":", formattedCities);
-    } else {
+    } else if (cities.length > 0) {
+      // Si des villes sont disponibles dans la base de données, les utiliser
+      setUseFallback(false);
+    } else if (!selectedRegion) {
+      // Si aucune région n'est sélectionnée, réinitialiser les villes locales
+      setLocalCities([]);
       setUseFallback(false);
     }
   }, [loadingCities, cities, selectedRegion]);
 
+  // Précharger les données locales pour toutes les régions
+  useEffect(() => {
+    if (selectedRegion) {
+      // Même si nous avons des données de la base de données, préparons toujours les données locales
+      const regionCities = CAMEROON_CITIES[selectedRegion] || [];
+      const formattedCities = regionCities.map((city, index) => ({
+        id: `local-${index}`,
+        name: city.name
+      }));
+      
+      setLocalCities(formattedCities);
+      
+      // Utiliser les données locales si la base de données est vide ou si nous préférons les données locales
+      if (cities.length === 0 && !loadingCities) {
+        setUseFallback(true);
+        console.log("Utilisation forcée des données locales pour", selectedRegion, ":", formattedCities);
+      }
+    }
+  }, [selectedRegion, cities.length, loadingCities]);
+
   // Déterminer les villes à afficher (depuis la base de données ou les données locales)
-  const displayCities = useFallback ? localCities : cities;
+  const displayCities = useFallback ? localCities : (cities.length > 0 ? cities : localCities);
   const hasNoCities = !loadingCities && displayCities.length === 0;
 
   return (

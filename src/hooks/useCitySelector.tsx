@@ -43,19 +43,17 @@ export function useCitySelector(selectedRegion: string) {
         
         if (citiesError) {
           console.error('Erreur lors du chargement des villes:', citiesError);
-          toast.error("Impossible de charger les villes");
+          console.log("Utilisation des données locales comme secours");
           setCities([]);
         } else if (!citiesData || citiesData.length === 0) {
-          console.log("Aucune ville trouvée pour cette région");
-          toast.info("Aucune ville trouvée pour cette région");
+          console.log("Aucune ville trouvée dans la base de données pour cette région");
           setCities([]);
         } else {
-          console.log(`${citiesData.length} villes chargées pour la région ${selectedRegion}:`, citiesData);
+          console.log(`${citiesData.length} villes chargées depuis la base de données pour la région ${selectedRegion}:`, citiesData);
           setCities(citiesData);
         }
       } catch (error) {
         console.error('Erreur lors du chargement des villes:', error);
-        toast.error("Une erreur est survenue lors du chargement des villes");
         setCities([]);
       } finally {
         setLoadingCities(false);
