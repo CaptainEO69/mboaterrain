@@ -36,7 +36,8 @@ interface PersonalInfoSectionProps {
   serviceType?: string;
   transportCapacity?: string;
   insuranceIncluded?: boolean;
-  onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name: string; value: string | number | boolean } }) => void;
+  associatedNotaries?: Array<{name: string; approval_number: string}>;
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name: string; value: string | number | boolean | any[] } }) => void;
 }
 
 export function PersonalInfoSection({
@@ -62,6 +63,7 @@ export function PersonalInfoSection({
   serviceType,
   transportCapacity,
   insuranceIncluded,
+  associatedNotaries,
   onInputChange,
 }: PersonalInfoSectionProps) {
   
@@ -126,6 +128,7 @@ export function PersonalInfoSection({
           <NotaryFields
             notaryOffice={notaryOffice}
             approvalNumber={approvalNumber}
+            associatedNotaries={associatedNotaries}
             isEditing={isEditing}
             onInputChange={onInputChange}
           />

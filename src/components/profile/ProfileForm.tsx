@@ -95,6 +95,7 @@ export function ProfileForm({
           serviceType={formData.service_type}
           transportCapacity={formData.transport_capacity}
           insuranceIncluded={formData.insurance_included}
+          associatedNotaries={formData.associated_notaries}
           onInputChange={onInputChange}
         />
       </div>

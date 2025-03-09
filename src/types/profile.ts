@@ -20,6 +20,9 @@ export interface Profile {
   sale_proof_url?: string;
   notary_office?: string;
   
+  // New field for associated notaries
+  associated_notaries?: Array<{name: string; approval_number: string}>;
+  
   // Nouveaux champs pour les différents types de profils
   agency_name?: string;
   commercial_register?: string;
@@ -49,6 +52,9 @@ export interface ProfileFormData {
   residence_place: string;
   birth_date: Date | null;
   user_type: string;
+  
+  // New field for associated notaries
+  associated_notaries?: Array<{name: string; approval_number: string}>;
   
   // Nouveaux champs pour les différents types de profils
   agency_name?: string;

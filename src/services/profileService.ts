@@ -37,6 +37,7 @@ export async function updateUserProfile(userId: string, formData: ProfileFormDat
         transport_capacity: formData.transport_capacity,
         insurance_included: formData.insurance_included,
         notary_office: formData.notary_office,
+        associated_notaries: formData.associated_notaries,
       },
     });
 
@@ -78,6 +79,7 @@ export async function updateUserProfile(userId: string, formData: ProfileFormDat
         transport_capacity: formData.transport_capacity,
         insurance_included: formData.insurance_included,
         notary_office: formData.notary_office,
+        associated_notaries: formData.associated_notaries,
         updated_at: new Date().toISOString(),
       })
       .eq("user_id", userId);
