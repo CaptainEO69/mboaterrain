@@ -102,8 +102,8 @@ export function useRegistrationForm(type: string | null) {
           is_certified: isCertified,
           notary_office: notaryOffice,
           service_prices: servicePrices,
-          is_phone_verified: true, // Puisque nous avons vérifié le téléphone
-          is_email_verified: true, // Puisque nous avons vérifié l'email
+          is_phone_verified: true, // Simplifié pour les tests
+          is_email_verified: true, // Simplifié pour les tests
           
           // Nouveaux champs
           property_type: propertyType,

@@ -36,6 +36,15 @@ export function BasicInfoSection({ formData, setters }: BasicInfoSectionProps) {
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Extraire seulement le numéro, sans l'indicatif
     let phoneNumber = e.target.value;
+    
+    // Assurez-vous que le numéro est formaté correctement pour la vérification
+    if (phoneNumber && !phoneNumber.startsWith("+")) {
+      if (countryCode === "CM" && !phoneNumber.startsWith("237")) {
+        // Si c'est un numéro camerounais sans l'indicatif, ajoutez-le
+        phoneNumber = `237${phoneNumber.replace(/^0+/, '')}`;
+      }
+    }
+    
     setters.setPhoneNumber(phoneNumber);
   };
 
