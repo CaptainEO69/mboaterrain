@@ -5,6 +5,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
 import { DebugInfo } from "./DebugInfo";
 import { FileUploader } from "./FileUploader";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 interface ContactFormProps {
   name: string;
@@ -44,53 +46,66 @@ export function ContactForm({
       <h2 className="text-lg font-semibold mb-4">Envoyez-nous un message</h2>
       
       <form onSubmit={onSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-            Nom complet
-          </label>
-          <Input
-            id="name"
-            value={name}
-            onChange={(e) => onNameChange(e.target.value)}
-            required
-            disabled={isLoading}
-            placeholder="Votre nom"
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="name" className="text-sm font-medium text-gray-700">
+              Nom complet
+            </Label>
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => onNameChange(e.target.value)}
+              required
+              disabled={isLoading}
+              placeholder="Votre nom"
+              className="w-full"
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+              Email
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => onEmailChange(e.target.value)}
+              required
+              disabled={isLoading}
+              placeholder="votre@email.com"
+              className="w-full"
+            />
+          </div>
         </div>
         
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            Email
-          </label>
-          <Input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => onEmailChange(e.target.value)}
-            required
-            disabled={isLoading}
-            placeholder="votre@email.com"
-          />
-        </div>
-        
-        <div>
-          <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2">
+          <Label htmlFor="subject" className="text-sm font-medium text-gray-700">
             Sujet
-          </label>
-          <Input
-            id="subject"
-            value={subject}
-            onChange={(e) => onSubjectChange(e.target.value)}
-            required
+          </Label>
+          <Select 
+            value={subject} 
+            onValueChange={onSubjectChange} 
             disabled={isLoading}
-            placeholder="Sujet de votre message"
-          />
+          >
+            <SelectTrigger id="subject" className="w-full">
+              <SelectValue placeholder="Sélectionnez un sujet" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="information">Demande d'informations</SelectItem>
+              <SelectItem value="property">Informations sur un bien</SelectItem>
+              <SelectItem value="partnership">Proposition de partenariat</SelectItem>
+              <SelectItem value="suggestion">Suggestion</SelectItem>
+              <SelectItem value="complaint">Réclamation</SelectItem>
+              <SelectItem value="other">Autre sujet</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         
-        <div>
-          <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2">
+          <Label htmlFor="message" className="text-sm font-medium text-gray-700">
             Message
-          </label>
+          </Label>
           <Textarea
             id="message"
             value={message}
@@ -99,13 +114,14 @@ export function ContactForm({
             disabled={isLoading}
             placeholder="Votre message..."
             rows={5}
+            className="resize-none"
           />
         </div>
         
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2">
+          <Label className="text-sm font-medium text-gray-700">
             Pièces jointes
-          </label>
+          </Label>
           <FileUploader 
             files={files}
             onAddFile={onAddFile}
@@ -116,7 +132,7 @@ export function ContactForm({
         
         <Button 
           type="submit" 
-          className="w-full bg-cmr-green hover:bg-cmr-green/90" 
+          className="w-full bg-cmr-green hover:bg-cmr-green/90 text-white font-medium py-2 rounded-md transition-colors" 
           disabled={isLoading}
         >
           {isLoading ? (

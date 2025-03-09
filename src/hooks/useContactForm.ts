@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,7 +32,7 @@ export function useContactForm(userEmail: string | undefined) {
   const [formState, setFormState] = useState<ContactFormState>({
     name: "",
     email: userEmail || "",
-    subject: "",
+    subject: "information",
     message: "",
     files: [],
     isLoading: false,
@@ -58,7 +57,7 @@ export function useContactForm(userEmail: string | undefined) {
       return false;
     }
     if (!subject.trim()) {
-      toast.error("Veuillez entrer un sujet");
+      toast.error("Veuillez sélectionner un sujet");
       return false;
     }
     if (!message.trim()) {
@@ -93,6 +92,13 @@ export function useContactForm(userEmail: string | undefined) {
       toast.error("Le fichier est trop volumineux (max 5 Mo)");
       return;
     }
+    
+    // Limite le nombre de fichiers à 3
+    if (files.length >= 3) {
+      toast.error("Vous ne pouvez pas joindre plus de 3 fichiers");
+      return;
+    }
+    
     setFormState(prev => ({ ...prev, files: [...prev.files, file] }));
   };
 
@@ -186,10 +192,22 @@ export function useContactForm(userEmail: string | undefined) {
     setFormState(prev => ({ ...prev, isLoading: true, debugInfo: null }));
     
     try {
+      // Traduire les valeurs de sujet pour l'email
+      const subjectLabels: Record<string, string> = {
+        information: "Demande d'informations",
+        property: "Informations sur un bien",
+        partnership: "Proposition de partenariat",
+        suggestion: "Suggestion",
+        complaint: "Réclamation",
+        other: "Autre sujet"
+      };
+      
+      const subjectLabel = subjectLabels[subject] || subject;
+      
       console.log("Envoi du formulaire de contact:", { 
         name, 
         email, 
-        subject, 
+        subject: subjectLabel, 
         messageLength: message.length, 
         filesCount: files.length 
       });
@@ -203,7 +221,7 @@ export function useContactForm(userEmail: string | undefined) {
       const formData: ContactFormData = {
         name,
         email,
-        subject,
+        subject: subjectLabel,
         message,
         hasAttachments: files.length > 0,
         fileUrls

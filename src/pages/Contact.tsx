@@ -29,11 +29,16 @@ export default function Contact() {
 
   return (
     <div className="min-h-screen pb-20">
-      <h1 className="text-xl font-bold p-4">Contactez-nous</h1>
+      <div className="bg-cmr-green text-white py-8 px-4">
+        <div className="container mx-auto max-w-4xl">
+          <h1 className="text-2xl md:text-3xl font-bold">Contactez-nous</h1>
+          <p className="mt-2 opacity-90">Nous sommes là pour répondre à toutes vos questions</p>
+        </div>
+      </div>
       
-      <div className="p-4">
+      <div className="container mx-auto max-w-4xl p-4">
         {showConfirmation && (
-          <Alert className="mb-4 bg-green-50 border-green-200 text-green-800">
+          <Alert className="mb-6 bg-green-50 border-green-200 text-green-800">
             <div className="flex items-center gap-2">
               <CheckCircle className="h-5 w-5 text-green-500" />
               <span className="font-medium">Message envoyé avec succès!</span>
@@ -42,24 +47,30 @@ export default function Contact() {
           </Alert>
         )}
         
-        <ContactInfo />
-        
-        <ContactForm
-          name={name}
-          email={email}
-          subject={subject}
-          message={message}
-          files={files}
-          isLoading={isLoading}
-          debugInfo={debugInfo}
-          onNameChange={setName}
-          onEmailChange={setEmail}
-          onSubjectChange={setSubject}
-          onMessageChange={setMessage}
-          onAddFile={handleAddFile}
-          onRemoveFile={handleRemoveFile}
-          onSubmit={handleSubmit}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-1">
+            <ContactInfo />
+          </div>
+          
+          <div className="md:col-span-2">
+            <ContactForm
+              name={name}
+              email={email}
+              subject={subject}
+              message={message}
+              files={files}
+              isLoading={isLoading}
+              debugInfo={debugInfo}
+              onNameChange={setName}
+              onEmailChange={setEmail}
+              onSubjectChange={setSubject}
+              onMessageChange={setMessage}
+              onAddFile={handleAddFile}
+              onRemoveFile={handleRemoveFile}
+              onSubmit={handleSubmit}
+            />
+          </div>
+        </div>
       </div>
       
       <BottomNav />
