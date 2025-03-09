@@ -1,16 +1,6 @@
 
-import {
-  CommonFields,
-  OwnerFields,
-  SellerFields,
-  BuyerFields,
-  SurveyorFields,
-  NotaryFields,
-  NotaryClerkFields,
-  FinancierFields,
-  MoverFields
-} from "./personal-info";
-import { ProfileTypeSelector } from "./personal-info/ProfileTypeSelector";
+import { CommonFields } from "./personal-info";
+import { UserTypeFieldsRenderer } from "./personal-info/UserTypeFieldsRenderer";
 
 interface PersonalInfoSectionProps {
   idNumber: string;
@@ -65,125 +55,39 @@ export function PersonalInfoSection({
   associatedNotaries,
   onInputChange,
 }: PersonalInfoSectionProps) {
-  
-  // Champs communs à plusieurs profils
-  const renderCommonFields = () => (
-    <CommonFields
-      idNumber={idNumber}
-      profession={profession}
-      residencePlace={residencePlace}
-      userType={userType}
-      isEditing={isEditing}
-      onInputChange={onInputChange}
-    />
-  );
-
-  // Champs spécifiques pour chaque type de profil
-  const renderProfileSpecificFields = () => {
-    switch(userType) {
-      case "owner":
-        return (
-          <OwnerFields
-            propertyType={propertyType}
-            isEditing={isEditing}
-            onInputChange={onInputChange}
-          />
-        );
-      
-      case "seller":
-        return (
-          <SellerFields
-            agencyName={agencyName}
-            commercialRegister={commercialRegister}
-            operationZone={operationZone}
-            isEditing={isEditing}
-            onInputChange={onInputChange}
-          />
-        );
-      
-      case "buyer":
-        return (
-          <BuyerFields
-            estimatedBudget={estimatedBudget}
-            propertyType={propertyType}
-            desiredLocation={desiredLocation}
-            isEditing={isEditing}
-            onInputChange={onInputChange}
-          />
-        );
-      
-      case "surveyor":
-        return (
-          <SurveyorFields
-            approvalNumber={approvalNumber}
-            interventionZone={interventionZone}
-            isEditing={isEditing}
-            onInputChange={onInputChange}
-          />
-        );
-      
-      case "notary":
-        return (
-          <NotaryFields
-            notaryOffice={notaryOffice}
-            approvalNumber={approvalNumber}
-            associatedNotaries={associatedNotaries}
-            isEditing={isEditing}
-            onInputChange={onInputChange}
-          />
-        );
-      
-      case "notary_clerk":
-        return (
-          <NotaryClerkFields
-            notaryOffice={notaryOffice}
-            experienceQualifications={experienceQualifications}
-            isEditing={isEditing}
-            onInputChange={onInputChange}
-          />
-        );
-      
-      case "financier":
-        return (
-          <FinancierFields
-            companyName={companyName}
-            legalStatus={legalStatus}
-            investmentType={investmentType}
-            operationZone={operationZone}
-            estimatedFundingCapacity={estimatedFundingCapacity}
-            isEditing={isEditing}
-            onInputChange={onInputChange}
-          />
-        );
-      
-      case "mover":
-        return (
-          <MoverFields
-            companyName={companyName}
-            serviceType={serviceType}
-            transportCapacity={transportCapacity}
-            interventionZone={interventionZone}
-            insuranceIncluded={insuranceIncluded}
-            isEditing={isEditing}
-            onInputChange={onInputChange}
-          />
-        );
-      
-      default:
-        return (
-          <ProfileTypeSelector
-            userType={userType}
-            isEditing={isEditing}
-            onInputChange={onInputChange}
-          />
-        );
-    }
-  };
-
   return (
     <>
-      {renderCommonFields()}
-      {renderProfileSpecificFields()}
+      <CommonFields
+        idNumber={idNumber}
+        profession={profession}
+        residencePlace={residencePlace}
+        userType={userType}
+        isEditing={isEditing}
+        onInputChange={onInputChange}
+      />
+      <UserTypeFieldsRenderer
+        userType={userType}
+        isEditing={isEditing}
+        propertyType={propertyType}
+        agencyName={agencyName}
+        commercialRegister={commercialRegister}
+        operationZone={operationZone}
+        estimatedBudget={estimatedBudget}
+        desiredLocation={desiredLocation}
+        approvalNumber={approvalNumber}
+        interventionZone={interventionZone}
+        notaryOffice={notaryOffice}
+        experienceQualifications={experienceQualifications}
+        companyName={companyName}
+        legalStatus={legalStatus}
+        investmentType={investmentType}
+        estimatedFundingCapacity={estimatedFundingCapacity}
+        serviceType={serviceType}
+        transportCapacity={transportCapacity}
+        insuranceIncluded={insuranceIncluded}
+        associatedNotaries={associatedNotaries}
+        onInputChange={onInputChange}
+      />
     </>
   );
 }
