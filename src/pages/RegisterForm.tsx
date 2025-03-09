@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { useRegistrationForm } from "@/hooks/useRegistrationForm";
+import { useRegistrationForm } from "@/hooks/registration";
 import { BasicInfoSection } from "@/components/registration/form-sections/BasicInfoSection";
 import { PersonalInfoSection } from "@/components/registration/form-sections/PersonalInfoSection";
 import { ProfessionalSection } from "@/components/registration/form-sections/ProfessionalSection";
