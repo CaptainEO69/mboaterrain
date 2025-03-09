@@ -8,3 +8,4 @@ export * from './NotaryFields';
 export * from './NotaryClerkFields';
 export * from './FinancierFields';
 export * from './MoverFields';
+export * from './ProfileTypeSelector';
