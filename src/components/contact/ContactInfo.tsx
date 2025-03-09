@@ -1,5 +1,5 @@
 
-import { Mail, MapPin, Phone, Clock } from "lucide-react";
+import { Mail } from "lucide-react";
 
 export function ContactInfo() {
   return (
@@ -14,30 +14,6 @@ export function ContactInfo() {
             <a href="mailto:contactmboater@yahoo.com" className="text-cmr-green hover:underline">
               contactmboater@yahoo.com
             </a>
-          </div>
-        </div>
-        
-        <div className="flex items-start">
-          <Phone className="w-5 h-5 text-cmr-green mt-1 mr-3" />
-          <div>
-            <p className="font-medium">Téléphone</p>
-            <p>+237 6XX XXX XXX</p>
-          </div>
-        </div>
-        
-        <div className="flex items-start">
-          <MapPin className="w-5 h-5 text-cmr-green mt-1 mr-3" />
-          <div>
-            <p className="font-medium">Adresse</p>
-            <p>Douala, Cameroun</p>
-          </div>
-        </div>
-        
-        <div className="flex items-start">
-          <Clock className="w-5 h-5 text-cmr-green mt-1 mr-3" />
-          <div>
-            <p className="font-medium">Heures d'ouverture</p>
-            <p>Lundi - Vendredi: 9h - 17h</p>
           </div>
         </div>
       </div>
