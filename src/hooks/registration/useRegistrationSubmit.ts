@@ -32,9 +32,9 @@ export function useRegistrationSubmit(type: string | null) {
     }
     
     try {
-      console.log("Creating account with:", { 
+      console.log("Création du compte avec:", { 
         email: formData.email, 
-        password: formData.password, 
+        password: "********", // Ne pas logger le mot de passe réel pour des raisons de sécurité
         firstName: formData.firstName, 
         lastName: formData.lastName, 
         phoneNumber: formData.phoneNumber, 
@@ -45,18 +45,18 @@ export function useRegistrationSubmit(type: string | null) {
       const { data: authData, error: authError } = await signUp(formData.email, formData.password);
       
       if (authError) {
-        console.error("Auth error:", authError);
+        console.error("Erreur Auth:", authError);
         throw authError;
       }
       
-      // Extraire l'ID de l'utilisateur
-      const userId = authData?.user?.id;
-      
-      if (!userId) {
-        throw new Error("Impossible de créer le compte utilisateur");
+      if (!authData || !authData.user) {
+        throw new Error("Erreur lors de la création du compte utilisateur");
       }
       
-      console.log("User created with ID:", userId);
+      // Extraire l'ID de l'utilisateur
+      const userId = authData.user.id;
+      
+      console.log("Utilisateur créé avec ID:", userId);
       
       // Convertir la date de naissance en année de naissance pour la BD
       const birthYear = formData.birthDate ? formData.birthDate.getFullYear() : null;
@@ -82,7 +82,7 @@ export function useRegistrationSubmit(type: string | null) {
           is_phone_verified: true, // Simplifié pour les tests
           is_email_verified: true, // Simplifié pour les tests
           
-          // Nouveaux champs
+          // Autres champs
           property_type: formData.propertyType,
           agency_name: formData.agencyName,
           commercial_register: formData.commercialRegister,
@@ -103,22 +103,25 @@ export function useRegistrationSubmit(type: string | null) {
         .select();
 
       if (profileError) {
-        console.error("Profile error:", profileError);
+        console.error("Erreur profil:", profileError);
         throw profileError;
       }
       
-      console.log("Profile created:", profile);
+      console.log("Profil créé:", profile);
       toast.success("Inscription réussie! Veuillez vous connecter.");
       navigate("/login");
+      return { success: true };
     } catch (error: any) {
-      console.error("Registration error:", error);
+      console.error("Erreur d'inscription:", error);
       
       // Messages d'erreur plus spécifiques
-      if (error.message?.includes("duplicate key") || error.message?.includes("already exists")) {
+      if (error.message?.includes("duplicate key") || error.message?.includes("already exists") || 
+          error.message?.includes("User already registered") || error.message?.includes("User exists")) {
         toast.error("Cette adresse email est déjà utilisée.");
       } else {
         toast.error(error.message || "Erreur lors de l'inscription");
       }
+      throw error; // Re-throw pour que le composant parent puisse gérer l'erreur
     }
   };
 

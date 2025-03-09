@@ -11,6 +11,7 @@ export function SearchBar() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
+      console.log("Recherche lancée avec le terme:", searchQuery);
       // Rediriger vers la page d'achat avec le terme de recherche
       navigate(`/buy?query=${encodeURIComponent(searchQuery.trim())}`);
     }
