@@ -12,7 +12,22 @@ export function SearchBar() {
     e.preventDefault();
     if (searchQuery.trim()) {
       console.log("Recherche lancée avec le terme:", searchQuery);
-      // Rediriger vers la page d'achat avec le terme de recherche
+      
+      // Détection des requêtes qui semblent être des questions sur l'immobilier
+      if (searchQuery.toLowerCase().includes("prix") || 
+          searchQuery.toLowerCase().includes("quartier") || 
+          searchQuery.toLowerCase().includes("invest") || 
+          searchQuery.toLowerCase().includes("valeur") || 
+          searchQuery.toLowerCase().includes("conseils") ||
+          searchQuery.toLowerCase().includes("?")) {
+        
+        // Rediriger vers l'assistant de chat avec la question préchargée
+        console.log("Question immobilière détectée, redirection vers le chat");
+        navigate('/', { state: { openChat: true, initialQuestion: searchQuery.trim() } });
+        return;
+      }
+      
+      // Sinon, rediriger vers la page d'achat avec le terme de recherche
       navigate(`/buy?query=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
@@ -21,7 +36,7 @@ export function SearchBar() {
     <form onSubmit={handleSearch} className="relative w-full">
       <Input
         type="text"
-        placeholder="Rechercher un bien..."
+        placeholder="Rechercher un bien ou poser une question..."
         className="w-full pl-12 py-6 bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder:text-white/70 focus:bg-white/20"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}

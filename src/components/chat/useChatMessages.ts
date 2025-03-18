@@ -52,6 +52,12 @@ export function useChatMessages() {
     }
   }, [isChatOpen]);
 
+  // Fonction pour ouvrir directement le chat
+  const openChat = useCallback(() => {
+    setIsChatOpen(true);
+    setUnreadCount(0);
+  }, []);
+
   // Fonction pour envoyer un message
   const handleSendMessage = useCallback((input: string) => {
     if (!input.trim()) return;
@@ -153,6 +159,7 @@ export function useChatMessages() {
       if (!isChatOpen) {
         setUnreadCount(0);
       }
-    }, [isChatOpen])
+    }, [isChatOpen]),
+    openChat // Ajout de la fonction pour ouvrir directement le chat
   };
 }

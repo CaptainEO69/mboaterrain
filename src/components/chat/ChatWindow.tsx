@@ -9,21 +9,46 @@ import { useEffect } from "react";
 import { useBackgroundImage } from "./useBackgroundImage";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useLocation } from "react-router-dom";
 
 export * from "./types";
 
 export function ChatWindow() {
   const { user } = useAuth();
+  const location = useLocation();
+  
   const {
     messages,
     unreadCount,
     isChatOpen,
     handleSendMessage,
-    toggleChat
+    toggleChat,
+    openChat
   } = useChatMessages();
   
   const backgroundImagePath = "/lovable-uploads/1f09cbc4-45e2-4b8c-8e32-75019e404759.png";
   const { imageLoaded, imageSrc, error } = useBackgroundImage(backgroundImagePath);
+
+  // Gérer l'ouverture automatique du chat et la question initiale
+  useEffect(() => {
+    const state = location.state as { openChat?: boolean; initialQuestion?: string } | null;
+    
+    if (state?.openChat) {
+      console.log("Ouverture automatique du chat demandée");
+      openChat();
+      
+      // Si une question initiale est fournie, l'envoyer après un court délai
+      if (state.initialQuestion) {
+        console.log("Question initiale détectée:", state.initialQuestion);
+        setTimeout(() => {
+          handleSendMessage(state.initialQuestion as string);
+          
+          // Nettoyer l'état pour éviter de renvoyer la même question lors des navigations futures
+          window.history.replaceState({}, document.title);
+        }, 500);
+      }
+    }
+  }, [location.state, openChat, handleSendMessage]);
 
   // Afficher des informations de débogage dans la console
   useEffect(() => {
