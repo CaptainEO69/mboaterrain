@@ -10,20 +10,30 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Info } from "lucide-react";
+import { Info, Building2 } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useState } from "react";
 
 interface BasicInfoSectionProps {
   errors: Record<string, string>;
   onPropertyTypeChange: (value: string) => void;
+  isRental?: boolean;
 }
 
-export function BasicInfoSection({ errors, onPropertyTypeChange }: BasicInfoSectionProps) {
+export function BasicInfoSection({ errors, onPropertyTypeChange, isRental = false }: BasicInfoSectionProps) {
+  const [isFurnished, setIsFurnished] = useState<boolean>(false);
+  const [propertyType, setPropertyType] = useState<string>("");
+  
+  const handlePropertyTypeChange = (value: string) => {
+    setPropertyType(value);
+    onPropertyTypeChange(value);
+  };
+  
   return (
     <div className="space-y-4">
       <div>
@@ -50,12 +60,13 @@ export function BasicInfoSection({ errors, onPropertyTypeChange }: BasicInfoSect
       </div>
 
       <div>
-        <Label htmlFor="property_type">Type de bien</Label>
+        <div className="flex items-center gap-2 mb-2">
+          <Label htmlFor="property_type">Type de bien</Label>
+          <Building2 className="w-4 h-4 text-muted-foreground" />
+        </div>
         <Select
           name="property_type"
-          onValueChange={(value) => {
-            onPropertyTypeChange(value);
-          }}
+          onValueChange={handlePropertyTypeChange}
         >
           <SelectTrigger>
             <SelectValue placeholder="Sélectionnez le type de bien" />
@@ -64,28 +75,37 @@ export function BasicInfoSection({ errors, onPropertyTypeChange }: BasicInfoSect
             <SelectItem value="house">Maison</SelectItem>
             <SelectItem value="apartment">Appartement</SelectItem>
             <SelectItem value="land">Terrain</SelectItem>
+            {isRental && <SelectItem value="commercial">Local commercial</SelectItem>}
           </SelectContent>
         </Select>
       </div>
 
-      <div className="flex items-center justify-between">
-        <div className="space-y-0.5">
-          <div className="flex items-center gap-2">
-            <Label htmlFor="is_furnished">Meublé</Label>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Info className="w-4 h-4 text-muted-foreground" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Indiquez si le bien est vendu meublé ou non</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+      {propertyType !== "land" && (
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="is_furnished">Meublé</Label>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Info className="w-4 h-4 text-muted-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Indiquez si le bien est {isRental ? "loué" : "vendu"} meublé ou non</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
+          <Switch 
+            id="is_furnished" 
+            name="is_furnished" 
+            checked={isFurnished}
+            onCheckedChange={(checked) => setIsFurnished(checked)}
+          />
+          <input type="hidden" name="is_furnished_value" value={isFurnished ? "true" : "false"} />
         </div>
-        <Switch id="is_furnished" name="is_furnished" />
-      </div>
+      )}
     </div>
   );
 }

@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
+import { useState } from "react";
 
 interface PriceInputProps {
   error?: string;
@@ -16,6 +17,8 @@ interface PriceInputProps {
 }
 
 export function PriceInput({ error, isRental = false }: PriceInputProps) {
+  const [priceType, setPriceType] = useState<string>("fixed");
+
   return (
     <div className="space-y-4">
       <div>
@@ -38,18 +41,38 @@ export function PriceInput({ error, isRental = false }: PriceInputProps) {
       </div>
 
       {isRental && (
-        <div>
-          <Label htmlFor="price_type" className="block mb-2">Type de tarification</Label>
-          <Select name="price_type" defaultValue="monthly">
-            <SelectTrigger id="price_type" className="w-full">
-              <SelectValue placeholder="Choisir un type de tarification" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="monthly">Mensuel</SelectItem>
-              <SelectItem value="daily">Journalier</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <>
+          <div>
+            <Label htmlFor="price_type" className="block mb-2">Type de tarification</Label>
+            <Select 
+              name="price_type" 
+              defaultValue="fixed"
+              onValueChange={(value) => setPriceType(value)}
+            >
+              <SelectTrigger id="price_type" className="w-full">
+                <SelectValue placeholder="Choisir un type de tarification" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="fixed">Fixe</SelectItem>
+                <SelectItem value="negotiable">Négociable</SelectItem>
+                <SelectItem value="range">Fourchette de prix</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {priceType === "range" && (
+            <div>
+              <Label htmlFor="max_price" className="block mb-2">Prix maximum (FCFA)</Label>
+              <Input
+                id="max_price"
+                name="max_price"
+                type="number"
+                min="0"
+                step="1000"
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   );

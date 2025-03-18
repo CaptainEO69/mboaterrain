@@ -2,9 +2,15 @@
 import { Label } from "@/components/ui/label";
 import { MapPin } from "lucide-react";
 import { LocationSelect } from "@/components/property-search/LocationSelect";
+import { useState } from "react";
 
 export function LocationField() {
+  const [selectedCity, setSelectedCity] = useState<string>("");
+  const [selectedNeighborhood, setSelectedNeighborhood] = useState<string>("");
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+  
   const handleCityChange = (city: string) => {
+    setSelectedCity(city);
     const form = document.querySelector('form');
     if (form) {
       const formData = new FormData(form);
@@ -14,6 +20,7 @@ export function LocationField() {
   };
   
   const handleNeighborhoodChange = (neighborhood: string) => {
+    setSelectedNeighborhood(neighborhood);
     const form = document.querySelector('form');
     if (form) {
       const formData = new FormData(form);
@@ -23,6 +30,7 @@ export function LocationField() {
   };
   
   const handleDistrictChange = (district: string) => {
+    setSelectedDistrict(district);
     const form = document.querySelector('form');
     if (form) {
       const formData = new FormData(form);
@@ -43,6 +51,15 @@ export function LocationField() {
         onNeighborhoodChange={handleNeighborhoodChange}
         onDistrictChange={handleDistrictChange}
       />
+      
+      {/* Afficher la sélection actuelle */}
+      {(selectedCity || selectedNeighborhood || selectedDistrict) && (
+        <div className="mt-2 text-sm text-muted-foreground">
+          {selectedCity && <div>Ville: {selectedCity}</div>}
+          {selectedNeighborhood && <div>Quartier: {selectedNeighborhood}</div>}
+          {selectedDistrict && <div>Arrondissement: {selectedDistrict}</div>}
+        </div>
+      )}
     </div>
   );
 }
