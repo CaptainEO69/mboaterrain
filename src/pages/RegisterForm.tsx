@@ -41,14 +41,16 @@ export default function RegisterForm() {
       console.log("Début de l'inscription...");
       setIsSubmitting(true);
       
-      // Procéder directement à l'inscription sans la vérification email/SMS pour simplifier
+      // Appel direct à la fonction originale
       await originalHandleSubmit(e);
       
       // Si nous arrivons ici, l'inscription a réussi
       toast.success("Inscription réussie ! Vous pouvez maintenant vous connecter.");
+      
+      // Redirection vers la page de connexion après un court délai
       setTimeout(() => {
         navigate("/login");
-      }, 2000);
+      }, 1500);
       
     } catch (error: any) {
       console.error("Erreur lors de l'inscription:", error);
@@ -56,38 +58,6 @@ export default function RegisterForm() {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleResendCode = async () => {
-    try {
-      console.log("Renvoi des codes de vérification à:", formData.email, formData.phoneNumber);
-      await Promise.all([
-        sendEmailVerification(formData.email),
-        sendSMSVerification(formData.phoneNumber)
-      ]);
-      toast.success("Codes de vérification renvoyés");
-    } catch (error) {
-      console.error("Erreur lors du renvoi des codes de vérification:", error);
-      toast.error("Erreur lors du renvoi des codes de vérification");
-    }
-  };
-
-  const handleVerificationSuccess = () => {
-    console.log("Vérification réussie, poursuite de l'inscription");
-    // Procéder à l'inscription proprement dite
-    originalHandleSubmit({ preventDefault: () => {} } as React.FormEvent);
-  };
-
-  const verificationProps = {
-    phoneNumber: formData.phoneNumber,
-    email: formData.email,
-    onVerificationSuccess: handleVerificationSuccess,
-    onResendCode: handleResendCode,
-    verificationCode,
-    setVerificationCode,
-    verifyCode,
-    isVerifying,
-    isResending: isSendingCode
   };
 
   return (
@@ -111,7 +81,17 @@ export default function RegisterForm() {
               formData={formData} 
               setters={setters} 
               isAwaitingVerification={isAwaitingVerification} 
-              verificationProps={verificationProps}
+              verificationProps={{
+                phoneNumber: formData.phoneNumber,
+                email: formData.email,
+                onVerificationSuccess: () => {},
+                onResendCode: async () => {},
+                verificationCode,
+                setVerificationCode,
+                verifyCode,
+                isVerifying,
+                isResending: isSendingCode
+              }}
             />
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">

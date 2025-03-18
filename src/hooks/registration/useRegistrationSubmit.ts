@@ -20,21 +20,12 @@ export function useRegistrationSubmit(type: string | null) {
     
     // Vérification des champs obligatoires
     if (!formData.email || !formData.password || !formData.firstName || !formData.lastName || !formData.phoneNumber) {
-      toast.error("Veuillez remplir tous les champs obligatoires");
-      return;
-    }
-    
-    // Vérification de la force du mot de passe
-    const strength = passwordStrength(formData.password);
-    if (strength.score < 3) {
-      toast.error("Le mot de passe n'est pas assez sécurisé. Veuillez le renforcer.");
-      return;
+      throw new Error("Veuillez remplir tous les champs obligatoires");
     }
     
     try {
       console.log("Création du compte avec:", { 
         email: formData.email, 
-        password: "********", // Ne pas logger le mot de passe réel pour des raisons de sécurité
         firstName: formData.firstName, 
         lastName: formData.lastName, 
         phoneNumber: formData.phoneNumber, 
@@ -108,8 +99,6 @@ export function useRegistrationSubmit(type: string | null) {
       }
       
       console.log("Profil créé:", profile);
-      toast.success("Inscription réussie! Veuillez vous connecter.");
-      navigate("/login");
       return { success: true };
     } catch (error: any) {
       console.error("Erreur d'inscription:", error);
@@ -117,11 +106,10 @@ export function useRegistrationSubmit(type: string | null) {
       // Messages d'erreur plus spécifiques
       if (error.message?.includes("duplicate key") || error.message?.includes("already exists") || 
           error.message?.includes("User already registered") || error.message?.includes("User exists")) {
-        toast.error("Cette adresse email est déjà utilisée.");
+        throw new Error("Cette adresse email est déjà utilisée.");
       } else {
-        toast.error(error.message || "Erreur lors de l'inscription");
+        throw error; // Re-throw pour que le composant parent puisse gérer l'erreur
       }
-      throw error; // Re-throw pour que le composant parent puisse gérer l'erreur
     }
   };
 

@@ -16,11 +16,11 @@ export function RegistrationFormFooter({
   const currentUserType = getCurrentUserType();
 
   return (
-    <div className="flex flex-col space-y-4">
+    <div className="flex flex-col space-y-4 w-full">
       {currentUserType && !isAwaitingVerification && (
         <Button 
           type="submit" 
-          className="w-full"
+          className="w-full bg-cmr-green hover:bg-cmr-green/90"
           disabled={isSubmitting}
         >
           {isSubmitting ? (

@@ -1,4 +1,3 @@
 
-// This file is a bridge for backward compatibility
-// It re-exports from the new location to avoid breaking existing imports
+// Ce fichier réexporte correctement le hook depuis son nouvel emplacement
 export { useRegistrationForm } from './registration';
