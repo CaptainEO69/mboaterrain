@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useProperties } from "./useProperties";
 import { useGeolocation } from "./useGeolocation";
 import { PropertyFilters } from "@/components/PropertySearchForm";
 
@@ -29,10 +29,10 @@ export interface PropertyWithLocation {
 }
 
 export function usePropertiesWithLocation(transactionType: "sale" | "rent") {
+  const { properties: allProperties, loading, fetchProperties } = useProperties(transactionType);
   const [properties, setProperties] = useState<PropertyWithLocation[]>([]);
-  const [filteredProperties, setFilteredProperties] = useState<PropertyWithLocation[]>([]);
-  const [loading, setLoading] = useState(true);
   const [nearbyLoading, setNearbyLoading] = useState(false);
+  
   const { 
     coordinates, 
     calculateDistance, 
@@ -40,105 +40,86 @@ export function usePropertiesWithLocation(transactionType: "sale" | "rent") {
     permissionDenied
   } = useGeolocation();
 
-  // Charger les propriétés depuis Supabase
-  const fetchProperties = async (filters: PropertyFilters = {}) => {
-    try {
-      setLoading(true);
-      const query = supabase
-        .from("properties")
-        .select("*, property_images(image_url, is_main)")
-        .eq("transaction_type", transactionType);
-
-      // Appliquer les filtres
-      if (filters.propertyType) query.eq("property_type", filters.propertyType);
-      if (filters.city) query.eq("city", filters.city);
-      if (filters.district) query.eq("district", filters.district);
-      if (filters.neighborhood) query.eq("neighborhood", filters.neighborhood);
-      if (filters.maxPrice) query.lte("price", filters.maxPrice);
-      if (filters.minSize) query.gte("area_size", filters.minSize);
-      if (filters.isFurnished !== undefined) query.eq("is_furnished", filters.isFurnished);
-      if (filters.distanceFromRoad) query.lte("distance_from_road", filters.distanceFromRoad);
-
-      const { data: propertiesData, error } = await query.order("created_at", { ascending: false });
-
-      if (error) throw error;
-
-      // Formater les propriétés avec la distance si la géolocalisation est disponible
-      const formattedProperties: PropertyWithLocation[] = (propertiesData || []).map(property => {
-        let distance = null;
-        
-        // Vérifier si la propriété et l'utilisateur ont des coordonnées
-        if (hasLocation && property.latitude && property.longitude) {
-          distance = calculateDistance(
-            coordinates.latitude!,
-            coordinates.longitude!,
-            property.latitude,
-            property.longitude
-          );
-        }
-
-        return {
-          ...property,
-          latitude: property.latitude || null,
-          longitude: property.longitude || null,
-          transaction_type: property.transaction_type as "sale" | "rent",
-          property_images: (property.property_images || []),
-          is_furnished: property.is_furnished || null,
-          distance_from_road: property.distance_from_road || null,
-          bathrooms: property.bathrooms || null,
-          bedrooms: property.bedrooms || null,
-          description: property.description || null,
-          distance: distance
-        };
-      });
-
-      setProperties(formattedProperties);
-      setFilteredProperties(formattedProperties);
-    } catch (error: any) {
-      console.error("Erreur lors du chargement des propriétés:", error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Charger les propriétés au démarrage
+  // Calculate distances when properties or location change
   useEffect(() => {
-    fetchProperties();
-  }, [transactionType, coordinates.latitude, coordinates.longitude]);
+    if (!allProperties) return;
 
-  // Filtrer les propriétés par proximité
+    const propertiesWithDistance = allProperties.map(property => {
+      let distance = null;
+      
+      if (hasLocation && property.latitude && property.longitude) {
+        distance = calculateDistance(
+          coordinates.latitude!,
+          coordinates.longitude!,
+          property.latitude,
+          property.longitude
+        );
+      }
+
+      return {
+        ...property,
+        distance
+      };
+    });
+
+    setProperties(propertiesWithDistance);
+  }, [allProperties, coordinates.latitude, coordinates.longitude, hasLocation, calculateDistance]);
+
+  // Find nearby properties
   const findNearbyProperties = (radius: number = 10) => {
-    if (!hasLocation) {
-      return;
-    }
+    if (!hasLocation) return;
 
     setNearbyLoading(true);
     
-    // Filtrer uniquement les propriétés avec coordonnées GPS
+    // Filter properties with location data
     const propertiesWithLocation = properties.filter(
       p => p.latitude !== null && p.longitude !== null
     );
     
-    // Filtrer par rayon (en km)
+    // Filter by radius and sort by distance
     const nearby = propertiesWithLocation
       .filter(p => p.distance !== null && p.distance <= radius)
       .sort((a, b) => (a.distance || 999) - (b.distance || 999));
     
-    setFilteredProperties(nearby);
+    setProperties(nearby);
     setNearbyLoading(false);
   };
 
-  // Réinitialiser le filtre de proximité
+  // Reset filters
   const resetNearbyFilter = () => {
-    setFilteredProperties(properties);
+    // Recalculate distances for all properties
+    const propertiesWithDistance = allProperties.map(property => {
+      let distance = null;
+      
+      if (hasLocation && property.latitude && property.longitude) {
+        distance = calculateDistance(
+          coordinates.latitude!,
+          coordinates.longitude!,
+          property.latitude,
+          property.longitude
+        );
+      }
+
+      return {
+        ...property,
+        distance
+      };
+    });
+
+    setProperties(propertiesWithDistance);
+  };
+
+  // Apply filters from the search form
+  const applyFilters = (filters: PropertyFilters) => {
+    fetchProperties(filters);
   };
 
   return {
-    properties: filteredProperties,
-    allProperties: properties,
+    properties,
+    allProperties,
     loading,
     nearbyLoading,
-    fetchProperties,
+    fetchProperties: applyFilters,
     findNearbyProperties,
     resetNearbyFilter,
     hasLocation,
