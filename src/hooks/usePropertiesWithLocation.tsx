@@ -59,7 +59,7 @@ export function usePropertiesWithLocation(transactionType: "sale" | "rent") {
       return {
         ...property,
         distance
-      };
+      } as PropertyWithLocation;
     });
 
     setProperties(propertiesWithDistance);
@@ -103,7 +103,7 @@ export function usePropertiesWithLocation(transactionType: "sale" | "rent") {
       return {
         ...property,
         distance
-      };
+      } as PropertyWithLocation;
     });
 
     setProperties(propertiesWithDistance);

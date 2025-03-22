@@ -5,7 +5,7 @@ import mapboxgl from "mapbox-gl";
 export const MAPBOX_TOKEN = "pk.eyJ1IjoiZXhhbXBsZXRva2VuIiwiYSI6ImNrdGg4ZjBwMzE3ZWQyd3BlYjA4c3lpYmUifQ.Kz0sP9xKpEZ2MIYcxFsZ9Q";
 
 // Coordonnées par défaut (centre du Cameroun si pas de localisation utilisateur)
-export const DEFAULT_CENTER = [11.5021, 3.8480]; // Yaoundé
+export const DEFAULT_CENTER: [number, number] = [11.5021, 3.8480]; // Yaoundé
 
 // Initialiser la carte Mapbox
 export const initializeMap = (

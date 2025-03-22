@@ -32,8 +32,8 @@ export function PropertyMap({
     if (!mapContainer.current || map.current) return;
 
     // Déterminer le centre initial de la carte
-    const center = userLocation?.latitude && userLocation?.longitude 
-      ? [userLocation.longitude, userLocation.latitude] as [number, number]
+    const center: [number, number] = userLocation?.latitude && userLocation?.longitude 
+      ? [userLocation.longitude, userLocation.latitude] 
       : DEFAULT_CENTER;
     
     // Créer la carte

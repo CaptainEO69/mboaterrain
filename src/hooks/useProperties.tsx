@@ -23,6 +23,8 @@ interface BaseProperty {
   bathrooms: number | null;
   bedrooms: number | null;
   description: string | null;
+  latitude: number | null;
+  longitude: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -66,6 +68,8 @@ export function useProperties(transactionType: "sale" | "rent") {
         bathrooms: property.bathrooms || null,
         bedrooms: property.bedrooms || null,
         description: property.description || null,
+        latitude: property.latitude || null,
+        longitude: property.longitude || null,
       }));
 
       setProperties(formattedProperties);
