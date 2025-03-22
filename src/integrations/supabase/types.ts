@@ -216,6 +216,8 @@ export type Database = {
           district: string | null
           id: string
           is_furnished: boolean | null
+          latitude: number | null
+          longitude: number | null
           neighborhood: string
           owner_id: string
           owner_profile_id: string | null
@@ -237,6 +239,8 @@ export type Database = {
           district?: string | null
           id?: string
           is_furnished?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
           neighborhood: string
           owner_id: string
           owner_profile_id?: string | null
@@ -258,6 +262,8 @@ export type Database = {
           district?: string | null
           id?: string
           is_furnished?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
           neighborhood?: string
           owner_id?: string
           owner_profile_id?: string | null
