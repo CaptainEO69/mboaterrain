@@ -67,6 +67,7 @@ export function usePropertiesWithLocation(transactionType: "sale" | "rent") {
       const formattedProperties: PropertyWithLocation[] = (propertiesData || []).map(property => {
         let distance = null;
         
+        // Vérifier si la propriété et l'utilisateur ont des coordonnées
         if (hasLocation && property.latitude && property.longitude) {
           distance = calculateDistance(
             coordinates.latitude!,
@@ -78,6 +79,8 @@ export function usePropertiesWithLocation(transactionType: "sale" | "rent") {
 
         return {
           ...property,
+          latitude: property.latitude || null,
+          longitude: property.longitude || null,
           transaction_type: property.transaction_type as "sale" | "rent",
           property_images: (property.property_images || []),
           is_furnished: property.is_furnished || null,
