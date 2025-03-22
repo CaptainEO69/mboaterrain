@@ -19,13 +19,15 @@ export async function generatePersonalizedResponse(
   
   if (userId) {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('price_min, price_max, preferred_locations, specific_criteria, property_type')
         .eq('user_id', userId)
         .maybeSingle();
         
-      if (data) {
+      if (error) {
+        console.error("Error fetching user preferences:", error);
+      } else if (data) {
         enhancedPreferences = {
           ...userPreferences,
           budget: data.price_min && data.price_max ? 

@@ -27,7 +27,7 @@ export async function checkForMatchingProperties(userId: string): Promise<void> 
     if (!userPreferences) return;
     
     // Check if we've sent a notification recently (don't spam users)
-    const lastNotification = userPreferences?.last_notification_sent ? new Date(userPreferences.last_notification_sent) : null;
+    const lastNotification = userPreferences.last_notification_sent ? new Date(userPreferences.last_notification_sent) : null;
     const now = new Date();
     
     // Don't send notifications more than once every 12 hours
@@ -46,19 +46,19 @@ export async function checkForMatchingProperties(userId: string): Promise<void> 
     query = query.gte("created_at", oneWeekAgo.toISOString());
     
     // Apply user preference filters
-    if (userPreferences?.property_type) {
+    if (userPreferences.property_type) {
       query = query.eq("property_type", userPreferences.property_type);
     }
     
-    if (userPreferences?.price_min) {
+    if (userPreferences.price_min) {
       query = query.gte("price", userPreferences.price_min);
     }
     
-    if (userPreferences?.price_max) {
+    if (userPreferences.price_max) {
       query = query.lte("price", userPreferences.price_max);
     }
     
-    if (userPreferences?.preferred_locations && userPreferences?.preferred_locations.length > 0) {
+    if (userPreferences.preferred_locations && userPreferences.preferred_locations.length > 0) {
       query = query.in("city", userPreferences.preferred_locations);
     }
     
@@ -85,7 +85,7 @@ export async function checkForMatchingProperties(userId: string): Promise<void> 
           label: "Voir",
           onClick: () => {
             // Navigate to properties page with filters
-            window.location.href = `/properties?${userPreferences?.property_type ? `type=${userPreferences.property_type}` : ''}`;
+            window.location.href = `/properties?${userPreferences.property_type ? `type=${userPreferences.property_type}` : ''}`;
           }
         },
         duration: 10000

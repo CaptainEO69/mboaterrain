@@ -50,19 +50,19 @@ export function PersonalizedSuggestions() {
           .limit(6);
         
         // Apply filters based on user preferences
-        if (profileData?.property_type) {
+        if (profileData && profileData.property_type) {
           query = query.eq("property_type", profileData.property_type);
         }
         
-        if (profileData?.price_min) {
+        if (profileData && profileData.price_min) {
           query = query.gte("price", profileData.price_min);
         }
         
-        if (profileData?.price_max) {
+        if (profileData && profileData.price_max) {
           query = query.lte("price", profileData.price_max);
         }
         
-        if (profileData?.preferred_locations && profileData?.preferred_locations.length > 0) {
+        if (profileData && profileData.preferred_locations && profileData.preferred_locations.length > 0) {
           query = query.in("city", profileData.preferred_locations);
         }
         
