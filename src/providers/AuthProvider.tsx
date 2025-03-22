@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocation, useNavigate } from "react-router-dom";
-import type { AuthResponse } from "@supabase/supabase-js";
 import { toast } from "sonner";
 import { AuthContext, UserWithProfile } from "@/contexts/AuthContext";
 import { isPublicRoute } from "@/lib/auth-constants";

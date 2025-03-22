@@ -1,88 +1,75 @@
+import { supabase } from "@/integrations/supabase/client";
+import { ConversationContext } from "../types/conversationContext";
 
-import { ConversationContext, GeneratedResponse } from "../types/conversationContext";
-import { findCityInfo } from "./locationUtils";
-import { PREDEFINED_RESPONSES } from "../types";
-
-/**
- * Génère une réponse personnalisée basée sur le contexte
- */
-export function generatePersonalizedResponse(
-  normalizedQuestion: string,
+// Fonction pour personnaliser les réponses en fonction du contexte de la conversation
+export async function getPersonalizedResponse(
+  input: string,
   conversationContext: ConversationContext
-): GeneratedResponse | null {
-  const { userProfile, userPreferences, lastCity, lastRegion, lastPropertyType } = conversationContext;
-  
-  // Personnalisation pour utilisateurs connectés
-  if (userProfile?.isLoggedIn) {
-    // Réponse pour professionnels
-    if (userProfile.userType && userProfile.userType !== "particulier") {
-      if (normalizedQuestion.includes("conseil") || normalizedQuestion.includes("expertise") || normalizedQuestion.includes("professionnel")) {
-        const professionalResponses = PREDEFINED_RESPONSES["professionnel"];
-        if (professionalResponses) {
-          return {
-            content: professionalResponses[Math.floor(Math.random() * professionalResponses.length)],
-            isPersonalized: true,
-            isExpert: true
-          };
-        }
-      }
-    }
-    
-    // Personnalisation basée sur les préférences utilisateur
-    if (userPreferences) {
-      // Si nous avons une ville et un type de propriété
-      if (lastCity && userPreferences.purpose && lastPropertyType) {
-        const city = findCityInfo(lastCity);
-        if (city) {
-          const propertyTypeMsg = lastPropertyType === "terrain" ? "terrains" : 
-                                lastPropertyType === "maison" ? "maisons" :
-                                lastPropertyType === "appartement" ? "appartements" :
-                                lastPropertyType === "bureau" ? "bureaux/commerces" : "biens immobiliers";
-          
-          const popularAreas = city.neighborhoods
-            .filter(n => n.isPopular)
-            .map(n => n.name)
-            .slice(0, 3)
-            .join(", ");
-          
-          return {
-            content: `Selon votre profil et votre intérêt pour ${userPreferences.purpose === "achat" ? "l'achat" : 
-                       userPreferences.purpose === "location" ? "la location" : "l'investissement"} de ${propertyTypeMsg} 
-                     à ${city.name}, je vous recommande particulièrement les quartiers de ${popularAreas}.
-                     ${userPreferences.budget ? `Avec un budget de ${userPreferences.budget}, vous pourriez ${
-                       userPreferences.purpose === "achat" ? "acquérir" : 
-                       userPreferences.purpose === "location" ? "louer" : "investir dans"
-                     } un bien de bonne qualité dans ces zones.` : ""}`,
-            isPersonalized: true,
-            isExpert: true
-          };
-        }
-      }
-      // Si nous avons juste une ville
-      else if (lastCity && userPreferences.purpose) {
-        const city = findCityInfo(lastCity);
-        if (city) {
-          const popularAreas = city.neighborhoods
-            .filter(n => n.isPopular)
-            .map(n => n.name)
-            .slice(0, 3)
-            .join(", ");
-          
-          return {
-            content: `Selon votre profil et votre intérêt pour ${userPreferences.purpose === "achat" ? "l'achat" : 
-                       userPreferences.purpose === "location" ? "la location" : "l'investissement"}, 
-                     à ${city.name}, je vous recommande particulièrement les quartiers de ${popularAreas}.
-                     ${userPreferences.budget ? `Avec un budget de ${userPreferences.budget}, vous pourriez ${
-                       userPreferences.purpose === "achat" ? "acquérir" : 
-                       userPreferences.purpose === "location" ? "louer" : "investir dans"
-                     } un bien de bonne qualité dans ces zones.` : ""}`,
-            isPersonalized: true,
-            isExpert: true
-          };
-        }
-      }
-    }
+): Promise<string> {
+  let personalizedResponse = "";
+
+  // Exemple de personnalisation basée sur le contexte
+  if (conversationContext.lastCity) {
+    personalizedResponse += `Ah, je vois que vous êtes intéressé par ${conversationContext.lastCity}. `;
   }
+
+  if (conversationContext.userPreferences?.budget) {
+    personalizedResponse += `Vous avez un budget d'environ ${conversationContext.userPreferences.budget}. `;
+  }
+
+  // Ajout d'une logique pour recommander des propriétés basées sur les préférences
+  if (conversationContext.userPreferences?.propertyType) {
+    personalizedResponse += `Je peux vous recommander des propriétés de type ${conversationContext.userPreferences.propertyType}. `;
+  }
+
+  // Exemple d'appel à une base de données pour récupérer des informations personnalisées
+  if (conversationContext.userProfile?.isLoggedIn) {
+    try {
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("preferred_locations, property_type, price_min, price_max, specific_criteria")
+        .eq("user_id", conversationContext.userProfile.user_id)
+        .single();
+
+      if (profileData && !profileError) {
+        const hasMinPrice = typeof profileData.price_min === 'number';
+        const hasMaxPrice = typeof profileData.price_max === 'number';
+        const priceRange = hasMinPrice && hasMaxPrice
+          ? `entre ${profileData.price_min} et ${profileData.price_max} FCFA`
+          : hasMinPrice ? `à partir de ${profileData.price_min} FCFA` : '';
+        
+        // Only access properties if they exist
+        const propertyType = profileData.property_type || '';
+        const locations = profileData.preferred_locations || [];
+        const criteria = profileData.specific_criteria || [];
+        
+        // Continue using these variables safely
+        if (propertyType) {
+          personalizedResponse += `Je vois que vous préférez les biens de type ${propertyType}. `;
+        }
   
-  return null;
+        if (locations && locations.length > 0) {
+          personalizedResponse += `Vous êtes intéressé par les localités suivantes : ${locations.join(", ")}. `;
+        }
+  
+        if (priceRange) {
+          personalizedResponse += `Votre budget se situe ${priceRange}. `;
+        }
+  
+        if (criteria && criteria.length > 0) {
+          personalizedResponse += `Vous avez des critères spécifiques tels que : ${criteria.join(", ")}. `;
+        }
+      } else {
+        console.error("Erreur lors de la récupération du profil utilisateur:", profileError);
+        personalizedResponse += "Je n'ai pas pu récupérer vos préférences pour le moment. ";
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération des données:", error);
+      personalizedResponse += "Une erreur s'est produite lors de la récupération de vos informations. ";
+    }
+  } else {
+    personalizedResponse += "Pour une expérience plus personnalisée, veuillez vous connecter. ";
+  }
+
+  return personalizedResponse;
 }

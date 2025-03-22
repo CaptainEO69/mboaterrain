@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { Message, PREDEFINED_RESPONSES } from "./types";
 import { toast } from "sonner";
@@ -104,7 +103,9 @@ export function useChatMessages() {
     const newTimeout = setTimeout(() => {
       setMessages(prev => {
         const withoutTyping = prev.filter(msg => msg.id !== typingIndicator.id);
-        const botResponse = generateResponse(input, conversationContext);
+        const latestUserMessage = withoutTyping[withoutTyping.length - 1]?.content;
+        const extractedContext = (typeof latestUserMessage === 'string' && latestUserMessage.slice(0, 50)) || '';
+        const botResponse = generateResponse(input, conversationContext, extractedContext);
         
         console.log("Contexte de conversation:", conversationContext);
         console.log("Réponse générée:", botResponse);
