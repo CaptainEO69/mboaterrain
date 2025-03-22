@@ -1,9 +1,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css"; // Fixed CSS import path
-import "./mapbox-css.css";
+import "mapbox-gl/dist/mapbox-css.css";
 import { PropertyWithLocation } from "@/hooks/usePropertiesWithLocation";
+import "./mapbox-css.css";
 import { MapMarkers } from "./MapMarkers";
 import { MapControls } from "./MapControls";
 import { MapPlaceholder } from "./MapPlaceholder";
@@ -32,8 +32,8 @@ export function PropertyMap({
     if (!mapContainer.current || map.current) return;
 
     // Déterminer le centre initial de la carte
-    const center: [number, number] = userLocation?.latitude && userLocation?.longitude 
-      ? [userLocation.longitude, userLocation.latitude] 
+    const center = userLocation?.latitude && userLocation?.longitude 
+      ? [userLocation.longitude, userLocation.latitude] as [number, number]
       : DEFAULT_CENTER;
     
     // Créer la carte

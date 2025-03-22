@@ -9,42 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      chat_history: {
-        Row: {
-          category: string | null
-          created_at: string | null
-          id: string
-          is_important: boolean | null
-          location: string | null
-          property_type: string | null
-          question: string
-          response: string
-          user_id: string
-        }
-        Insert: {
-          category?: string | null
-          created_at?: string | null
-          id?: string
-          is_important?: boolean | null
-          location?: string | null
-          property_type?: string | null
-          question: string
-          response: string
-          user_id: string
-        }
-        Update: {
-          category?: string | null
-          created_at?: string | null
-          id?: string
-          is_important?: boolean | null
-          location?: string | null
-          property_type?: string | null
-          question?: string
-          response?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       cities: {
         Row: {
           created_at: string
@@ -184,19 +148,13 @@ export type Database = {
           is_certified: boolean | null
           is_email_verified: boolean | null
           is_phone_verified: boolean | null
-          last_notification_sent: string | null
           notary_office: string | null
           phone_number: string | null
-          preferred_locations: string[] | null
-          price_max: number | null
-          price_min: number | null
           profession: string | null
           residence_place: string | null
           sale_proof_url: string | null
           sale_reason: string | null
-          search_history: Json | null
           service_prices: Json | null
-          specific_criteria: Json | null
           updated_at: string
           user_id: string
           user_type: string
@@ -211,19 +169,13 @@ export type Database = {
           is_certified?: boolean | null
           is_email_verified?: boolean | null
           is_phone_verified?: boolean | null
-          last_notification_sent?: string | null
           notary_office?: string | null
           phone_number?: string | null
-          preferred_locations?: string[] | null
-          price_max?: number | null
-          price_min?: number | null
           profession?: string | null
           residence_place?: string | null
           sale_proof_url?: string | null
           sale_reason?: string | null
-          search_history?: Json | null
           service_prices?: Json | null
-          specific_criteria?: Json | null
           updated_at?: string
           user_id: string
           user_type: string
@@ -238,19 +190,13 @@ export type Database = {
           is_certified?: boolean | null
           is_email_verified?: boolean | null
           is_phone_verified?: boolean | null
-          last_notification_sent?: string | null
           notary_office?: string | null
           phone_number?: string | null
-          preferred_locations?: string[] | null
-          price_max?: number | null
-          price_min?: number | null
           profession?: string | null
           residence_place?: string | null
           sale_proof_url?: string | null
           sale_reason?: string | null
-          search_history?: Json | null
           service_prices?: Json | null
-          specific_criteria?: Json | null
           updated_at?: string
           user_id?: string
           user_type?: string

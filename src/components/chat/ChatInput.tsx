@@ -3,14 +3,13 @@ import React, { useState } from "react";
 import { ChatSuggestions } from "./ChatSuggestions";
 import { ChatInputForm } from "./ChatInputForm"; 
 import { useChatSuggestions } from "./hooks/useChatSuggestions";
-import { Message } from "./types/messages";
 
-export interface ChatInputProps {
+interface ChatInputProps {
   onSendMessage: (input: string) => void;
-  messages?: Message[];
+  messages: Array<{content: string; sender: string;}>;
 }
 
-export function ChatInput({ onSendMessage, messages = [] }: ChatInputProps) {
+export function ChatInput({ onSendMessage, messages }: ChatInputProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { suggestions } = useChatSuggestions(messages);
 
