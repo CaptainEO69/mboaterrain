@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { useRegistrationForm } from "@/hooks/registration";
+import { useRegistrationForm } from "@/hooks/useRegistrationForm";
 import { useVerification } from "@/hooks/useVerification";
 import { toast } from "sonner";
 import { UserTypeSelector, getCurrentUserType } from "@/components/registration/UserTypeSelector";
@@ -42,19 +42,28 @@ export default function RegisterForm() {
       setIsSubmitting(true);
       
       // Appel direct à la fonction originale
-      await originalHandleSubmit(e);
+      const result = await originalHandleSubmit(e);
       
       // Si nous arrivons ici, l'inscription a réussi
-      toast.success("Inscription réussie ! Vous pouvez maintenant vous connecter.");
+      toast.success(result?.message || "Inscription réussie !");
       
-      // Redirection vers la page de connexion après un court délai
-      setTimeout(() => {
-        navigate("/login");
-      }, 1500);
+      // Si l'API demande une redirection vers OTP
+      if (result?.redirectToOTP) {
+        console.log("Redirection vers la page de vérification OTP...");
+        // Vous pouvez ajouter ici la redirection vers la page OTP
+        // Par exemple:
+        navigate("/verify-otp");
+      } else {
+        // Comportement par défaut existant
+        // Redirection vers la page de connexion après un court délai
+        setTimeout(() => {
+          navigate("/login");
+        }, 1500);
+      }
       
     } catch (error: any) {
       console.error("Erreur lors de l'inscription:", error);
-      toast.error(error.message || "Erreur lors de l'inscription. Veuillez réessayer.");
+      toast.error(error.message || "Inscription échouée, veuillez réessayer plus tard.");
     } finally {
       setIsSubmitting(false);
     }

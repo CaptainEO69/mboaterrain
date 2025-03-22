@@ -73,5 +73,9 @@ export interface RegistrationFormSetters {
 export interface RegistrationResult {
   formData: RegistrationFormData;
   setters: RegistrationFormSetters;
-  handleSubmit: (e: React.FormEvent) => Promise<void>;
+  handleSubmit: (e: React.FormEvent) => Promise<{
+    success: boolean;
+    redirectToOTP?: boolean;
+    message?: string;
+  } | undefined>;
 }
