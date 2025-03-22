@@ -17,7 +17,7 @@ export async function checkForMatchingProperties(userId: string): Promise<void> 
       .from("profiles")
       .select("property_type, price_min, price_max, preferred_locations, specific_criteria, last_notification_sent")
       .eq("user_id", userId)
-      .single();
+      .maybeSingle();
       
     if (preferencesError) throw preferencesError;
     

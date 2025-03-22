@@ -2,21 +2,10 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { PropertyCard } from "@/components/properties/PropertyCard";
+import { PropertyCard, Property } from "@/components/properties/PropertyCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-
-interface Property {
-  id: string;
-  title: string;
-  price: number;
-  city: string;
-  neighborhood: string;
-  property_type: string;
-  transaction_type: "sale" | "rent";
-  property_images: { image_url: string; is_main: boolean }[];
-}
 
 export function PersonalizedSuggestions() {
   const { user } = useAuth();
@@ -35,7 +24,7 @@ export function PersonalizedSuggestions() {
           .from("profiles")
           .select("property_type, price_min, price_max, preferred_locations, specific_criteria")
           .eq("user_id", user.id)
-          .single();
+          .maybeSingle();
           
         if (profileError) throw profileError;
         
@@ -45,21 +34,23 @@ export function PersonalizedSuggestions() {
           .select("*, property_images(image_url, is_main)")
           .limit(6);
         
-        // Apply filters based on user preferences
-        if (profileData.property_type) {
-          query = query.eq("property_type", profileData.property_type);
-        }
-        
-        if (profileData.price_min) {
-          query = query.gte("price", profileData.price_min);
-        }
-        
-        if (profileData.price_max) {
-          query = query.lte("price", profileData.price_max);
-        }
-        
-        if (profileData.preferred_locations && profileData.preferred_locations.length > 0) {
-          query = query.in("city", profileData.preferred_locations);
+        // Apply filters based on user preferences if profile data exists
+        if (profileData) {
+          if (profileData.property_type) {
+            query = query.eq("property_type", profileData.property_type);
+          }
+          
+          if (profileData.price_min) {
+            query = query.gte("price", profileData.price_min);
+          }
+          
+          if (profileData.price_max) {
+            query = query.lte("price", profileData.price_max);
+          }
+          
+          if (profileData.preferred_locations && profileData.preferred_locations.length > 0) {
+            query = query.in("city", profileData.preferred_locations);
+          }
         }
         
         // Execute query
@@ -67,8 +58,17 @@ export function PersonalizedSuggestions() {
         
         if (propertiesError) throw propertiesError;
         
-        // Process results
-        setSuggestions(propertiesData || []);
+        // Process results and ensure property.transaction_type is either "sale" or "rent"
+        if (propertiesData) {
+          const typedProperties = propertiesData.map(property => ({
+            ...property,
+            transaction_type: property.transaction_type === "sale" ? "sale" : "rent"
+          })) as Property[];
+          
+          setSuggestions(typedProperties);
+        } else {
+          setSuggestions([]);
+        }
       } catch (error: any) {
         console.error("Error fetching personalized suggestions:", error.message);
         toast.error("Impossible de charger les suggestions personnalisées");
