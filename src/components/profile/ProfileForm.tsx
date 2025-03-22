@@ -4,7 +4,6 @@ import { ProfileFormData } from "@/types/profile";
 import { BasicInfoSection } from "./form-sections/BasicInfoSection";
 import { BirthInfoSection } from "./form-sections/BirthInfoSection";
 import { PersonalInfoSection } from "./form-sections/PersonalInfoSection";
-import { PreferencesSection } from "./form-sections/PreferencesSection";
 
 interface ProfileFormProps {
   formData: ProfileFormData;
@@ -99,17 +98,6 @@ export function ProfileForm({
           associatedNotaries={formData.associated_notaries}
           onInputChange={onInputChange}
         />
-        
-        {/* New preferences section */}
-        <PreferencesSection 
-          priceMin={formData.price_min}
-          priceMax={formData.price_max}
-          preferredLocations={formData.preferred_locations}
-          specificCriteria={formData.specific_criteria}
-          propertyType={formData.property_type}
-          isEditing={isEditing}
-          onInputChange={onInputChange}
-        />
       </div>
 
       <div className="flex flex-wrap gap-4 justify-between items-center pt-4">
@@ -120,7 +108,7 @@ export function ProfileForm({
               onClick={onEdit}
               className="bg-cmr-yellow text-black hover:bg-cmr-yellow/90"
             >
-              Modifier mon profil
+              Modifier le profil
             </Button>
           ) : (
             <>

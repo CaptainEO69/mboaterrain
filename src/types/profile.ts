@@ -1,3 +1,4 @@
+
 export interface Profile {
   id?: string;
   user_id: string;
@@ -19,16 +20,10 @@ export interface Profile {
   sale_proof_url?: string;
   notary_office?: string;
   
-  // New fields for preferences
-  price_min?: number;
-  price_max?: number;
-  preferred_locations?: string[];
-  specific_criteria?: Record<string, boolean>;
-  search_history?: Array<{query: string, timestamp: string}>;
-  last_notification_sent?: Date;
-  
-  // Existing fields
+  // New field for associated notaries
   associated_notaries?: Array<{name: string; approval_number: string}>;
+  
+  // Nouveaux champs pour les différents types de profils
   agency_name?: string;
   commercial_register?: string;
   operation_zone?: string;
@@ -58,14 +53,10 @@ export interface ProfileFormData {
   birth_date: Date | null;
   user_type: string;
   
-  // New fields for preferences
-  price_min?: number;
-  price_max?: number;
-  preferred_locations?: string[];
-  specific_criteria?: Record<string, boolean>;
-  
-  // Existing fields
+  // New field for associated notaries
   associated_notaries?: Array<{name: string; approval_number: string}>;
+  
+  // Nouveaux champs pour les différents types de profils
   agency_name?: string;
   commercial_register?: string;
   operation_zone?: string;
