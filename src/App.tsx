@@ -1,72 +1,42 @@
 
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { Toaster } from "sonner";
-import { Suspense, lazy } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/providers/AuthProvider";
 import Layout from "./Layout";
 import Home from "./pages/Home";
-import { PropertyMatchNotifier } from "@/components/PropertyMatchNotifier";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Properties from "./pages/Properties";
+import PropertyDetail from "./pages/PropertyDetail";
+import AboutUs from "./pages/AboutUs";
+import Profile from "./pages/Profile";
+import Messaging from "./pages/Messaging";
+import { PropertyMatchNotifier } from "./components/PropertyMatchNotifier";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-// Lazy loaded components
-const Properties = lazy(() => import("./pages/Properties"));
-const PropertyDetail = lazy(() => import("./pages/PropertyDetail"));
-const Profile = lazy(() => import("./pages/Profile"));
-const AboutUs = lazy(() => import("./pages/AboutUs"));
-const Contact = lazy(() => import("./pages/Contact"));
-const Register = lazy(() => import("./pages/Register"));
-const RegisterForm = lazy(() => import("./pages/RegisterForm"));
-const Login = lazy(() => import("./pages/Login"));
+// Create a client
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <Router>
-      <PropertyMatchNotifier />
-      <Toaster position="top-center" richColors closeButton />
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/properties" element={
-            <Suspense fallback={<div>Loading...</div>}>
-              <Properties />
-            </Suspense>
-          } />
-          <Route path="/properties/:id" element={
-            <Suspense fallback={<div>Loading...</div>}>
-              <PropertyDetail />
-            </Suspense>
-          } />
-          <Route path="/profile" element={
-            <Suspense fallback={<div>Loading...</div>}>
-              <Profile />
-            </Suspense>
-          } />
-          <Route path="/about" element={
-            <Suspense fallback={<div>Loading...</div>}>
-              <AboutUs />
-            </Suspense>
-          } />
-          <Route path="/contact" element={
-            <Suspense fallback={<div>Loading...</div>}>
-              <Contact />
-            </Suspense>
-          } />
-          <Route path="/register" element={
-            <Suspense fallback={<div>Loading...</div>}>
-              <Register />
-            </Suspense>
-          } />
-          <Route path="/register-form" element={
-            <Suspense fallback={<div>Loading...</div>}>
-              <RegisterForm />
-            </Suspense>
-          } />
-          <Route path="/login" element={
-            <Suspense fallback={<div>Loading...</div>}>
-              <Login />
-            </Suspense>
-          } />
-        </Route>
-      </Routes>
-    </Router>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
+          <Layout>
+            <PropertyMatchNotifier />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/properties" element={<Properties />} />
+              <Route path="/property/:id" element={<PropertyDetail />} />
+              <Route path="/about" element={<AboutUs />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/messaging" element={<Messaging />} />
+            </Routes>
+          </Layout>
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 
