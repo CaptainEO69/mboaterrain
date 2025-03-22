@@ -1,9 +1,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-css.css";
-import { PropertyWithLocation } from "@/hooks/usePropertiesWithLocation";
+import "mapbox-gl/dist/mapbox-gl.css"; // Fixed CSS import path
 import "./mapbox-css.css";
+import { PropertyWithLocation } from "@/hooks/usePropertiesWithLocation";
 import { MapMarkers } from "./MapMarkers";
 import { MapControls } from "./MapControls";
 import { MapPlaceholder } from "./MapPlaceholder";
