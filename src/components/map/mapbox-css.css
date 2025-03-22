@@ -1,0 +1,26 @@
+
+.mapboxgl-map {
+  font-family: 'Inter', sans-serif;
+}
+
+.mapboxgl-popup {
+  max-width: 240px;
+}
+
+.mapboxgl-popup-content {
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.mapboxgl-popup-close-button {
+  font-size: 18px;
+  padding: 5px;
+}
+
+.mapboxgl-ctrl-logo {
+  margin: 0 0 5px 5px !important;
+}
+
+.mapboxgl-ctrl-attrib {
+  font-size: 10px;
+}

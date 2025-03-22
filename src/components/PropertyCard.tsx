@@ -1,8 +1,10 @@
+
 import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { useFavorites } from "@/hooks/useFavorites";
 import { Button } from "./ui/button";
+import { PropertyDistance } from "./PropertyDistance";
 
 interface PropertyCardProps {
   id: string;
@@ -11,10 +13,20 @@ interface PropertyCardProps {
   location: string;
   size: string;
   imageUrl: string;
+  distance?: number | null;
   className?: string;
 }
 
-export function PropertyCard({ id, title, price, location, size, imageUrl, className }: PropertyCardProps) {
+export function PropertyCard({ 
+  id, 
+  title, 
+  price, 
+  location, 
+  size, 
+  imageUrl, 
+  distance = null,
+  className 
+}: PropertyCardProps) {
   const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites();
   const favorite = isFavorite(id);
 
@@ -45,6 +57,9 @@ export function PropertyCard({ id, title, price, location, size, imageUrl, class
           <span>{location}</span>
           <span>{size}</span>
         </div>
+        {distance !== null && (
+          <PropertyDistance distance={distance} className="mt-2" />
+        )}
       </div>
     </Link>
   );

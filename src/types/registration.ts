@@ -79,3 +79,13 @@ export interface RegistrationResult {
     message?: string;
   } | undefined>;
 }
+
+// Types pour géolocalisation et propriétés
+export interface Coordinates {
+  latitude: number;
+  longitude: number;
+}
+
+export interface PropertyWithLocation extends Coordinates {
+  distance?: number; // Distance en km par rapport à l'utilisateur
+}

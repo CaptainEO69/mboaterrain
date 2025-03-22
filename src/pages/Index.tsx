@@ -2,10 +2,41 @@
 import { SearchBar } from "@/components/SearchBar";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Building2, Key, PlusCircle } from "lucide-react";
+import { Building2, Key, PlusCircle, MapPin, Map } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useGeolocation } from "@/hooks/useGeolocation";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { PropertyMap } from "@/components/map/PropertyMap";
+import { usePropertiesWithLocation } from "@/hooks/usePropertiesWithLocation";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Index() {
   const navigate = useNavigate();
+  const { permissionDenied, requestGeolocation, hasLocation } = useGeolocation();
+  const { properties, findNearbyProperties, loading, nearbyLoading } = usePropertiesWithLocation("sale");
+  const [showMap, setShowMap] = useState(false);
+  const [nearbyProperties, setNearbyProperties] = useState(false);
+
+  // Demander la géolocalisation au chargement initial
+  useEffect(() => {
+    const hasPromptedLocation = localStorage.getItem('hasPromptedLocation');
+    
+    if (!hasPromptedLocation) {
+      // Attendre un peu avant de demander la permission
+      const timer = setTimeout(() => {
+        requestGeolocation();
+        localStorage.setItem('hasPromptedLocation', 'true');
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const handleFindNearby = () => {
+    findNearbyProperties(5); // Chercher dans un rayon de 5km
+    setNearbyProperties(true);
+    setShowMap(true);
+  };
 
   return (
     <div className="flex flex-col gap-6 pb-20">
@@ -19,6 +50,69 @@ export default function Index() {
         </p>
         <SearchBar />
       </div>
+
+      {/* Géolocalisation Alert */}
+      {permissionDenied && (
+        <Alert className="mx-4">
+          <AlertDescription>
+            Vous avez refusé l'accès à votre position. La recherche de biens à proximité n'est pas disponible. 
+            Vous pouvez modifier ce paramètre dans les options de votre navigateur.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Nearby Properties Button */}
+      <div className="px-4">
+        <Button
+          onClick={handleFindNearby}
+          disabled={!hasLocation || loading || nearbyLoading}
+          className="w-full bg-cmr-green hover:bg-cmr-green/90 h-16"
+        >
+          <MapPin className="mr-2 h-5 w-5" />
+          <div className="flex flex-col items-start">
+            <span className="text-lg font-semibold">Trouver les annonces proches</span>
+            <span className="text-xs opacity-90">Biens immobiliers à proximité</span>
+          </div>
+        </Button>
+      </div>
+
+      {/* Map Section (conditionally rendered) */}
+      {showMap && (
+        <div className="px-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Map className="h-5 w-5" />
+                <span>{nearbyProperties ? "Biens à proximité" : "Carte des biens"}</span>
+              </CardTitle>
+              <CardDescription>
+                {nearbyProperties 
+                  ? `${properties.length} bien${properties.length > 1 ? 's' : ''} trouvé${properties.length > 1 ? 's' : ''} dans un rayon de 5 km`
+                  : "Visualisez les biens disponibles sur la carte"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <PropertyMap 
+                properties={properties} 
+                userLocation={hasLocation ? { 
+                  latitude: localStorage.getItem('userLatitude') ? parseFloat(localStorage.getItem('userLatitude')!) : null,
+                  longitude: localStorage.getItem('userLongitude') ? parseFloat(localStorage.getItem('userLongitude')!) : null
+                } : undefined}
+                mapHeight="300px"
+              />
+            </CardContent>
+            <CardFooter>
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => navigate(nearbyProperties ? "/buy" : "/map")}
+              >
+                Voir {nearbyProperties ? "tous les biens" : "la carte complète"}
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      )}
 
       {/* Main Actions */}
       <div className="px-4">

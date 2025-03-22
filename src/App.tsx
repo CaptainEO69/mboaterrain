@@ -22,6 +22,7 @@ import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Terms from "@/pages/Terms";
 import Contact from "@/pages/Contact";
 import Messaging from "@/pages/Messaging";
+import MapView from "@/pages/MapView";
 import { ChatWindow } from "@/components/chat/ChatWindow";
 import { BottomNav } from "@/components/BottomNav";
 
@@ -43,6 +44,7 @@ function App() {
                 <Route path="/register/form" element={<RegisterForm />} />
                 <Route path="/buy" element={<Buy />} />
                 <Route path="/rent" element={<Rent />} />
+                <Route path="/map" element={<MapView />} />
                 <Route path="/property/:id" element={<PropertyDetails />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/update-password" element={<UpdatePassword />} />

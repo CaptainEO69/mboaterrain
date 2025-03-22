@@ -1,3 +1,4 @@
+
 import { PropertyCard } from "@/components/PropertyCard";
 
 type Property = {
@@ -7,6 +8,7 @@ type Property = {
   city: string;
   neighborhood: string;
   area_size: number;
+  distance?: number | null;
   property_images: {
     image_url: string;
     is_main: boolean;
@@ -38,6 +40,7 @@ export function PropertyList({ properties, loading, isRental = false }: Property
           price={`${property.price.toLocaleString()} FCFA${isRental ? '/mois' : ''}`}
           location={`${property.neighborhood}, ${property.city}`}
           size={`${property.area_size} m²`}
+          distance={property.distance}
           imageUrl={
             property.property_images.find((img) => img.is_main)?.image_url ||
             "/placeholder.svg"
