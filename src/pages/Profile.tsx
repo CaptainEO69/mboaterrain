@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { PersonalizedSuggestions } from "@/components/profile/PersonalizedSuggestions";
 
 export default function Profile() {
   const { user, signOut } = useAuth();
@@ -127,6 +128,9 @@ export default function Profile() {
           />
         </CardContent>
       </Card>
+      
+      {/* Display personalized suggestions when user is logged in */}
+      {user && <PersonalizedSuggestions />}
     </div>
   );
 }

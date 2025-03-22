@@ -20,6 +20,7 @@ import {
   extractNeighborhoodFromQuestion,
   isBestLocationQuestion
 } from "./keywordDetection";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Obtient une réponse aléatoire d'une catégorie
@@ -32,17 +33,60 @@ export function getRandomResponse(category: string): string {
 /**
  * Fonction principale pour générer une réponse
  */
-export function generateResponse(
+export async function generateResponse(
   question: string,
-  conversationContext: ConversationContext
-): GeneratedResponse {
+  conversationContext: ConversationContext,
+  userId?: string
+): Promise<GeneratedResponse> {
   const normalizedQuestion = question.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   console.log("Génération de réponse pour:", normalizedQuestion);
   console.log("Contexte actuel:", conversationContext);
   
   // Tentative de réponse personnalisée
-  const personalizedResponse = generatePersonalizedResponse(normalizedQuestion, conversationContext);
+  const personalizedResponse = await generatePersonalizedResponse(normalizedQuestion, conversationContext, userId);
   if (personalizedResponse) return personalizedResponse;
+  
+  // Check for similar questions in user's history if logged in
+  if (userId) {
+    try {
+      const { data: similarQuestions } = await supabase
+        .from('chat_history')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(20);
+      
+      if (similarQuestions && similarQuestions.length > 0) {
+        // Simple similarity check - look for keyword matches
+        const keywords = normalizedQuestion.split(/\s+/).filter(word => word.length > 3);
+        
+        for (const entry of similarQuestions) {
+          const entryKeywords = entry.question.toLowerCase().normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "").split(/\s+/).filter((word: string) => word.length > 3);
+          
+          // Calculate similarity by counting matching keywords
+          const matchingKeywords = keywords.filter(keyword => 
+            entryKeywords.some(entryWord => entryWord.includes(keyword) || keyword.includes(entryWord))
+          );
+          
+          // If more than 50% of keywords match, consider it similar
+          if (matchingKeywords.length / keywords.length > 0.5) {
+            return {
+              content: `D'après votre précédente question similaire, voici ma réponse: 
+              
+              ${entry.response}
+              
+              Souhaitez-vous des informations supplémentaires à ce sujet?`,
+              isPersonalized: true,
+              isExpert: false
+            };
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error checking similar questions:", error);
+    }
+  }
   
   // Vérification si c'est une question d'expert
   const expertQuestion = isExpertQuestion(normalizedQuestion);
