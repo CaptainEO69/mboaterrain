@@ -1,5 +1,5 @@
 
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/lib/auth";
 import { ChatHeader } from "./ChatHeader";
 import { ChatMessages } from "./ChatMessages";
 import { ChatInput } from "./ChatInput";
@@ -84,7 +84,7 @@ export function ChatWindow() {
         <div className="relative h-full flex flex-col rounded-lg overflow-hidden">
           <ChatHeader toggleChat={toggleChat} unreadCount={unreadCount} />
           <ChatMessages messages={messages} />
-          <ChatInput onSendMessage={handleSendMessage} />
+          <ChatInput onSendMessage={handleSendMessage} messages={messages} />
         </div>
       </div>
     </TooltipProvider>

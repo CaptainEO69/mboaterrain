@@ -130,8 +130,7 @@ export function useChatMessages() {
         .eq('user_id', user.id)
         .single();
         
-      // Fix for the error: Property 'slice' does not exist on type...
-      let searchHistory = Array.isArray(profile?.search_history) ? profile.search_history : [];
+      let searchHistory = profile?.search_history || [];
       searchHistory = [
         { query: question, timestamp: new Date().toISOString() },
         ...searchHistory.slice(0, 19)  // Keep last 20 searches
@@ -283,6 +282,6 @@ export function useChatMessages() {
         setUnreadCount(0);
       }
     }, [isChatOpen]),
-    openChat
+    openChat // Ajout de la fonction pour ouvrir directement le chat
   };
 }

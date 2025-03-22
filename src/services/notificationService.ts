@@ -17,12 +17,9 @@ export async function checkForMatchingProperties(userId: string): Promise<void> 
       .from("profiles")
       .select("property_type, price_min, price_max, preferred_locations, specific_criteria, last_notification_sent")
       .eq("user_id", userId)
-      .maybeSingle();
+      .single();
       
-    if (preferencesError) {
-      console.error("Error fetching user preferences:", preferencesError);
-      return;
-    }
+    if (preferencesError) throw preferencesError;
     
     if (!userPreferences) return;
     
@@ -65,10 +62,7 @@ export async function checkForMatchingProperties(userId: string): Promise<void> 
     // Execute query
     const { data: matchingProperties, error: propertiesError } = await query;
     
-    if (propertiesError) {
-      console.error("Error finding matching properties:", propertiesError);
-      return;
-    }
+    if (propertiesError) throw propertiesError;
     
     // If we have matching properties, notify the user
     if (matchingProperties && matchingProperties.length > 0) {

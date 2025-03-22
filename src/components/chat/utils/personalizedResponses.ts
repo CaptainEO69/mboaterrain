@@ -19,15 +19,13 @@ export async function generatePersonalizedResponse(
   
   if (userId) {
     try {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('profiles')
         .select('price_min, price_max, preferred_locations, specific_criteria, property_type')
         .eq('user_id', userId)
-        .maybeSingle();
+        .single();
         
-      if (error) {
-        console.error("Error fetching user preferences:", error);
-      } else if (data) {
+      if (data) {
         enhancedPreferences = {
           ...userPreferences,
           budget: data.price_min && data.price_max ? 
@@ -78,7 +76,7 @@ export async function generatePersonalizedResponse(
           
           // Check if user has specific criteria
           const criteriaMsg = enhancedPreferences.specificCriteria ? 
-            Object.entries(enhancedPreferences.specificCriteria as Record<string, boolean>)
+            Object.entries(enhancedPreferences.specificCriteria)
               .filter(([_, value]) => value)
               .map(([key]) => {
                 switch(key) {
