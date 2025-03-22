@@ -23,7 +23,7 @@ export async function generatePersonalizedResponse(
         .from('profiles')
         .select('price_min, price_max, preferred_locations, specific_criteria, property_type')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
         
       if (data) {
         enhancedPreferences = {
@@ -76,7 +76,7 @@ export async function generatePersonalizedResponse(
           
           // Check if user has specific criteria
           const criteriaMsg = enhancedPreferences.specificCriteria ? 
-            Object.entries(enhancedPreferences.specificCriteria)
+            Object.entries(enhancedPreferences.specificCriteria as Record<string, boolean>)
               .filter(([_, value]) => value)
               .map(([key]) => {
                 switch(key) {

@@ -11,6 +11,7 @@ export interface ConversationContext {
     propertyType?: string;
     purpose?: string; // achat, location, investissement
     preferredLocations?: string[];
+    specificCriteria?: Record<string, boolean>;
   };
   userProfile?: {
     isLoggedIn: boolean;
