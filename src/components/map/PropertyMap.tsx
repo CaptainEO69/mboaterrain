@@ -24,7 +24,8 @@ export function PropertyMap({
     if (!mapContainer.current || map.current) return;
 
     // Déterminer le centre initial de la carte
-    const center = userLocation?.latitude && userLocation?.longitude 
+    // Résout l'erreur TS2345 en garantissant que center est toujours un tuple [number, number]
+    const center: [number, number] = userLocation?.latitude && userLocation?.longitude 
       ? [userLocation.longitude, userLocation.latitude] 
       : DEFAULT_CENTER;
     
