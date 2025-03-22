@@ -8,7 +8,9 @@ export function useRegistrationForm(type: string | null): RegistrationResult {
   const { handleSubmit: submitHandler } = useRegistrationSubmit(type);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    await submitHandler(e, formData);
+    // Il est crucial de retourner explicitement le résultat de submitHandler
+    // pour que le type corresponde à celui attendu dans RegistrationResult
+    return await submitHandler(e, formData);
   };
 
   return {
