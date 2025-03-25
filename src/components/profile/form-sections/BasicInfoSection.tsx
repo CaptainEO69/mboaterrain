@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { useState, useEffect } from "react";
-import { CountryCode } from "libphonenumber-js";
+import { CountryCode, getCountryCallingCode } from "libphonenumber-js";
 
 interface BasicInfoSectionProps {
   userEmail: string;
@@ -23,18 +23,32 @@ export function BasicInfoSection({
   onInputChange,
 }: BasicInfoSectionProps) {
   const [countryCode, setCountryCode] = useState<CountryCode>("CM"); // Cameroun par défaut
+  const [displayPhoneNumber, setDisplayPhoneNumber] = useState("");
   
-  // Détecter le code pays si un numéro existe déjà
+  // Détecter le code pays et formater le numéro pour l'affichage
   useEffect(() => {
     if (phoneNumber) {
       // Si le numéro commence par +, essayons de détecter le pays
       if (phoneNumber.startsWith('+')) {
         // Logique simple: +237 -> CM (Cameroun), +33 -> FR (France), etc.
-        // Pour une implémentation plus complète, utiliser une bibliothèque comme libphonenumber-js
-        if (phoneNumber.startsWith('+237')) setCountryCode('CM');
-        else if (phoneNumber.startsWith('+33')) setCountryCode('FR');
+        if (phoneNumber.startsWith('+237')) {
+          setCountryCode('CM');
+          setDisplayPhoneNumber(phoneNumber.substring(4)); // Enlever le +237
+        }
+        else if (phoneNumber.startsWith('+33')) {
+          setCountryCode('FR');
+          setDisplayPhoneNumber(phoneNumber.substring(3)); // Enlever le +33
+        }
         // Ajouter d'autres cas selon les besoins
+        else {
+          // Cas par défaut
+          setDisplayPhoneNumber(phoneNumber);
+        }
+      } else {
+        setDisplayPhoneNumber(phoneNumber);
       }
+    } else {
+      setDisplayPhoneNumber("");
     }
   }, [phoneNumber]);
 
@@ -43,8 +57,36 @@ export function BasicInfoSection({
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Juste passer la valeur telle quelle
-    onInputChange(e);
+    // Formater le numéro avec l'indicatif du pays pour le stockage
+    const rawPhoneNumber = e.target.value;
+    
+    if (rawPhoneNumber) {
+      const formattedNumber = `+${getCountryCallingCode(countryCode)}${rawPhoneNumber}`;
+      
+      // Créer un nouvel événement avec le numéro formaté
+      const newEvent = {
+        ...e,
+        target: {
+          ...e.target,
+          name: "phone_number",
+          value: formattedNumber
+        }
+      } as React.ChangeEvent<HTMLInputElement>;
+      
+      onInputChange(newEvent);
+    } else {
+      // Si le champ est vide
+      const newEvent = {
+        ...e,
+        target: {
+          ...e.target,
+          name: "phone_number",
+          value: ""
+        }
+      } as React.ChangeEvent<HTMLInputElement>;
+      
+      onInputChange(newEvent);
+    }
   };
 
   return (
@@ -86,8 +128,7 @@ export function BasicInfoSection({
           label="Téléphone"
           countryCode={countryCode}
           onCountryChange={handleCountryChange}
-          value={phoneNumber}
-          name="phone_number"
+          value={displayPhoneNumber}
           onChange={handlePhoneChange}
           disabled={!isEditing}
         />

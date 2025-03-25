@@ -34,21 +34,14 @@ export function BasicInfoSection({ formData, setters }: BasicInfoSectionProps) {
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Extraire seulement le numéro, sans l'indicatif
-    let phoneNumber = e.target.value;
-    
-    // Formatage simplifié pour éviter les erreurs de validation
+    // Formater le numéro avec l'indicatif du pays pour le stockage
+    const phoneNumber = e.target.value;
     if (phoneNumber) {
-      // Supprimer tous les espaces et caractères non numériques sauf le +
-      phoneNumber = phoneNumber.replace(/[^\d+]/g, '');
-      
-      // S'assurer que le numéro commence par l'indicatif du pays
-      if (countryCode === "CM" && !phoneNumber.startsWith("+237") && !phoneNumber.startsWith("237")) {
-        phoneNumber = "237" + phoneNumber;
-      }
+      const formattedNumber = `+${getCountryCallingCode(countryCode)}${phoneNumber}`;
+      setters.setPhoneNumber(formattedNumber);
+    } else {
+      setters.setPhoneNumber("");
     }
-    
-    setters.setPhoneNumber(phoneNumber);
   };
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,6 +57,14 @@ export function BasicInfoSection({ formData, setters }: BasicInfoSectionProps) {
   const formattedDate = formData.birthDate 
     ? formData.birthDate.toISOString().split('T')[0] 
     : "";
+    
+  // Pour l'affichage dans le champ de téléphone, nous retirons l'indicatif du pays
+  const displayPhoneNumber = formData.phoneNumber
+    ? formData.phoneNumber.replace(new RegExp(`^\\+${getCountryCallingCode(countryCode)}`), "")
+    : "";
+
+  // Import pour accéder à la fonction getCountryCallingCode
+  const { getCountryCallingCode } = require("libphonenumber-js");
 
   return (
     <div className="flex flex-col space-y-4">
@@ -100,7 +101,7 @@ export function BasicInfoSection({ formData, setters }: BasicInfoSectionProps) {
           label="Téléphone"
           countryCode={countryCode}
           onCountryChange={handleCountryChange}
-          value={formData.phoneNumber}
+          value={displayPhoneNumber}
           onChange={handlePhoneChange}
           required
         />

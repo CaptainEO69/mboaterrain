@@ -1,7 +1,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css"; // Correct path to mapbox CSS
+import "mapbox-gl/dist/mapbox-gl.css"; // Correct import path for mapbox CSS
 import "./mapbox-css.css";
 import { MapMarkers } from "./MapMarkers";
 import { MapControls } from "./MapControls";
@@ -25,9 +25,12 @@ export function PropertyMap({
 
     // Déterminer le centre initial de la carte
     // Résout l'erreur TS2345 en garantissant que center est toujours un tuple [number, number]
-    const center: [number, number] = userLocation?.latitude && userLocation?.longitude 
-      ? [userLocation.longitude, userLocation.latitude] 
-      : DEFAULT_CENTER;
+    let center: [number, number];
+    if (userLocation?.latitude && userLocation?.longitude) {
+      center = [userLocation.longitude, userLocation.latitude];
+    } else {
+      center = DEFAULT_CENTER;
+    }
     
     // Créer la carte
     map.current = initializeMap(mapContainer.current, center);
