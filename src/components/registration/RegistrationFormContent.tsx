@@ -1,11 +1,12 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RegistrationFormData, RegistrationFormSetters } from "@/types/registration";
 import { BasicInfoSection } from "@/components/registration/form-sections/BasicInfoSection";
 import { PersonalInfoSection } from "@/components/registration/form-sections/PersonalInfoSection";
 import { ProfessionalSection } from "@/components/registration/form-sections/ProfessionalSection";
 import { VerificationForm } from "@/components/auth/VerificationForm";
 import { getCurrentUserType } from "./UserTypeSelector";
+import { toast } from "sonner";
 
 interface RegistrationFormContentProps {
   formData: RegistrationFormData;
@@ -33,14 +34,28 @@ export function RegistrationFormContent({
   const currentUserType = getCurrentUserType();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [propertyType, setPropertyType] = useState<string>("");
+  const [verificationCompleted, setVerificationCompleted] = useState<boolean>(false);
 
   const handlePropertyTypeChange = (value: string) => {
     setPropertyType(value);
     setters.setPropertyType(value);
   };
 
+  const handleVerificationSuccess = () => {
+    setVerificationCompleted(true);
+    toast.success("Vérification réussie! Vous pouvez maintenant continuer.");
+    
+    // Appeler la fonction de succès fournie par les props
+    if (verificationProps.onVerificationSuccess) {
+      verificationProps.onVerificationSuccess();
+    }
+  };
+
   if (isAwaitingVerification) {
-    return <VerificationForm {...verificationProps} />;
+    return <VerificationForm 
+      {...verificationProps} 
+      onVerificationSuccess={handleVerificationSuccess}
+    />;
   }
 
   return (

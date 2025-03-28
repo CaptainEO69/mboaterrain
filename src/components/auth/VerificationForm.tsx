@@ -31,6 +31,7 @@ export function VerificationForm({
 }: VerificationFormProps) {
   const [timer, setTimer] = useState(60);
   const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(null);
+  const [verificationResult, setVerificationResult] = useState<boolean | null>(null);
 
   // Set up the timer when component mounts
   useEffect(() => {
@@ -58,12 +59,22 @@ export function VerificationForm({
       return;
     }
     
-    console.log("Attempting to verify code:", verificationCode);
-    if (verifyCode(verificationCode)) {
-      console.log("Verification successful");
-      onVerificationSuccess();
-    } else {
-      console.log("Verification failed");
+    console.log("Tentative de vérification du code:", verificationCode);
+    try {
+      const result = verifyCode(verificationCode);
+      setVerificationResult(result);
+      
+      if (result) {
+        console.log("Vérification réussie");
+        toast.success("Vérification réussie");
+        onVerificationSuccess();
+      } else {
+        console.log("Échec de la vérification");
+        toast.error("Code incorrect. Veuillez réessayer.");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la vérification:", error);
+      toast.error("Une erreur s'est produite lors de la vérification");
     }
   };
 
@@ -91,8 +102,9 @@ export function VerificationForm({
       }, 1000);
       
       setTimerInterval(interval);
+      toast.success("Un nouveau code a été envoyé");
     } catch (error) {
-      console.error("Error resending code:", error);
+      console.error("Erreur lors de l'envoi du code:", error);
       toast.error("Erreur lors de l'envoi du code");
     }
   };
@@ -114,7 +126,8 @@ export function VerificationForm({
       <div className="text-center">
         <h2 className="text-lg font-semibold">Vérification</h2>
         <p className="text-sm text-gray-500">
-          Nous avons envoyé un code de vérification à votre email ({email}) et votre téléphone ({formatPhoneNumber(phoneNumber)}).
+          Nous avons envoyé un code de vérification à votre téléphone ({formatPhoneNumber(phoneNumber)})
+          {email && ` et votre email (${email})`}.
         </p>
       </div>
 

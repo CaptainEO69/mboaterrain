@@ -6,6 +6,12 @@ const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
 const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
 const twilioPhoneNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
 
+console.log("Twilio credentials available:", {
+  accountSid: !!accountSid,
+  authToken: !!authToken,
+  twilioPhoneNumber: !!twilioPhoneNumber
+});
+
 const twilio = new Twilio(accountSid, authToken);
 
 const corsHeaders = {
@@ -55,8 +61,6 @@ serve(async (req) => {
     console.log("Attempting to send verification SMS to:", phoneNumber);
     console.log("Verification code:", code);
     console.log("Twilio phone number:", twilioPhoneNumber);
-    console.log("Twilio SID available:", !!accountSid);
-    console.log("Twilio Auth Token available:", !!authToken);
 
     // Improved phone number formatting
     let formattedPhone = phoneNumber;

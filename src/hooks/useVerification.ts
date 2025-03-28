@@ -24,7 +24,7 @@ export function useVerification() {
       localStorage.setItem("verification_code", code);
       localStorage.setItem("verification_expires", (Date.now() + 600000).toString()); // 10 minutes
       
-      console.log("Sending SMS verification with code:", code, "to phone:", phoneNumber);
+      console.log("Envoi du code de vérification par SMS:", code, "au numéro:", phoneNumber);
       
       // Format the phone number correctly
       let formattedPhone = phoneNumber;
@@ -38,7 +38,7 @@ export function useVerification() {
         }
       }
       
-      console.log("Using formatted phone number for SMS:", formattedPhone);
+      console.log("Numéro de téléphone formaté pour l'envoi SMS:", formattedPhone);
       
       // Appel à la fonction Edge Function
       const { data, error } = await supabase.functions.invoke("send-verification-sms", {
@@ -46,17 +46,17 @@ export function useVerification() {
       });
 
       if (error) {
-        console.error("Error response from function:", error);
-        throw error;
+        console.error("Erreur de la fonction d'envoi SMS:", error);
+        throw new Error(`Erreur lors de l'envoi du SMS: ${error.message}`);
       }
       
-      console.log("SMS verification function response:", data);
+      console.log("Réponse de la fonction d'envoi SMS:", data);
       
       setIsCodeSent(true);
       toast.success("Un code de vérification a été envoyé par SMS");
       return true;
     } catch (error: any) {
-      console.error("Error sending SMS verification:", error);
+      console.error("Erreur lors de l'envoi du SMS de vérification:", error);
       toast.error(error.message || "Erreur lors de l'envoi du SMS");
       return false;
     } finally {
@@ -76,7 +76,7 @@ export function useVerification() {
       localStorage.setItem("verification_code", code);
       localStorage.setItem("verification_expires", (Date.now() + 600000).toString()); // 10 minutes
       
-      console.log("Sending email verification with code:", code, "to email:", email);
+      console.log("Envoi du code de vérification par email:", code, "à l'adresse:", email);
       
       // Appel à la fonction Edge Function
       const { data, error } = await supabase.functions.invoke("send-verification-email", {
@@ -84,17 +84,17 @@ export function useVerification() {
       });
 
       if (error) {
-        console.error("Error sending email:", error);
-        throw error;
+        console.error("Erreur lors de l'envoi de l'email:", error);
+        throw new Error(`Erreur lors de l'envoi de l'email: ${error.message}`);
       }
       
-      console.log("Email verification function response:", data);
+      console.log("Réponse de la fonction d'envoi d'email:", data);
       
       setIsCodeSent(true);
       toast.success("Un code de vérification a été envoyé par email");
       return true;
     } catch (error: any) {
-      console.error("Error sending email verification:", error);
+      console.error("Erreur lors de l'envoi de l'email de vérification:", error);
       toast.error(error.message || "Erreur lors de l'envoi de l'email");
       return false;
     } finally {
@@ -110,7 +110,7 @@ export function useVerification() {
       const storedCode = localStorage.getItem("verification_code");
       const expiresStr = localStorage.getItem("verification_expires");
       
-      console.log("Verifying code:", code, "against stored code:", storedCode);
+      console.log("Vérification du code:", code, "par rapport au code stocké:", storedCode);
       
       if (!storedCode || !expiresStr) {
         toast.error("Aucun code de vérification trouvé");
@@ -135,7 +135,7 @@ export function useVerification() {
       toast.success("Vérification réussie");
       return true;
     } catch (error) {
-      console.error("Error verifying code:", error);
+      console.error("Erreur lors de la vérification du code:", error);
       toast.error("Erreur lors de la vérification du code");
       return false;
     } finally {
