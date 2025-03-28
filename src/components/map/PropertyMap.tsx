@@ -24,13 +24,18 @@ export function PropertyMap({
     if (!mapContainer.current || map.current) return;
 
     // Déterminer le centre initial de la carte
-    let center: [number, number];
+    let centerLng: number;
+    let centerLat: number;
+
     if (userLocation?.latitude && userLocation?.longitude) {
-      // On s'assure que center est un tuple de deux nombres
-      center = [userLocation.longitude, userLocation.latitude] as [number, number];
+      centerLng = userLocation.longitude;
+      centerLat = userLocation.latitude;
     } else {
-      center = DEFAULT_CENTER;
+      [centerLng, centerLat] = DEFAULT_CENTER;
     }
+    
+    // Création d'un tuple explicite pour le centre
+    const center: [number, number] = [centerLng, centerLat];
     
     // Créer la carte
     map.current = initializeMap(mapContainer.current, center);
