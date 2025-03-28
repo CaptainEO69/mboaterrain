@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PropertyFilters } from "@/components/PropertySearchForm";
+import { toast } from "sonner";
 
 interface BasePropertyImage {
   image_url: string;
@@ -37,6 +38,9 @@ export function useProperties(transactionType: "sale" | "rent") {
 
   const fetchProperties = async (filters: PropertyFilters = {}) => {
     try {
+      console.log("Chargement des propriétés avec les filtres:", filters);
+      setLoading(true);
+      
       const query = supabase
         .from("properties")
         .select("*, property_images(image_url, is_main)")
@@ -54,7 +58,13 @@ export function useProperties(transactionType: "sale" | "rent") {
 
       const { data: propertiesData, error } = await query.order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erreur lors du chargement des propriétés:", error);
+        toast.error("Erreur lors du chargement des propriétés");
+        throw error;
+      }
+
+      console.log("Propriétés récupérées:", propertiesData?.length || 0);
 
       // Cast the response data to the correct type with explicit type checking
       const formattedProperties: PropertyWithImages[] = (propertiesData || []).map(property => ({
@@ -69,6 +79,10 @@ export function useProperties(transactionType: "sale" | "rent") {
       }));
 
       setProperties(formattedProperties);
+      
+      if (formattedProperties.length === 0) {
+        toast.info("Aucune propriété ne correspond à vos critères");
+      }
     } catch (error: any) {
       console.error("Erreur lors du chargement des propriétés:", error.message);
     } finally {

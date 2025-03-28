@@ -7,35 +7,36 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
-import { useRegionSelector } from "@/hooks/useRegionSelector";
 import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
+
+// Données des régions du Cameroun
+const CAMEROON_REGIONS = [
+  { id: "1", name: "Adamaoua" },
+  { id: "2", name: "Centre" },
+  { id: "3", name: "Est" },
+  { id: "4", name: "Extrême-Nord" },
+  { id: "5", name: "Littoral" },
+  { id: "6", name: "Nord" },
+  { id: "7", name: "Nord-Ouest" },
+  { id: "8", name: "Ouest" },
+  { id: "9", name: "Sud" },
+  { id: "10", name: "Sud-Ouest" }
+];
 
 interface RegionSelectProps {
   onRegionChange: (region: string) => void;
 }
 
 export function RegionSelect({ onRegionChange }: RegionSelectProps) {
-  const { regions, loading, error, useFallback } = useRegionSelector();
   const [selectedRegion, setSelectedRegion] = useState<string>("");
-  const [retryCount, setRetryCount] = useState(0);
+  const [loading, setLoading] = useState(false);
 
-  // Réessayer le chargement si nécessaire
+  // Debug
   useEffect(() => {
-    if (error && retryCount < 2) {
-      const timer = setTimeout(() => {
-        console.log(`Tentative de rechargement des régions (${retryCount + 1}/2)...`);
-        setRetryCount(prev => prev + 1);
-      }, 2000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [error, retryCount]);
-
-  // Effets de débogage
-  useEffect(() => {
-    console.log("État du RegionSelect:", { loading, regionsCount: regions.length, useFallback, error: error?.message });
-  }, [loading, regions, useFallback, error]);
+    console.log("RegionSelect mounted, regions available:", CAMEROON_REGIONS);
+  }, []);
 
   const handleRegionChange = (value: string) => {
     console.log("Région sélectionnée:", value);
@@ -53,28 +54,14 @@ export function RegionSelect({ onRegionChange }: RegionSelectProps) {
       onValueChange={handleRegionChange}
     >
       <SelectTrigger className="w-full">
-        {loading ? (
-          <div className="flex items-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <span>Chargement des régions...</span>
-          </div>
-        ) : (
-          <SelectValue placeholder="Région" />
-        )}
+        <SelectValue placeholder="Sélectionnez une région" />
       </SelectTrigger>
       <SelectContent>
-        {regions && regions.length > 0 ? (
-          regions.map((region) => (
-            <SelectItem key={region.id} value={region.name}>
-              {region.name}
-              {useFallback && region.id.startsWith('fallback') && ' (données locales)'}
-            </SelectItem>
-          ))
-        ) : (
-          <SelectItem value="no-regions" disabled>
-            {loading ? "Chargement..." : "Aucune région disponible"}
+        {CAMEROON_REGIONS.map((region) => (
+          <SelectItem key={region.id} value={region.name}>
+            {region.name}
           </SelectItem>
-        )}
+        ))}
       </SelectContent>
     </Select>
   );

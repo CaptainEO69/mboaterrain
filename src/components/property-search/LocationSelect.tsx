@@ -4,7 +4,6 @@ import { RegionSelect } from "./RegionSelect";
 import { CitySelect } from "./CitySelect";
 import { ManualCityInput } from "./ManualCityInput";
 import { LocationTextFields } from "./LocationTextFields";
-import { LocationDisplay } from "./LocationDisplay";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 

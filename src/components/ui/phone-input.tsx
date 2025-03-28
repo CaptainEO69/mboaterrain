@@ -14,6 +14,9 @@ interface PhoneInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 const countries = getCountries();
 
+// Fonction utilisée plus loin
+const getCountryCallingCodeFunc = getCountryCallingCode;
+
 export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
   ({ className, countryCode, onCountryChange, onChange, label, ...props }, ref) => {
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,11 +24,11 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
       let value = e.target.value.replace(/[^\d+]/g, "");
       
       // Supprimer l'indicatif du pays s'il est présent au début
-      const countryPrefix = `+${getCountryCallingCode(countryCode)}`;
+      const countryPrefix = `+${getCountryCallingCodeFunc(countryCode)}`;
       if (value.startsWith(countryPrefix)) {
         value = value.substring(countryPrefix.length);
-      } else if (value.startsWith(getCountryCallingCode(countryCode))) {
-        value = value.substring(getCountryCallingCode(countryCode).length);
+      } else if (value.startsWith(getCountryCallingCodeFunc(countryCode))) {
+        value = value.substring(getCountryCallingCodeFunc(countryCode).length);
       }
       
       // Si le numéro commence par un 0, le supprimer également
@@ -61,7 +64,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
                   <div className="flex items-center gap-2">
                     <span className="text-xs">{country}</span>
                     <span className="text-xs text-muted-foreground">
-                      +{getCountryCallingCode(country)}
+                      +{getCountryCallingCodeFunc(country)}
                     </span>
                   </div>
                 </SelectItem>

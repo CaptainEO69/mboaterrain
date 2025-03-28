@@ -1,7 +1,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css"; // Correct import path for mapbox CSS
+import "mapbox-gl/dist/mapbox-gl.css"; // Correction du chemin d'importation
 import "./mapbox-css.css";
 import { MapMarkers } from "./MapMarkers";
 import { MapControls } from "./MapControls";
@@ -24,7 +24,7 @@ export function PropertyMap({
     if (!mapContainer.current || map.current) return;
 
     // Déterminer le centre initial de la carte
-    // Résout l'erreur TS2345 en garantissant que center est toujours un tuple [number, number]
+    // Résout l'erreur TS2322 en garantissant que center est toujours un tuple [number, number]
     let center: [number, number];
     if (userLocation?.latitude && userLocation?.longitude) {
       center = [userLocation.longitude, userLocation.latitude];

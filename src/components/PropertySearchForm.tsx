@@ -5,6 +5,7 @@ import { PropertyTypeSelect } from "./property-search/PropertyTypeSelect";
 import { FurnishedSelect } from "./property-search/FurnishedSelect";
 import { LocationSelect } from "./property-search/LocationSelect";
 import { PropertyFilters } from "./property-search/PropertyFilters";
+import { toast } from "sonner";
 
 export type PropertyFilters = {
   propertyType?: string;
@@ -28,7 +29,9 @@ export function PropertySearchForm({ transactionType, onSearch }: PropertySearch
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Recherche soumise avec les filtres:", filters);
     onSearch(filters);
+    toast.success("Recherche lancée");
   };
 
   return (
@@ -69,7 +72,10 @@ export function PropertySearchForm({ transactionType, onSearch }: PropertySearch
         </div>
       </div>
 
-      <Button type="submit" className="w-full bg-cmr-green hover:bg-cmr-green/90">
+      <Button 
+        type="submit" 
+        className="w-full bg-cmr-green hover:bg-cmr-green/90 text-white font-medium py-3"
+      >
         Rechercher
       </Button>
     </form>
