@@ -1,7 +1,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css"; // Correction du chemin d'importation
+import "mapbox-gl/dist/mapbox-gl.css";
 import "./mapbox-css.css";
 import { MapMarkers } from "./MapMarkers";
 import { MapControls } from "./MapControls";
@@ -27,7 +27,8 @@ export function PropertyMap({
     // Résout l'erreur TS2322 en garantissant que center est toujours un tuple [number, number]
     let center: [number, number];
     if (userLocation?.latitude && userLocation?.longitude) {
-      center = [userLocation.longitude, userLocation.latitude];
+      // Utiliser une conversion explicite pour garantir le type [number, number]
+      center = [userLocation.longitude, userLocation.latitude] as [number, number];
     } else {
       center = DEFAULT_CENTER;
     }
