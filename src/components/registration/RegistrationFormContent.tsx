@@ -31,6 +31,13 @@ export function RegistrationFormContent({
   verificationProps,
 }: RegistrationFormContentProps) {
   const currentUserType = getCurrentUserType();
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [propertyType, setPropertyType] = useState<string>("");
+
+  const handlePropertyTypeChange = (value: string) => {
+    setPropertyType(value);
+    setters.setPropertyType(value);
+  };
 
   if (isAwaitingVerification) {
     return <VerificationForm {...verificationProps} />;
@@ -40,7 +47,11 @@ export function RegistrationFormContent({
     <>
       {currentUserType && (
         <>
-          <BasicInfoSection formData={formData} setters={setters} />
+          <BasicInfoSection 
+            errors={errors} 
+            onPropertyTypeChange={handlePropertyTypeChange}
+            isRental={false}
+          />
 
           {(currentUserType === "owner" || 
             currentUserType === "seller" || 

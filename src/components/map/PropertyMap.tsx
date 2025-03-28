@@ -24,10 +24,9 @@ export function PropertyMap({
     if (!mapContainer.current || map.current) return;
 
     // Déterminer le centre initial de la carte
-    // Résout l'erreur TS2322 en garantissant que center est toujours un tuple [number, number]
     let center: [number, number];
     if (userLocation?.latitude && userLocation?.longitude) {
-      // Utiliser une conversion explicite pour garantir le type [number, number]
+      // On s'assure que center est un tuple de deux nombres
       center = [userLocation.longitude, userLocation.latitude] as [number, number];
     } else {
       center = DEFAULT_CENTER;
