@@ -61,11 +61,12 @@ export function RegistrationFormContent({
     setCountryCode(code);
   };
 
+  // Correction ici : Utilisation de countryCode au lieu de code
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawPhoneNumber = e.target.value;
     if (rawPhoneNumber) {
       // Utiliser l'indicatif du pays sélectionné
-      setters.setPhoneNumber(`+${code}${rawPhoneNumber}`);
+      setters.setPhoneNumber(`+${countryCode}${rawPhoneNumber}`);
     } else {
       setters.setPhoneNumber("");
     }
