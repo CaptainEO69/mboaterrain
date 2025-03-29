@@ -1,4 +1,3 @@
-
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,8 +17,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useState } from "react";
-// Import au début du fichier pour éviter l'erreur "used before declaration"
-import { getCountryCallingCode } from "libphonenumber-js";
 
 interface BasicInfoSectionProps {
   errors: Record<string, string>;

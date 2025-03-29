@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from "react";
 import { RegistrationFormData, RegistrationFormSetters } from "@/types/registration";
-import { BasicInfoSection } from "@/components/registration/form-sections/BasicInfoSection";
 import { PersonalInfoSection } from "@/components/registration/form-sections/PersonalInfoSection";
 import { ProfessionalSection } from "@/components/registration/form-sections/ProfessionalSection";
 import { VerificationForm } from "@/components/auth/VerificationForm";
@@ -12,6 +11,12 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { CountryCode } from "libphonenumber-js";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
 interface RegistrationFormContentProps {
   formData: RegistrationFormData;
@@ -38,14 +43,8 @@ export function RegistrationFormContent({
 }: RegistrationFormContentProps) {
   const currentUserType = getCurrentUserType();
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [propertyType, setPropertyType] = useState<string>("");
   const [verificationCompleted, setVerificationCompleted] = useState<boolean>(false);
   const [countryCode, setCountryCode] = useState<CountryCode>("CM");
-
-  const handlePropertyTypeChange = (value: string) => {
-    setPropertyType(value);
-    setters.setPropertyType(value);
-  };
 
   const handleVerificationSuccess = () => {
     setVerificationCompleted(true);
@@ -61,7 +60,6 @@ export function RegistrationFormContent({
     setCountryCode(code);
   };
 
-  // Correction ici : Utilisation de countryCode au lieu de code
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawPhoneNumber = e.target.value;
     if (rawPhoneNumber) {
@@ -131,6 +129,40 @@ export function RegistrationFormContent({
         />
 
         <div className="space-y-2">
+          <Label htmlFor="birthDate">Date de naissance</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal",
+                  !formData.birthDate && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {formData.birthDate ? (
+                  format(formData.birthDate, "PPP", { locale: fr })
+                ) : (
+                  <span>Sélectionner une date</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={formData.birthDate || undefined}
+                onSelect={(date) => setters.setBirthDate(date)}
+                initialFocus
+                captionLayout="dropdown-buttons"
+                fromYear={1930}
+                toYear={2006}
+                locale={fr}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="password">Mot de passe</Label>
           <Input
             id="password"
@@ -144,12 +176,6 @@ export function RegistrationFormContent({
 
       {currentUserType && (
         <>
-          <BasicInfoSection 
-            errors={errors} 
-            onPropertyTypeChange={handlePropertyTypeChange}
-            isRental={false}
-          />
-
           {(currentUserType === "owner" || 
             currentUserType === "seller" || 
             currentUserType === "surveyor" || 
