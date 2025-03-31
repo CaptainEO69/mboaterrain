@@ -23,14 +23,6 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
       // Supprimer les caractères non numériques sauf +
       let value = e.target.value.replace(/[^\d+]/g, "");
       
-      // Supprimer l'indicatif du pays s'il est présent au début
-      const countryPrefix = `+${getCountryCallingCodeFunc(countryCode)}`;
-      if (value.startsWith(countryPrefix)) {
-        value = value.substring(countryPrefix.length);
-      } else if (value.startsWith(getCountryCallingCodeFunc(countryCode))) {
-        value = value.substring(getCountryCallingCodeFunc(countryCode).length);
-      }
-      
       // Si le numéro commence par un 0, le supprimer également
       if (value.startsWith("0")) {
         value = value.substring(1);
@@ -71,13 +63,18 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
               ))}
             </SelectContent>
           </Select>
-          <Input
-            className={cn("", className)}
-            onChange={handlePhoneChange}
-            ref={ref}
-            placeholder="Numéro de téléphone"
-            {...props}
-          />
+          <div className="relative flex-grow">
+            <Input
+              className={cn("pl-14", className)}
+              onChange={handlePhoneChange}
+              ref={ref}
+              placeholder="Numéro de téléphone"
+              {...props}
+            />
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+              +{getCountryCallingCodeFunc(countryCode)}
+            </div>
+          </div>
         </div>
       </div>
     );

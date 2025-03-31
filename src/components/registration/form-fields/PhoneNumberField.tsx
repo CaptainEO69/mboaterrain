@@ -1,6 +1,5 @@
 
 import React from "react";
-import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { CountryCode } from "libphonenumber-js";
 
@@ -19,12 +18,8 @@ export function PhoneNumberField({
 }: PhoneNumberFieldProps) {
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawPhoneNumber = e.target.value;
-    if (rawPhoneNumber) {
-      // Utiliser l'indicatif du pays sélectionné
-      onChange(`+${countryCode}${rawPhoneNumber}`);
-    } else {
-      onChange("");
-    }
+    // Formater le numéro complet avec l'indicatif du pays
+    onChange(rawPhoneNumber);
   };
 
   return (
@@ -32,7 +27,7 @@ export function PhoneNumberField({
       label="Téléphone"
       countryCode={countryCode}
       onCountryChange={onCountryChange}
-      value={value.replace(/^\+\d+/, "")}
+      value={value}
       onChange={handlePhoneChange}
     />
   );
