@@ -147,7 +147,10 @@ export function RegistrationFormContent({
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent 
+              className="w-auto p-0 bg-popover shadow-md border border-border" 
+              align="start"
+            >
               <Calendar
                 mode="single"
                 selected={formData.birthDate || undefined}
