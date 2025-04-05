@@ -28,6 +28,13 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
         value = value.substring(1);
       }
       
+      // Supprimer le préfixe du pays s'il est présent
+      // Par exemple, supprimer +237 si le pays est le Cameroun
+      const prefix = `+${getCountryCallingCodeFunc(countryCode)}`;
+      if (value.startsWith(prefix)) {
+        value = value.substring(prefix.length);
+      }
+      
       // Mettre à jour le champ avec la valeur nettoyée
       if (onChange) {
         const newEvent = {

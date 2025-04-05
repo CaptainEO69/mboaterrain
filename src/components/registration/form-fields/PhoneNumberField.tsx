@@ -18,7 +18,7 @@ export function PhoneNumberField({
 }: PhoneNumberFieldProps) {
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawPhoneNumber = e.target.value;
-    // Formater le numéro complet avec l'indicatif du pays
+    // Passer simplement le numéro sans préfixe car il sera ajouté ailleurs
     onChange(rawPhoneNumber);
   };
 
